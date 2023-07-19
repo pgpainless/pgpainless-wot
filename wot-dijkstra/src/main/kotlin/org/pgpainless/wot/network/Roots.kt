@@ -12,6 +12,8 @@ class Roots {
     // Map for efficient lookup by Fingerprint
     private val roots: Map<Fingerprint, Root>
 
+    constructor(root: Root): this(listOf(root))
+
     constructor(roots: List<Root>) {
         this.roots = roots.associateBy { it.fingerprint }
     }
