@@ -1,0 +1,23 @@
+// SPDX-FileCopyrightText: 2021 Paul Schaub <info@pgpainless.org>
+//
+// SPDX-License-Identifier: CC0-1.0
+
+allprojects {
+    ext {
+        shortVersion = '1.0.0'
+        isSnapshot = true
+        pgpainlessMinAndroidSdk = 10
+        javaSourceCompatibility = 1.8
+        bouncyCastleVersion = '1.75'
+        bouncyPgVersion = bouncyCastleVersion
+        junitVersion = '5.8.2'
+        kotlinVersion = '1.8.10'
+        logbackVersion = '1.2.11'
+        certDJavaVersion = '0.2.2'
+        pgpainlessCertDVersion = '0.2.2'
+        pgpainlessVersion = '1.6.1-SNAPSHOT'
+        mockitoVersion = '4.5.1'
+        slf4jVersion = '1.7.36'
+        sopJavaVersion = '7.0.0'
+    }
+}

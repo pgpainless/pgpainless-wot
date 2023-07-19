@@ -1,0 +1,25 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: PGPainless-WOT
+Upstream-Contact: Paul Schaub <info@pgpainless.org>
+Source: https://pgpainless.org
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
+
+# Gradle build tool
+Files: gradle*
+Copyright: 2015 the original author or authors.
+License: Apache-2.0
+
+# PGPainless Test Vectors
+Files: pgpainless-wot/src/testFixtures/resources/test_vectors/*
+Copyright: 2ß23 Paul Schaub
+License: Apache-2.0
+
+# Sequoia PGP Test Vectors
+Files: sequoia-wot-vectors/src/testFixtures/resources/org/sequoia_pgp/wot/vectors/*
+Copyright: 2022 Neal Walfield
+License: BSD-3-Clause

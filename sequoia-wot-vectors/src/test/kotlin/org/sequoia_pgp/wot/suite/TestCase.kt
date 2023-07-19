@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Paul Schaub <vanitasvitae@fsfe.org>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 package org.sequoia_pgp.wot.suite
 
 import org.junit.jupiter.api.Named

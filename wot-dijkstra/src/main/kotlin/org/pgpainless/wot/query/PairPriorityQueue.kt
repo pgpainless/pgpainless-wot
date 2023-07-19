@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Heiko Schäfer <heiko@schaefer.name>
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.pgpainless.wot.query
 
 import java.util.*
