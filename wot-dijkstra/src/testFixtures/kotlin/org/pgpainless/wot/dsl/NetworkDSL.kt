@@ -5,6 +5,7 @@
 package org.pgpainless.wot.dsl
 
 import org.pgpainless.wot.network.*
+import org.pgpainless.wot.query.Path
 import java.util.*
 
 /**
@@ -200,5 +201,11 @@ interface NetworkDSL {
         val builder = Network.builder()
         builder.builderAction()
         return builder.build()
+    }
+
+    fun Path.assertNodeFingerprints(fingerprints: List<Fingerprint>): Boolean {
+        return root.fingerprint == fingerprints[0] && certificates.withIndex().all { (i, node) ->
+            fingerprints[i + 1] == node.fingerprint
+        }
     }
 }
