@@ -20,6 +20,6 @@ Copyright: 2ß23 Paul Schaub
 License: Apache-2.0
 
 # Sequoia PGP Test Vectors
-Files: sequoia-wot-vectors/src/testFixtures/resources/org/sequoia_pgp/wot/vectors/*
+Files: sequoia-wot-vectors/src/main/resources/org/sequoia_pgp/wot/vectors/*
 Copyright: 2022 Neal Walfield
 License: BSD-3-Clause
