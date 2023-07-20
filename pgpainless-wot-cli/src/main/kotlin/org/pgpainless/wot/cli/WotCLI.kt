@@ -17,6 +17,7 @@ import org.pgpainless.wot.network.Fingerprint
 import org.pgpainless.wot.network.ReferenceTime
 import org.pgpainless.wot.network.Root
 import org.pgpainless.wot.network.Roots
+import pgp.cert_d.BaseDirectoryProvider
 import pgp.cert_d.PGPCertificateStoreAdapter
 import pgp.cert_d.SpecialNames
 import pgp.cert_d.subkey_lookup.InMemorySubkeyLookupFactory
@@ -54,8 +55,9 @@ class WotCLI: Callable<Int> {
         @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true)
         var keyring: Array<File>? = null
 
-        @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], required = true)
-        var pgpCertD: File? = null
+        @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], arity = "0..1",
+            fallbackValue = "")
+        var pgpCertD: String? = null
 
         @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])
         var gpg = false
@@ -152,8 +154,15 @@ class WotCLI: Callable<Int> {
                 )
             }
 
+            if (mCertificateSource.pgpCertD == "") {
+                val certDFile = BaseDirectoryProvider.getDefaultBaseDir()
+                val certD = PGPainlessCertD.fileBased(
+                    certDFile,
+                    InMemorySubkeyLookupFactory())
+                return PGPCertificateStoreAdapter(certD)
+            }
             val certD = PGPainlessCertD.fileBased(
-                    mCertificateSource.pgpCertD,
+                    File(mCertificateSource.pgpCertD!!),
                     InMemorySubkeyLookupFactory())
             return PGPCertificateStoreAdapter(certD)
         }
