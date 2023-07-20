@@ -109,6 +109,10 @@ allprojects {
 }
 
 subprojects {
+
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
@@ -120,6 +124,76 @@ subprojects {
     task testsJar(type: Jar, dependsOn: testClasses) {
         classifier = 'tests'
         from sourceSets.test.output
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+                artifact testsJar
+                pom {
+                    name = 'PGPainless-WOT'
+                    description = 'Web of Trust Implementation using PGPainless'
+                    url = 'https://github.com/pgpainless/pgpainless-wot'
+                    inceptionYear = '2022'
+
+                    scm {
+                        url = 'https://github.com/pgpainless/pgpainless-wot'
+                        connection = 'scm:https://github.com/pgpainless/pgpainless-wot'
+                        developerConnection = 'scm:git://github.com/pgpainless/pgpainless-wot.git'
+                    }
+
+                    licenses {
+                        if (project.name == "sequoia-wot-vectors") {
+                            license {
+                                name = 'The 3-Clause BSD License'
+                                url = 'https://opensource.org/license/bsd-3-clause/'
+                                distribution = 'repo'
+                            }
+                        } else {
+                            license {
+                                name = 'The Apache Software License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                distribution = 'repo'
+                            }
+                        }
+
+                    }
+
+                    developers {
+                        developer {
+                            id = 'vanitasvitae'
+                            name = 'Paul Schaub'
+                            email = 'vanitasvitae@fsfe.org'
+                        }
+                        developer {
+                            id = 'hkos'
+                            name = 'Heiko Schäfer'
+                            email = 'heiko@schaefer.name'
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            if (sonatypeCredentialsAvailable) {
+                maven {
+                    url isSnapshot ? sonatypeSnapshotUrl : sonatypeStagingUrl
+                    credentials {
+                        username = sonatypeUsername
+                        password = sonatypePassword
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        useGpgCmd()
+        required { signingRequired }
+        sign publishing.publications.mavenJava
     }
 }
 
