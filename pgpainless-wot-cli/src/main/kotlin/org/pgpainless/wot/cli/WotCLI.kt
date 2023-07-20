@@ -24,7 +24,6 @@ import pgp.certificate_store.PGPCertificateStore
 import picocli.CommandLine
 import picocli.CommandLine.*
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
@@ -227,9 +226,6 @@ class WotCLI: Callable<Int> {
         fun execute(args: Array<String>): Int {
             return CommandLine(WotCLI()).execute(*args)
         }
-
-        @JvmStatic
-        val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
     }
 
     override fun toString(): String {
