@@ -6,13 +6,12 @@ package org.pgpainless.wot.cli.subcommands
 
 import org.pgpainless.wot.api.AuthenticateAPI
 import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.query.Path
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
 import picocli.CommandLine.ParentCommand
-import java.text.SimpleDateFormat
 import java.util.concurrent.Callable
 
 /**
@@ -30,8 +29,8 @@ class AuthenticateCmd: Callable<Int> {
     /**
      * Fingerprint of the certificate.
      */
-    @Parameters(index = "0")
-    lateinit var fingerprint: String
+    @Parameters(index = "0", converter = [FingerprintConverter::class])
+    lateinit var fingerprint: Fingerprint
 
     /**
      * User-ID to authenticate.
@@ -50,10 +49,12 @@ class AuthenticateCmd: Callable<Int> {
      * @return exit code
      */
     override fun call(): Int {
-        val result = parent.api.authenticate(AuthenticateAPI.Arguments(
-                Fingerprint(fingerprint), userId, email))
+        val result = parent.api.authenticate(
+            AuthenticateAPI.Arguments(fingerprint, userId, email)
+        )
 
-        println(parent.formatter.format(result))
+        println(parent.outputFormatter.format(result))
+
         return if (result.acceptable) 0 else 1
     }
 }

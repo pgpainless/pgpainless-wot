@@ -23,7 +23,7 @@ class ListCmd: Callable<Int> {
     override fun call(): Int {
         val result = parent.api.list()
 
-        println(parent.formatter.format(result))
+        println(parent.outputFormatter.format(result))
         return 0
     }
 }

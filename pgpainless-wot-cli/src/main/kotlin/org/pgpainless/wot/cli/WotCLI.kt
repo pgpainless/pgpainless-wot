@@ -6,13 +6,15 @@ package org.pgpainless.wot.cli
 
 import org.pgpainless.PGPainless
 import org.pgpainless.certificate_store.PGPainlessCertD
-import org.pgpainless.util.DateUtil
 import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.WebOfTrust
-import org.pgpainless.wot.cli.format.Formatter
 import org.pgpainless.wot.api.WoTAPI
+import org.pgpainless.wot.cli.converters.ReferenceTimeConverter
+import org.pgpainless.wot.cli.converters.RootConverter
+import org.pgpainless.wot.cli.format.Formatter
 import org.pgpainless.wot.cli.format.SQWOTFormatter
 import org.pgpainless.wot.cli.subcommands.*
+import org.pgpainless.wot.letIf
 import org.pgpainless.wot.network.Fingerprint
 import org.pgpainless.wot.network.ReferenceTime
 import org.pgpainless.wot.network.Root
@@ -34,34 +36,25 @@ import kotlin.system.exitProcess
  * @see <a href="https://gitlab.com/sequoia-pgp/sequoia-wot/">Sequoia Web of Trust Reference Implementation</a>
  */
 @Command(name = "pgpainless-wot",
-        subcommands = [
-            AuthenticateCmd::class,
-            IdentifyCmd::class,
-            ListCmd::class,
-            LookupCmd::class,
-            PathCmd::class,
-            HelpCommand::class
-        ]
+    subcommands = [
+        AuthenticateCmd::class,
+        IdentifyCmd::class,
+        ListCmd::class,
+        LookupCmd::class,
+        PathCmd::class,
+        HelpCommand::class
+    ]
 )
 class WotCLI: Callable<Int> {
 
-    @Option(names = ["--trust-root", "-r"])
-    var mTrustRoot: Array<String> = arrayOf()
+    @Option(names = ["--trust-root", "-r"], converter = [RootConverter::class])
+    var optTrustRoot: List<Root> = listOf()
+
+    @ArgGroup(exclusive = true)
+    var optTrustAmount: TrustAmount = TrustAmount()
 
     @ArgGroup(exclusive = true, multiplicity = "1")
-    lateinit var mCertificateSource: CertificateSource
-
-    class CertificateSource {
-        @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true)
-        var keyring: Array<File>? = null
-
-        @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], arity = "0..1",
-            fallbackValue = "")
-        var pgpCertD: String? = null
-
-        @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])
-        var gpg = false
-    }
+    lateinit var optKeyRing: CertificateSource
 
     /*
     @Option(names = ["--network"], description = ["Look for missing certificates on a key server or the WKD."])
@@ -72,128 +65,110 @@ class WotCLI: Callable<Int> {
     */
 
     @Option(names = ["--gpg-ownertrust"])
-    var gpgOwnertrust: Boolean = false
+    var optGpgOwnerTrust = false
 
     @Option(names = ["--certification-network"], description = ["Treat the web of trust as a certification network instead of an authentication network."])
-    var certificationNetwork = false
+    var optCertificationNetwork = false
 
     @Option(names = ["--gossip"], description = ["Find arbitrary paths by treating all certificates as trust-roots with zero trust."])
-    var gossip = false
+    var optGossip = false
 
-    @ArgGroup(exclusive = true)
-    var mTrustAmount: TrustAmount = TrustAmount()
+    @Option(names = ["--time"], description = ["Reference time."],
+        converter = [ReferenceTimeConverter::class])
+    val optReferenceTime: ReferenceTime = ReferenceTime.now()
+
+    @Option(names = ["--known-notation"], description = ["Add a notation to the list of known notations."])
+    var optKnownNotations: Array<String> = arrayOf()
 
     class TrustAmount {
         @Option(names = ["--trust-amount", "-a"], description = ["The required amount of trust."])
-        var amount: Int? = null
+        var optAmount: Int? = null
 
         @Option(names = ["--partial"])
-        var partial: Boolean = false
+        var optPartial: Boolean = false
 
         @Option(names = ["--full"])
-        var full: Boolean = false
+        var optFull: Boolean = false
 
         @Option(names = ["--double"])
-        var double: Boolean = false
+        var optDouble: Boolean = false
+
+        fun get(certificationNetwork: Boolean): Int {
+            return when {
+                optAmount != null -> optAmount!! // --amount=XY
+                optPartial -> 40                           // --partial
+                optFull -> 120                             // --full
+                optDouble -> 240                           // --double
+                else -> if (certificationNetwork) 1200 else 120      // default 120, if --certification-network -> 1200
+            }
+        }
     }
 
+    class CertificateSource {
+        @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true)
+        var optKeyring: Array<File>? = null
 
-    @Option(names = ["--time"], description = ["Reference time."])
-    var mTime: String? = null
+        @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], arity = "0..1",
+            fallbackValue = "")
+        var optPgpCertD: String? = null
 
-    @Option(names = ["--known-notation"], description = ["Add a notation to the list of known notations."])
-    var knownNotations: Array<String> = arrayOf()
+        @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])
+        var optGpg = false
 
-    private val referenceTime: ReferenceTime
-        get() {
-            return mTime?.let {
-                ReferenceTime.timestamp(DateUtil.parseUTCDate(mTime!!))
-            } ?: ReferenceTime.now()
-        }
-
-    private val trustRoots: Roots
-        get() {
-            var trustRootFingerprints = mTrustRoot.map { Fingerprint(it) }.map { Root(it) }
-            if (mCertificateSource.gpg || gpgOwnertrust) {
-                trustRootFingerprints = trustRootFingerprints.plus(readGpgOwnertrust())
-            }
-            if (mCertificateSource.pgpCertD != null) {
-                try {
-                    val rootCert = certificateStore.getCertificate(SpecialNames.TRUST_ROOT)
-                    trustRootFingerprints = trustRootFingerprints.plus(Root(Fingerprint(rootCert.fingerprint), Int.MAX_VALUE))
-                } catch (e: NoSuchElementException) {
-                    // ignore
+        val get: PGPCertificateStore
+            get() {
+                if (optGpg) {
+                    return gpgHelper.readGpgKeyRing()
                 }
-            }
-            return Roots(trustRootFingerprints)
-        }
-
-    private val amount: Int
-        get() = when {
-            mTrustAmount.amount != null -> mTrustAmount.amount!! // --amount=XY
-            mTrustAmount.partial -> 40                           // --partial
-            mTrustAmount.full -> 120                             // --full
-            mTrustAmount.double -> 240                           // --double
-            else -> if (certificationNetwork) 1200 else 120      // default 120, if --certification-network -> 1200
-        }
-
-    private val certificateStore: PGPCertificateStore
-        get() {
-            if (mCertificateSource.gpg) {
-                return KeyRingCertificateStore(
-                        PGPainless.readKeyRing().publicKeyRingCollection(
-                                Runtime.getRuntime().exec("/usr/bin/gpg --export").inputStream
-                        )
-                )
-            }
-            if (mCertificateSource.keyring != null) {
-                return KeyRingCertificateStore(
-                        mCertificateSource.keyring!!.map {
+                if (optKeyring != null) {
+                    return KeyRingCertificateStore(
+                        optKeyring!!.map {
                             PGPainless.readKeyRing().publicKeyRingCollection(it.inputStream())
                         }
-                )
-            }
+                    )
+                }
 
-            if (mCertificateSource.pgpCertD == "") {
-                val certDFile = BaseDirectoryProvider.getDefaultBaseDir()
+                if (optPgpCertD == "") {
+                    val certDFile = BaseDirectoryProvider.getDefaultBaseDir()
+                    val certD = PGPainlessCertD.fileBased(
+                        certDFile,
+                        InMemorySubkeyLookupFactory())
+                    return PGPCertificateStoreAdapter(certD)
+                }
                 val certD = PGPainlessCertD.fileBased(
-                    certDFile,
+                    File(optPgpCertD!!),
                     InMemorySubkeyLookupFactory())
                 return PGPCertificateStoreAdapter(certD)
             }
-            val certD = PGPainlessCertD.fileBased(
-                    File(mCertificateSource.pgpCertD!!),
-                    InMemorySubkeyLookupFactory())
-            return PGPCertificateStoreAdapter(certD)
+    }
+
+    val outputFormatter: Formatter = SQWOTFormatter()
+
+    private val trustRoots: Roots
+        get() {
+            return optTrustRoot
+                .letIf(optKeyRing.optGpg || optGpgOwnerTrust) {
+                    plus(gpgHelper.readGpgOwnertrust())
+                }.letIf(optKeyRing.optPgpCertD != null) {
+                    try {
+                        val rootCert = optKeyRing.get.getCertificate(SpecialNames.TRUST_ROOT)
+                        plus(Root(Fingerprint(rootCert.fingerprint), Int.MAX_VALUE))
+                    } catch (e: NoSuchElementException) { this }
+                }.let { Roots(it) }
         }
 
-    val formatter: Formatter = SQWOTFormatter()
-
-    fun readGpgOwnertrust(): List<Root> = Runtime.getRuntime()
-            .exec("/usr/bin/gpg --export-ownertrust")
-            .inputStream
-            .bufferedReader()
-            .readLines()
-            .asSequence()
-            .filterNot { it.startsWith("#") }
-            .filterNot { it.isBlank() }
-            .map {
-                Fingerprint(it.substring(0, it.indexOf(':'))) to it.elementAt(it.indexOf(':') + 1) }
-            .map {
-                it.first to when (it.second.digitToInt()) {
-                    2 -> null   // unknown
-                    3 -> 0      // not trust
-                    4 -> 40     // marginally trusted
-                    5 -> 120    // fully trusted
-                    6 -> Int.MAX_VALUE    // ultimately trusted
-                    else -> null
-                }
-            }
-            .filterNot { it.second == null }
-            .map {
-                Root(it.first, it.second!!)
-            }
-            .toList()
+    val api: WoTAPI
+        get() {
+            val network = WebOfTrust(optKeyRing.get)
+                .buildNetwork(referenceTime = optReferenceTime)
+            return WoTAPI(
+                network = network,
+                trustRoots = trustRoots,
+                gossip = optGossip,
+                certificationNetwork = optCertificationNetwork,
+                trustAmount = optTrustAmount.get(optCertificationNetwork),
+                referenceTime = optReferenceTime)
+        }
 
     /**
      * Execute the command.
@@ -201,49 +176,40 @@ class WotCLI: Callable<Int> {
      * @return exit code
      */
     override fun call(): Int {
-        require(mTrustRoot.isNotEmpty()) {
+        require(optTrustRoot.isNotEmpty()) {
             "Expected at least one trust-root."
         }
 
-        for (notation in knownNotations) {
+        for (notation in optKnownNotations) {
             PGPainless.getPolicy().notationRegistry.addKnownNotation(notation)
         }
 
         return 0
     }
 
-    val api: WoTAPI
-        get() {
-            val network = WebOfTrust(certificateStore)
-                    .buildNetwork(referenceTime = referenceTime)
-            return WoTAPI(
-                    network = network,
-                    trustRoots = trustRoots,
-                    gossip = gossip,
-                    certificationNetwork = certificationNetwork,
-                    trustAmount = amount,
-                    referenceTime = referenceTime)
-        }
-
     companion object {
 
         @JvmStatic
         fun main(args: Array<String>): Unit = exitProcess(
-                execute(args)
+            execute(args)
         )
 
+        @JvmStatic
         fun execute(args: Array<String>): Int {
             return CommandLine(WotCLI()).execute(*args)
         }
+
+        @JvmStatic
+        val gpgHelper = GpgHelper("/usr/bin/gpg")
     }
 
     override fun toString(): String {
-        val source = if (mCertificateSource.gpg) {
+        val source = if (optKeyRing.optGpg) {
             "gpg"
         } else {
-            mCertificateSource.pgpCertD ?: mCertificateSource.keyring?.contentToString() ?: "null"
+            optKeyRing.optPgpCertD ?: optKeyRing.optKeyring?.contentToString() ?: "null"
         }
-        return "trustroot=${trustRoots}, source=$source, gossip=$gossip, amount=$amount," +
-                " referenceTime=${referenceTime.timestamp}, notations=${knownNotations.contentToString()}"
+        return "trustroot=${trustRoots}, source=$source, gossip=$optGossip, amount=${optTrustAmount.get(optCertificationNetwork)}," +
+                " referenceTime=${optReferenceTime.timestamp}, notations=${optKnownNotations.contentToString()}"
     }
 }
