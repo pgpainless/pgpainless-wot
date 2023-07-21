@@ -47,7 +47,7 @@ import kotlin.system.exitProcess
 )
 class WebOfTrustCLI: Callable<Int> {
 
-    @Option(names = ["--trust-root", "-r"], converter = [RootConverter::class])
+    @Option(names = ["--trust-root", "-r"], converter = [RootConverter::class], paramLabel = "FINGERPRINT")
     var optTrustRoot: List<Root> = listOf()
 
     @ArgGroup(exclusive = true)
@@ -74,14 +74,14 @@ class WebOfTrustCLI: Callable<Int> {
     var optGossip = false
 
     @Option(names = ["--time"], description = ["Reference time."],
-        converter = [ReferenceTimeConverter::class])
+        converter = [ReferenceTimeConverter::class], paramLabel = "TIMESTAMP")
     val optReferenceTime: ReferenceTime = ReferenceTime.now()
 
-    @Option(names = ["--known-notation"], description = ["Add a notation to the list of known notations."])
+    @Option(names = ["--known-notation"], description = ["Add a notation to the list of known notations."], paramLabel = "NOTATION NAME")
     var optKnownNotations: Array<String> = arrayOf()
 
     class TrustAmount {
-        @Option(names = ["--trust-amount", "-a"], description = ["The required amount of trust."])
+        @Option(names = ["--trust-amount", "-a"], description = ["The required amount of trust."], paramLabel = "AMOUNT")
         var optAmount: Int? = null
 
         @Option(names = ["--partial"])
@@ -105,11 +105,11 @@ class WebOfTrustCLI: Callable<Int> {
     }
 
     class CertificateSource {
-        @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true)
+        @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true, paramLabel = "FILE")
         var optKeyring: Array<File>? = null
 
         @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], arity = "0..1",
-            fallbackValue = "")
+            fallbackValue = "", paramLabel = "PATH")
         var optPgpCertD: String? = null
 
         @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])

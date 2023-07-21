@@ -14,7 +14,7 @@ import java.util.concurrent.Callable
 /**
  * Authenticate a binding between a certification and one of its user-ids.
  */
-@Command(name = "authenticate")
+@Command(name = "authenticate", description = ["Authenticate the binding between a certificate and user ID."])
 class AuthenticateCmd: Callable<Int> {
 
     /**
@@ -26,13 +26,13 @@ class AuthenticateCmd: Callable<Int> {
     /**
      * Fingerprint of the certificate.
      */
-    @Parameters(index = "0", converter = [FingerprintConverter::class])
+    @Parameters(index = "0", description = ["Fingerprint of the certificate"], converter = [FingerprintConverter::class], paramLabel = "FINGERPRINT")
     lateinit var fingerprint: Fingerprint
 
     /**
      * User-ID to authenticate.
      */
-    @Parameters(index = "1")
+    @Parameters(index = "1", description = ["UserID"], paramLabel = "USERID")
     lateinit var userId: String
 
     /**

@@ -12,13 +12,13 @@ import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
 import java.util.concurrent.Callable
 
-@Command(name = "identify")
+@Command(name = "identify", description = ["Identify a certificate via its fingerprint by determining the authenticity of its user IDs."])
 class IdentifyCmd: Callable<Int> {
 
     @CommandLine.ParentCommand
     lateinit var parent: WebOfTrustCLI
 
-    @Parameters(index = "0", description = ["Certificate fingerprint."], converter = [FingerprintConverter::class])
+    @Parameters(index = "0", description = ["Certificate fingerprint."], paramLabel = "FINGERPRINT", converter = [FingerprintConverter::class])
     lateinit var fingerprint: Fingerprint
 
     /**
