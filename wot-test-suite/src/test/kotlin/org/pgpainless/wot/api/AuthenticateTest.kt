@@ -27,8 +27,7 @@ class AuthenticateTest: NetworkDSL {
         val roots = Roots(Root(v.aliceFpr))
         val api = WoTAPI(network, roots, false, false, 120, v.t1)
 
-        val args = AuthenticateAPI.Arguments(v.targetFpr, v.targetUid, false)
-        val result = api.authenticate(args)
+        val result = api.authenticate(v.targetFpr, v.targetUid, false)
 
         assertTrue { result.acceptable }
         assertEquals(1, result.binding.paths.paths.size)

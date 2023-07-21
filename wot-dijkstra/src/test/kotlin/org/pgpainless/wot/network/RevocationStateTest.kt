@@ -5,8 +5,6 @@
 package org.pgpainless.wot.network
 
 import org.junit.jupiter.api.Test
-import org.pgpainless.wot.network.ReferenceTime
-import org.pgpainless.wot.network.RevocationState
 import java.util.*
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

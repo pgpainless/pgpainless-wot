@@ -25,12 +25,12 @@ class LookupTest {
         val roots = Roots(Root(v.aliceFpr))
         val api = WoTAPI(network, roots, false, false, 120, v.t1)
 
-        val byExactUserId = api.lookup(LookupAPI.Arguments(v.targetUid, false))
+        val byExactUserId = api.lookup(v.targetUid, false)
         assertEquals(v.targetFpr, byExactUserId.bindings[0].fingerprint)
 
 
-        val byEmail = api.lookup(LookupAPI.Arguments(
-                v.targetUid.replace("<", "").replace(">", ""), true))
+        val byEmail = api.lookup(
+                v.targetUid.replace("<", "").replace(">", ""), true)
         assertEquals(v.targetFpr, byEmail.bindings[0].fingerprint)
     }
 }

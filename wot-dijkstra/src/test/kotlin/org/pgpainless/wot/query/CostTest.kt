@@ -4,7 +4,6 @@
 
 package org.pgpainless.wot.query
 
-import org.pgpainless.wot.query.Cost
 import kotlin.test.Test
 
 class CostTest {

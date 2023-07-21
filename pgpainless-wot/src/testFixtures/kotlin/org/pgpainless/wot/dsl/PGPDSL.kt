@@ -10,8 +10,8 @@ import org.pgpainless.algorithm.RevocationStateType
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.key.info.KeyRingInfo
 import org.pgpainless.wot.WebOfTrust
-import org.pgpainless.wot.network.Node
 import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Node
 import org.pgpainless.wot.network.RevocationState
 
 interface PGPDSL {

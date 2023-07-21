@@ -5,7 +5,6 @@
 package org.pgpainless.wot.network
 
 import org.junit.jupiter.api.Test
-import org.pgpainless.wot.network.Fingerprint
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 

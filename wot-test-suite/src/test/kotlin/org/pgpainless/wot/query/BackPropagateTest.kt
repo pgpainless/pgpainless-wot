@@ -7,7 +7,6 @@ package org.pgpainless.wot.query
 import org.pgpainless.wot.network.Fingerprint
 import org.pgpainless.wot.network.Root
 import org.pgpainless.wot.network.Roots
-import org.pgpainless.wot.query.Path
 import org.sequoia_pgp.wot.vectors.*
 import kotlin.test.Test
 import kotlin.test.assertEquals

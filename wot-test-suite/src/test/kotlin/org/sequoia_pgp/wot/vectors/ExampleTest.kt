@@ -4,12 +4,10 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.util.DateUtil
-import org.pgpainless.wot.network.ReferenceTime
 
 class ExampleTest {
 

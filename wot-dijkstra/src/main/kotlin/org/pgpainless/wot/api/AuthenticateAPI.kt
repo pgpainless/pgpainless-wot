@@ -17,18 +17,7 @@ interface AuthenticateAPI {
      *
      * @param arguments arguments
      */
-    fun authenticate(arguments: Arguments): Result
-
-    /**
-     * Bundle for arguments to the authenticate operation.
-     * @param fingerprint fingerprint of the certificate
-     * @param userId user-ID for which we want to authenticate a binding to the certificate
-     * @param email if true, consider [userId] to be an email address and consider all bindings containing it
-     */
-    data class Arguments(
-            var fingerprint: Fingerprint,
-            var userId: String,
-            var email: Boolean = false)
+    fun authenticate(fingerprint: Fingerprint, userId: String, email: Boolean = false): Result
 
     /**
      * Authentication result.

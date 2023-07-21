@@ -8,9 +8,7 @@ import org.pgpainless.wot.network.Fingerprint
 
 interface PathAPI {
 
-    fun path(arguments: Arguments): Result
-
-    data class Arguments(val rootFingerprint: Fingerprint, val pathFingerprints: List<Fingerprint>, val userId: String)
+    fun path(rootFingerprint: Fingerprint, pathFingerprints: List<Fingerprint>, userId: String): Result
 
     interface Result {
 

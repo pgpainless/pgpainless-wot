@@ -13,7 +13,6 @@ import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.network.ReferenceTime
 import java.io.File
 import java.io.InputStream
-import java.lang.IllegalArgumentException
 import java.nio.file.Files
 import java.text.ParseException
 import java.text.SimpleDateFormat

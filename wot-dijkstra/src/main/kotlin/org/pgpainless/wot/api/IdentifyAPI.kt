@@ -5,14 +5,10 @@
 package org.pgpainless.wot.api
 
 import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.network.Node
-import org.pgpainless.wot.query.Paths
 
 interface IdentifyAPI {
 
-    fun identify(arguments: Arguments): Result
-
-    data class Arguments(val fingerprint: Fingerprint)
+    fun identify(fingerprint: Fingerprint): Result
 
     data class Result(val bindings: List<Binding>, val targetAmount: Int) {
         val acceptable: Boolean

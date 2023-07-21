@@ -7,8 +7,7 @@ package org.pgpainless.wot.query
 import org.pgpainless.wot.network.*
 import org.sequoia_pgp.wot.vectors.*
 import java.time.Instant
-import java.util.Date
-import kotlin.RuntimeException
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

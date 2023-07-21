@@ -6,9 +6,7 @@ package org.pgpainless.wot.api
 
 interface LookupAPI {
 
-    fun lookup(arguments: Arguments): Result
-
-    data class Arguments(val userId: String, val email: Boolean = false)
+    fun lookup(userId: String, email: Boolean = false): Result
 
     data class Result(val bindings: List<Binding>, val targetAmount: Int) {
         val acceptable: Boolean

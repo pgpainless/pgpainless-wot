@@ -7,9 +7,9 @@ package org.pgpainless.wot.util
 import org.bouncycastle.openpgp.PGPSignature
 import org.pgpainless.algorithm.SignatureType
 import org.pgpainless.signature.subpackets.SignatureSubpacketsUtil
-import org.pgpainless.wot.network.Node
-import org.pgpainless.wot.network.EdgeComponent
 import org.pgpainless.wot.network.Depth
+import org.pgpainless.wot.network.EdgeComponent
+import org.pgpainless.wot.network.Node
 import org.pgpainless.wot.network.RegexSet
 import org.pgpainless.wot.network.RegexSet.Companion.fromExpressionList
 

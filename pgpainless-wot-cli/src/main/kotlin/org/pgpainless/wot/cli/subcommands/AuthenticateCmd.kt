@@ -4,14 +4,11 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.api.AuthenticateAPI
 import org.pgpainless.wot.cli.WotCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Fingerprint
 import picocli.CommandLine
-import picocli.CommandLine.Command
-import picocli.CommandLine.Parameters
-import picocli.CommandLine.ParentCommand
+import picocli.CommandLine.*
 import java.util.concurrent.Callable
 
 /**
@@ -49,9 +46,7 @@ class AuthenticateCmd: Callable<Int> {
      * @return exit code
      */
     override fun call(): Int {
-        val result = parent.api.authenticate(
-            AuthenticateAPI.Arguments(fingerprint, userId, email)
-        )
+        val result = parent.api.authenticate(fingerprint, userId, email)
 
         println(parent.outputFormatter.format(result))
 

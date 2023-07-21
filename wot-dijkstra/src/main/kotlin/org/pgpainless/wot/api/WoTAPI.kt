@@ -4,9 +4,8 @@
 
 package org.pgpainless.wot.api
 
-import org.pgpainless.wot.query.Query
 import org.pgpainless.wot.network.*
-import org.pgpainless.wot.query.Paths
+import org.pgpainless.wot.query.Query
 
 /**
  * Web of Trust API, offering different operations.
@@ -38,22 +37,22 @@ class WoTAPI(
                 referenceTime: ReferenceTime = ReferenceTime.now()):
             this(network,trustRoots, gossip,certificationNetwork, trustAmount.amount, referenceTime)
 
-    override fun authenticate(arguments: AuthenticateAPI.Arguments): AuthenticateAPI.Result {
+    override fun authenticate(fingerprint: Fingerprint, userId: String, email: Boolean): AuthenticateAPI.Result {
         val query = Query(network, trustRoots, certificationNetwork)
-        val paths = query.authenticate(arguments.fingerprint, arguments.userId, trustAmount)
-        return AuthenticateAPI.Result(Binding(arguments.fingerprint, arguments.userId, paths), trustAmount)
+        val paths = query.authenticate(fingerprint, userId, trustAmount)
+        return AuthenticateAPI.Result(Binding(fingerprint, userId, paths), trustAmount)
     }
 
-    override fun identify(arguments: IdentifyAPI.Arguments): IdentifyAPI.Result {
-        val cert = network.nodes[arguments.fingerprint]
+    override fun identify(fingerprint: Fingerprint): IdentifyAPI.Result {
+        val cert = network.nodes[fingerprint]
                 ?: return IdentifyAPI.Result(listOf(), trustAmount)
 
         val bindings = mutableListOf<Binding>()
         cert.userIds.keys.toList().forEach {
             val query = Query(network, trustRoots, certificationNetwork)
-            val paths = query.authenticate(arguments.fingerprint, it, trustAmount)
+            val paths = query.authenticate(fingerprint, it, trustAmount)
             if (paths.amount != 0) {
-                bindings.add(Binding(arguments.fingerprint, it, paths))
+                bindings.add(Binding(fingerprint, it, paths))
             }
         }
         return IdentifyAPI.Result(bindings, trustAmount)
@@ -62,15 +61,12 @@ class WoTAPI(
     override fun list(): ListAPI.Result {
         val bindings = mutableListOf<Binding>()
         network.nodes.forEach {
-            bindings.addAll(identify(IdentifyAPI.Arguments(it.key)).bindings)
+            bindings.addAll(identify(it.key).bindings)
         }
         return ListAPI.Result(bindings, trustAmount)
     }
 
-    override fun lookup(arguments: LookupAPI.Arguments): LookupAPI.Result {
-        val userId = arguments.userId
-        val email = arguments.email
-
+    override fun lookup(userId: String, email: Boolean): LookupAPI.Result {
         val candidates = network.nodes.values.mapNotNull { node ->
             val matches = node.mapToMatchingUserIds(userId, email)
             if (matches.isEmpty()) {
@@ -86,7 +82,7 @@ class WoTAPI(
             val userIds = it.second
 
             for (mUserId in userIds) {
-                authenticate(AuthenticateAPI.Arguments(node.fingerprint, mUserId, email)).let { result ->
+                authenticate(node.fingerprint, mUserId, email).let { result ->
                     if (result.binding.paths.paths.isNotEmpty()) {
                         results.add(result.binding)
                     }
@@ -97,7 +93,7 @@ class WoTAPI(
         return LookupAPI.Result(results, trustAmount)
     }
 
-    override fun path(arguments: PathAPI.Arguments): PathAPI.Result {
+    override fun path(rootFingerprint: Fingerprint, pathFingerprints: List<Fingerprint>, userId: String): PathAPI.Result {
         TODO("Not yet implemented")
     }
 

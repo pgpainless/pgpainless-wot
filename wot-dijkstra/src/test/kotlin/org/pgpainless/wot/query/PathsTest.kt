@@ -6,8 +6,8 @@ package org.pgpainless.wot.query
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.pgpainless.wot.network.Depth
 import org.pgpainless.wot.dsl.NetworkDSL
+import org.pgpainless.wot.network.Depth
 import kotlin.test.assertEquals
 
 class PathsTest: NetworkDSL {

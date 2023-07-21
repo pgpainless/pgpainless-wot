@@ -4,9 +4,6 @@
 
 package org.pgpainless.wot.testfixtures;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.opentest4j.TestAbortedException;
 import org.pgpainless.certificate_store.KeyMaterialReader;
 import pgp.cert_d.PGPCertificateDirectory;
@@ -17,6 +14,9 @@ import pgp.certificate_store.certificate.KeyMaterial;
 import pgp.certificate_store.certificate.KeyMaterialMerger;
 import pgp.certificate_store.certificate.KeyMaterialReaderBackend;
 import pgp.certificate_store.exception.BadDataException;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class TestCertificateStores {
 

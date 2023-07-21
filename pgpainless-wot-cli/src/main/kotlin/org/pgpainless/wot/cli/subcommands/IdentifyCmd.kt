@@ -4,7 +4,6 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.api.IdentifyAPI
 import org.pgpainless.wot.cli.WotCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Fingerprint
@@ -28,9 +27,7 @@ class IdentifyCmd: Callable<Int> {
      * @return exit code
      */
     override fun call(): Int {
-        val result = parent.api.identify(
-            IdentifyAPI.Arguments(fingerprint)
-        )
+        val result = parent.api.identify(fingerprint)
 
         print(parent.outputFormatter.format(result))
         return if (result.acceptable) 0 else 1

@@ -5,7 +5,6 @@
 package org.pgpainless.wot
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing
-
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.network.Edge
 import org.pgpainless.wot.network.Fingerprint
@@ -13,11 +12,7 @@ import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.network.ReferenceTime
 import org.pgpainless.wot.testfixtures.TestCertificateStores
 import org.pgpainless.wot.testfixtures.WotTestVectors
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
-import kotlin.test.Test
+import kotlin.test.*
 
 class WebOfTrustTest {
 

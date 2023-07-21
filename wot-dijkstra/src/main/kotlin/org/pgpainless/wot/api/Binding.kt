@@ -5,9 +5,7 @@
 package org.pgpainless.wot.api
 
 import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.query.Path
 import org.pgpainless.wot.query.Paths
-import java.text.SimpleDateFormat
 
 data class Binding(val fingerprint: Fingerprint, val userId: String, val paths: Paths) {
     /**
