@@ -5,6 +5,8 @@ SPDX-License-Identifier: CC0-1.0
 -->
 # OpenPGP Web-of-Trust
 
+[![REUSE status](https://api.reuse.software/badge/codeberg.org/PGPainless/pgpainless-wot)](https://api.reuse.software/info/codeberg.org/PGPainless/pgpainless-wot)
+
 An implementation of the [OpenPGP Web of Trust](https://sequoia-pgp.gitlab.io/sequoia-wot/) using [PGPainless](https://pgpainless.org).
 
 ## Module Overview
