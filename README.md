@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2023 Paul Schaub <info@pgpainless.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 # OpenPGP Web-of-Trust
-
+[![status-badge](https://ci.codeberg.org/api/badges/PGPainless/pgpainless-wot/status.svg)](https://ci.codeberg.org/PGPainless/pgpainless-wot)
 [![REUSE status](https://api.reuse.software/badge/codeberg.org/PGPainless/pgpainless-wot)](https://api.reuse.software/info/codeberg.org/PGPainless/pgpainless-wot)
 
 An implementation of the [OpenPGP Web of Trust](https://sequoia-pgp.gitlab.io/sequoia-wot/) using [PGPainless](https://pgpainless.org).
