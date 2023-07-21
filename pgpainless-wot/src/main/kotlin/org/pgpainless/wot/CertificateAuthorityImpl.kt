@@ -65,6 +65,13 @@ class CertificateAuthorityImpl(private val network: Network,
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
+    override fun identify(fingerprint: OpenPgpFingerprint, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
+        val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
+            targetAmount, ReferenceTime.timestamp(referenceTime))
+        val result = api.identify(IdentifyAPI.Arguments(Fingerprint(fingerprint.toString())))
+        return result.bindings.map { mapToAuthenticity(it, targetAmount) }
+    }
+
     private fun mapToAuthenticity(binding: Binding, targetAmount: Int): CertificateAuthenticity {
         val publicKeyRing = readPublicKeyRing(binding.fingerprint)
 
