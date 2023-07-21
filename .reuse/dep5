@@ -14,6 +14,11 @@ Files: gradle*
 Copyright: 2015 the original author or authors.
 License: Apache-2.0
 
+# Woodpecker build files
+Files: .woodpecker/*
+Copyright: 2022 the original author or authors.
+License: Apache-2.0
+
 # PGPainless Test Vectors
 Files: pgpainless-wot/src/testFixtures/resources/test_vectors/*
 Copyright: 2ß23 Paul Schaub
