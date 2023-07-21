@@ -45,7 +45,7 @@ dependencies {
     // implementation("org.pgpainless:wkd-java:0.1.2")
 }
 
-mainClassName = 'org.pgpainless.wot.cli.WotCLI'
+mainClassName = 'org.pgpainless.wot.cli.WebOfTrustCLI'
 
 application {
     mainClass = mainClassName

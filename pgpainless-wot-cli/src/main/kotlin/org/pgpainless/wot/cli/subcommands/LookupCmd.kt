@@ -4,7 +4,7 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine.*
 import java.util.concurrent.Callable
 
@@ -12,7 +12,7 @@ import java.util.concurrent.Callable
 class LookupCmd: Callable<Int> {
 
     @ParentCommand
-    lateinit var parent: WotCLI
+    lateinit var parent: WebOfTrustCLI
 
     @Option(names = ["--email"], description = ["Consider all user-IDs that contain the given email address."])
     var email = false

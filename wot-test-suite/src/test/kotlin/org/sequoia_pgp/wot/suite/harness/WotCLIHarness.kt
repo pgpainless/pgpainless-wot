@@ -4,14 +4,14 @@
 
 package org.sequoia_pgp.wot.suite.harness
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.sequoia_pgp.wot.suite.ExecutionCallback
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 /**
- * Harness for the [WotCLI] class.
+ * Harness for the [WebOfTrustCLI] class.
  */
 class WotCLIHarness: Harness() {
 
@@ -24,7 +24,7 @@ class WotCLIHarness: Harness() {
                 val bOut = ByteArrayOutputStream()
                 System.setOut(PrintStream(bOut))
 
-                val exitCode = WotCLI.execute(arguments)
+                val exitCode = WebOfTrustCLI.execute(arguments)
 
                 System.setOut(origStdout)
                 return bOut.toString() to exitCode

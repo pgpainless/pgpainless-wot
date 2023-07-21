@@ -4,7 +4,7 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Fingerprint
 import picocli.CommandLine
@@ -21,7 +21,7 @@ class AuthenticateCmd: Callable<Int> {
      * Parent command to acquire global options from.
      */
     @ParentCommand
-    lateinit var parent: WotCLI
+    lateinit var parent: WebOfTrustCLI
 
     /**
      * Fingerprint of the certificate.

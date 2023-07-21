@@ -4,7 +4,7 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
@@ -14,7 +14,7 @@ import java.util.concurrent.Callable
 class PathCmd: Callable<Int> {
 
     @CommandLine.ParentCommand
-    lateinit var parent: WotCLI
+    lateinit var parent: WebOfTrustCLI
 
     @Parameters(index = "*",
             arity = "2..*",

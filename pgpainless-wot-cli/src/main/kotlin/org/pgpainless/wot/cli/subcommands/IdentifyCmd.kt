@@ -4,7 +4,7 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Fingerprint
 import picocli.CommandLine
@@ -16,7 +16,7 @@ import java.util.concurrent.Callable
 class IdentifyCmd: Callable<Int> {
 
     @CommandLine.ParentCommand
-    lateinit var parent: WotCLI
+    lateinit var parent: WebOfTrustCLI
 
     @Parameters(index = "0", description = ["Certificate fingerprint."], converter = [FingerprintConverter::class])
     lateinit var fingerprint: Fingerprint

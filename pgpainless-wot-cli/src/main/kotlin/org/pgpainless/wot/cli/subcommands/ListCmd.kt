@@ -4,7 +4,7 @@
 
 package org.pgpainless.wot.cli.subcommands
 
-import org.pgpainless.wot.cli.WotCLI
+import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import java.util.concurrent.Callable
@@ -13,7 +13,7 @@ import java.util.concurrent.Callable
 class ListCmd: Callable<Int> {
 
     @CommandLine.ParentCommand
-    lateinit var parent: WotCLI
+    lateinit var parent: WebOfTrustCLI
 
     /**
      * Execute the command.

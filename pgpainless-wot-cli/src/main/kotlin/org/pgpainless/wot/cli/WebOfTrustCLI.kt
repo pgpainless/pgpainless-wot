@@ -45,7 +45,7 @@ import kotlin.system.exitProcess
         HelpCommand::class
     ]
 )
-class WotCLI: Callable<Int> {
+class WebOfTrustCLI: Callable<Int> {
 
     @Option(names = ["--trust-root", "-r"], converter = [RootConverter::class])
     var optTrustRoot: List<Root> = listOf()
@@ -196,7 +196,7 @@ class WotCLI: Callable<Int> {
 
         @JvmStatic
         fun execute(args: Array<String>): Int {
-            return CommandLine(WotCLI()).execute(*args)
+            return CommandLine(WebOfTrustCLI()).execute(*args)
         }
 
         @JvmStatic
