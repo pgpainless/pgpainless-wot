@@ -47,7 +47,7 @@ import kotlin.system.exitProcess
 )
 class WebOfTrustCLI: Callable<Int> {
 
-    @Option(names = ["--trust-root", "-r"], converter = [RootConverter::class], paramLabel = "FINGERPRINT")
+    @Option(names = ["--trust-root", "-r"], description = ["One or more certificates to use as trust-roots."], converter = [RootConverter::class], paramLabel = "FINGERPRINT")
     var optTrustRoot: List<Root> = listOf()
 
     @ArgGroup(exclusive = true)
@@ -64,7 +64,7 @@ class WebOfTrustCLI: Callable<Int> {
     var keyServer: String = "hkps://keyserver.ubuntu.com"
     */
 
-    @Option(names = ["--gpg-ownertrust"])
+    @Option(names = ["--gpg-ownertrust"], description = ["Read trust-roots from GnuPGs ownertrust."])
     var optGpgOwnerTrust = false
 
     @Option(names = ["--certification-network"], description = ["Treat the web of trust as a certification network instead of an authentication network."])
@@ -84,22 +84,22 @@ class WebOfTrustCLI: Callable<Int> {
         @Option(names = ["--trust-amount", "-a"], description = ["The required amount of trust."], paramLabel = "AMOUNT")
         var optAmount: Int? = null
 
-        @Option(names = ["--partial"])
+        @Option(names = ["--partial"], description = ["Equivalent to -a 40."])
         var optPartial: Boolean = false
 
-        @Option(names = ["--full"])
+        @Option(names = ["--full"], description = ["Equivalent to -a 120."])
         var optFull: Boolean = false
 
-        @Option(names = ["--double"])
+        @Option(names = ["--double"], description = ["Equivalent to -a 240."])
         var optDouble: Boolean = false
 
         fun get(certificationNetwork: Boolean): Int {
             return when {
-                optAmount != null -> optAmount!! // --amount=XY
-                optPartial -> 40                           // --partial
-                optFull -> 120                             // --full
-                optDouble -> 240                           // --double
-                else -> if (certificationNetwork) 1200 else 120      // default 120, if --certification-network -> 1200
+                optAmount != null -> optAmount!!                    // --amount=XY
+                optPartial -> 40                                    // --partial
+                optFull -> 120                                      // --full
+                optDouble -> 240                                    // --double
+                else -> if (certificationNetwork) 1200 else 120     // default 120, if --certification-network -> 1200
             }
         }
     }
@@ -108,8 +108,9 @@ class WebOfTrustCLI: Callable<Int> {
         @Option(names = ["--keyring", "-k"], description = ["Specify a keyring file."], required = true, paramLabel = "FILE")
         var optKeyring: Array<File>? = null
 
-        @Option(names = ["--cert-d"], description = ["Specify a pgp-cert-d base directory."], arity = "0..1",
-            fallbackValue = "", paramLabel = "PATH")
+        @Option(names = ["--cert-d"],
+            description = ["Specify a pgp-cert-d base directory. Leave empty to fallback to the default pgp-cert-d location."],
+            arity = "0..1", fallbackValue = "", paramLabel = "PATH")
         var optPgpCertD: String? = null
 
         @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])
