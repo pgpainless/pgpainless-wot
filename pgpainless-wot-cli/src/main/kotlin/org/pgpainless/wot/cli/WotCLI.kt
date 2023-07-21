@@ -8,7 +8,7 @@ import org.pgpainless.PGPainless
 import org.pgpainless.certificate_store.PGPainlessCertD
 import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.PGPNetworkParser
-import org.pgpainless.wot.api.WoTAPI
+import org.pgpainless.wot.api.WebOfTrustAPI
 import org.pgpainless.wot.cli.converters.ReferenceTimeConverter
 import org.pgpainless.wot.cli.converters.RootConverter
 import org.pgpainless.wot.cli.format.Formatter
@@ -157,11 +157,11 @@ class WotCLI: Callable<Int> {
                 }.let { Roots(it) }
         }
 
-    val api: WoTAPI
+    val api: WebOfTrustAPI
         get() {
             val network = PGPNetworkParser(optKeyRing.get)
                 .buildNetwork(referenceTime = optReferenceTime)
-            return WoTAPI(
+            return WebOfTrustAPI(
                 network = network,
                 trustRoots = trustRoots,
                 gossip = optGossip,

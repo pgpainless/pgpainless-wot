@@ -23,7 +23,7 @@ class ListTest {
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t0)
 
         val roots = Roots(Root(v.aliceFpr))
-        val api = WoTAPI(network, roots, false, false, 120, v.t0)
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t0)
 
         assertEquals(1, api.list().bindings.size)
     }
@@ -36,7 +36,7 @@ class ListTest {
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t1)
 
         val roots = Roots(Root(v.aliceFpr))
-        val api = WoTAPI(network, roots, false, false, 120, v.t1)
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1)
 
         assertEquals(6, api.list().bindings.size)
     }

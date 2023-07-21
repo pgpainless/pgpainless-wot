@@ -17,7 +17,7 @@ import org.pgpainless.wot.query.Query
  * @param trustAmount minimum trust amount
  * @param referenceTime reference time at which the web of trust is evaluated
  */
-class WoTAPI(
+class WebOfTrustAPI(
         val network: Network,
         val trustRoots: Roots,
         val gossip: Boolean = false,

@@ -23,7 +23,7 @@ class IdentifyTest {
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t1)
 
         val roots = Roots(Root(v.aliceFpr))
-        val api = WoTAPI(network, roots, false, false, 120, v.t1)
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1)
 
         val result = api.identify(v.targetFpr)
         assertEquals(v.targetUid, result.bindings[0].userId)

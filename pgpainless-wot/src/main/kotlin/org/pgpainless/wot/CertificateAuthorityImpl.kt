@@ -12,7 +12,7 @@ import org.pgpainless.authentication.CertificateAuthenticity.ChainLink
 import org.pgpainless.authentication.CertificateAuthority
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.api.Binding
-import org.pgpainless.wot.api.WoTAPI
+import org.pgpainless.wot.api.WebOfTrustAPI
 import org.pgpainless.wot.network.Fingerprint
 import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.network.ReferenceTime
@@ -52,7 +52,7 @@ class CertificateAuthorityImpl(private val network: Network,
     }
 
     override fun authenticateBinding(fingerprint: OpenPgpFingerprint, userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): CertificateAuthenticity {
-        val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
+        val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.authenticate(Fingerprint(fingerprint.toString()), userId, email)
 
@@ -60,14 +60,14 @@ class CertificateAuthorityImpl(private val network: Network,
     }
 
     override fun lookupByUserId(userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
-        val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
+        val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.lookup(userId, email)
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
     override fun identifyByFingerprint(fingerprint: OpenPgpFingerprint, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
-        val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
+        val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.identify(Fingerprint(fingerprint.toString()))
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
