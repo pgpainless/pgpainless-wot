@@ -7,5 +7,5 @@ rootProject.name = 'PGPainless-WOT'
 include 'pgpainless-wot',
         'pgpainless-wot-cli',
         'wot-dijkstra',
-        'sequoia-wot-vectors'
+        'wot-test-suite'
 

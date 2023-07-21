@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2023 Paul Schaub <info@pgpainless.org>
 SPDX-License-Identifier: BSD-3-Clause
 -->
 
-# Sequoia-WOT Test Vectors
+# WoT Test Suite
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 

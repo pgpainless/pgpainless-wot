@@ -146,7 +146,7 @@ subprojects {
                     }
 
                     licenses {
-                        if (project.name == "sequoia-wot-vectors") {
+                        if (project.name == "wot-test-suite") {
                             license {
                                 name = 'The 3-Clause BSD License'
                                 url = 'https://opensource.org/license/bsd-3-clause/'
