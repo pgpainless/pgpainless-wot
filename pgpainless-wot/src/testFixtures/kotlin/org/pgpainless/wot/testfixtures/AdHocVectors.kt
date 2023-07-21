@@ -62,33 +62,35 @@ interface AdHocVectors {
         val zebraFingerprint = Fingerprint(zebraKey)
 
         override val publicKeyRingCollection: PGPPublicKeyRingCollection
-            get() {
-                val signedCerts = listOf(
-                        targetCert.let {
-                            // C ---120/10--> Target
-                            certify(issuer = carolKey, target = it, amount = 120, depth = 10)
-                        }.let {
-                            // Z ---50/10---> Target
-                            certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
-                        },
-                        carolCert.let {
-                            // B ---120/10--> C
-                            certify(issuer = bobKey, target = it, amount = 120, depth = 10)
-                        },
-                        bobCert.let {
-                            // A ---120/10--> B
-                            certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
-                        },
-                        zebraCert.let {
-                            // Y ---50/10--> Z
-                            certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
-                        },
-                        yellowCert.let {
-                            // A ---50/10--> Y
-                            certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
-                        })
-                return PGPPublicKeyRingCollection(signedCerts)
-            }
+
+        init {
+            publicKeyRingCollection = listOf(
+                targetCert.let {
+                    // C ---120/10--> Target
+                    certify(issuer = carolKey, target = it, amount = 120, depth = 10)
+                }.let {
+                    // Z ---50/10---> Target
+                    certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
+                },
+                carolCert.let {
+                    // B ---120/10--> C
+                    certify(issuer = bobKey, target = it, amount = 120, depth = 10)
+                },
+                bobCert.let {
+                    // A ---120/10--> B
+                    certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
+                },
+                aliceCert,
+                zebraCert.let {
+                    // Y ---50/10--> Z
+                    certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
+                },
+                yellowCert.let {
+                    // A ---50/10--> Y
+                    certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
+                }
+            ).let { PGPPublicKeyRingCollection(it) }
+        }
     }
 
     val publicKeyRingCollection: PGPPublicKeyRingCollection
