@@ -9,31 +9,33 @@ package org.pgpainless.wot.query
  *
  * @param _paths list of paths
  */
-class Paths(private val _paths: MutableList<Item>) {
+class Paths(private val _paths: MutableMap<Path, Int>) {
 
     /**
      * Empty collection of paths.
      */
-    constructor(): this(mutableListOf<Item>())
+    constructor(): this(mutableMapOf<Path, Int>())
 
     val paths: List<Path>
         get() {
-            return _paths.map { it.path }
+            return _paths.keys.toList()
         }
 
-    val items: List<Item>
-        get() = _paths.toList()
+    val items: List<Map.Entry<Path, Int>>
+        get() = _paths.entries.toList()
 
     /**
      * Add a [Path] to the list.
      *
+     * @param path path to add
+     * @param amount effective amount of the path (might be smaller than the paths actual amount)
      * @throws IllegalArgumentException if the given amount is smaller or equal to the paths trust amount.
      */
     fun add(path: Path, amount: Int) {
         require(amount <= path.amount) {
-            "Amount too small. TODO: Better error message"
+            "Effective amount cannot exceed actual amount of the path."
         }
-        _paths.add(Item(path, amount))
+        _paths[path] = amount
     }
 
     /**
@@ -41,16 +43,6 @@ class Paths(private val _paths: MutableList<Item>) {
      */
     val amount: Int
         get() {
-            return _paths.sumOf { it.amount }
+            return _paths.values.sumOf { it }
         }
-
-    /**
-     * @param path path
-     * @param amount trust amount
-     */
-    data class Item(val path: Path, val amount: Int) {
-        override fun toString(): String {
-            return "$path ($amount)"
-        }
-    }
 }
