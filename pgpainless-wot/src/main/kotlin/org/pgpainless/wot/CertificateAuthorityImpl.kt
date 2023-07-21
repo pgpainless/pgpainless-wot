@@ -31,6 +31,25 @@ class CertificateAuthorityImpl(private val network: Network,
                                private val certificateStore: PGPCertificateStore):
     CertificateAuthority {
 
+    companion object {
+
+        /**
+         * Instantiate a [CertificateAuthority] using the Web of Trust.
+         * It is advised to keep the result of this operation around for later reuse, since this method does
+         * some heavy lifting.
+         *
+         * @param certificateStore certificate source
+         * @param trustRoots some trust-roots
+         * @param referenceTime reference time for trust calculations
+         * @return certificate authority using the Web of Trust
+         */
+        @JvmStatic
+        fun webOfTrustFromCertificateStore(certificateStore: PGPCertificateStore, trustRoots: Roots, referenceTime: Date): CertificateAuthorityImpl {
+            val network = WebOfTrust(certificateStore).buildNetwork(referenceTime = ReferenceTime.timestamp(referenceTime))
+            return CertificateAuthorityImpl(network, trustRoots, certificateStore)
+        }
+    }
+
     override fun authenticate(fingerprint: OpenPgpFingerprint, userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): CertificateAuthenticity {
         val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))

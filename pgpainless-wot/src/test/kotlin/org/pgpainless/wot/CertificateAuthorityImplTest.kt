@@ -28,10 +28,8 @@ class CertificateAuthorityImplTest {
 
     val v = AdHocVectors.BestViaRoot()
     val store = KeyRingCertificateStore(v.publicKeyRingCollection)
-    val network = WebOfTrust(store).buildNetwork()
     val trustRoots = Roots(Root(v.aliceFingerprint))
-
-    val certAuthority = CertificateAuthorityImpl(network, trustRoots, store)
+    val certAuthority = CertificateAuthorityImpl.webOfTrustFromCertificateStore(store, trustRoots, Date())
 
     @Test
     fun testSuccessfulAuthentication() {
