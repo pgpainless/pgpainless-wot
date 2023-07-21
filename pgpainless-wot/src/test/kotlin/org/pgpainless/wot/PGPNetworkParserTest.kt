@@ -14,7 +14,7 @@ import org.pgpainless.wot.testfixtures.TestCertificateStores
 import org.pgpainless.wot.testfixtures.WotTestVectors
 import kotlin.test.*
 
-class WebOfTrustTest {
+class PGPNetworkParserTest {
 
     private val fooBankCa = fingerprintOf(WotTestVectors.freshFooBankCaCert)
     private val fooBankEmployee = fingerprintOf(WotTestVectors.freshFooBankEmployeeCert)
@@ -29,7 +29,7 @@ class WebOfTrustTest {
     @Test
     fun testWithTwoNodesAndOneDelegation() {
         val certD = TestCertificateStores.oneDelegationGraph()
-        val network = WebOfTrust(certD).buildNetwork()
+        val network = PGPNetworkParser(certD).buildNetwork()
 
         assertEquals(2, network.nodes.size)
         assertHasEdge(network, fooBankAdmin, barBankCa)
@@ -42,7 +42,7 @@ class WebOfTrustTest {
     @Test
     fun testWithCrossSignedCertificates() {
         val certD = TestCertificateStores.disconnectedGraph()
-        val network = WebOfTrust(certD).buildNetwork()
+        val network = PGPNetworkParser(certD).buildNetwork()
 
         assertEquals(5, network.nodes.size)
         assertTrue {
@@ -73,7 +73,7 @@ class WebOfTrustTest {
     @Test
     fun testWotCreationOfEmptyCertificates() {
         val certD = TestCertificateStores.emptyGraph()
-        val network = WebOfTrust(certD).buildNetwork()
+        val network = PGPNetworkParser(certD).buildNetwork()
 
         assertTrue { network.nodes.isEmpty() }
         assertTrue { network.edges.isEmpty() }
@@ -83,7 +83,7 @@ class WebOfTrustTest {
     @Test
     fun testWotWithAnomaly() {
         val store = TestCertificateStores.anomalyGraph()
-        val network = WebOfTrust(store).buildNetwork()
+        val network = PGPNetworkParser(store).buildNetwork()
 
         assertEquals(1, network.nodes.size)
     }
@@ -92,7 +92,7 @@ class WebOfTrustTest {
     fun `referenceTime is propagated properly`() {
         val referenceTime = ReferenceTime.now()
 
-        val network = WebOfTrust(KeyRingCertificateStore(listOf()))
+        val network = PGPNetworkParser(KeyRingCertificateStore(listOf()))
                 .buildNetwork(referenceTime = referenceTime)
 
         assertEquals(referenceTime, network.referenceTime)

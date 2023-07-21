@@ -9,7 +9,7 @@ import org.bouncycastle.openpgp.PGPSignature
 import org.pgpainless.algorithm.RevocationStateType
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.key.info.KeyRingInfo
-import org.pgpainless.wot.WebOfTrust
+import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.network.Fingerprint
 import org.pgpainless.wot.network.Node
 import org.pgpainless.wot.network.RevocationState
@@ -39,7 +39,7 @@ interface PGPDSL {
     }
 
     fun RevocationState(signature: PGPSignature?): RevocationState {
-        return WebOfTrust.RevocationState(signature)
+        return PGPNetworkParser.RevocationState(signature)
     }
 
     fun RevocationState(pgpRevocationState: org.pgpainless.algorithm.RevocationState): RevocationState {

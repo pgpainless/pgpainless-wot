@@ -14,6 +14,6 @@ class AdHocTest: PGPDSL {
     fun test() {
         val vectors = AdHocVectors.BestViaRoot()
         val store = vectors.pgpCertificateStore
-        val network = WebOfTrust(store).buildNetwork()
+        val network = PGPNetworkParser(store).buildNetwork()
     }
 }

@@ -8,7 +8,7 @@ import org.bouncycastle.util.io.Streams
 import org.pgpainless.PGPainless
 import org.pgpainless.policy.Policy
 import org.pgpainless.wot.KeyRingCertificateStore
-import org.pgpainless.wot.WebOfTrust
+import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.network.ReferenceTime
 import java.io.File
@@ -60,7 +60,7 @@ interface ArtifactVectors {
         val inputStream = keyRingInputStream()
         val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(inputStream)
         val store = KeyRingCertificateStore(keyRing)
-        return WebOfTrust(store).buildNetwork(policy, referenceTime)
+        return PGPNetworkParser(store).buildNetwork(policy, referenceTime)
     }
 
     fun keyRingInputStream(): InputStream {

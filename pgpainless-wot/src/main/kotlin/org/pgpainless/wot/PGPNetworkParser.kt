@@ -32,14 +32,14 @@ import java.io.IOException
 import java.util.*
 
 /**
- * Create a [WebOfTrust] based on a [PGPCertificateStore] instance.
+ * Create a Network based on a [PGPCertificateStore] instance.
  *
  * @param certificateStore certificate store
  */
-class WebOfTrust(private val certificateStore: PGPCertificateStore) {
+class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
 
     /**
-     * Create a [WebOfTrust] based on a [PGPCertificateDirectory] instance, which gets adapted to the
+     * Create a Network based on a [PGPCertificateDirectory] instance, which gets adapted to the
      * [PGPCertificateStore] interface.
      *
      * @param certificateDirectory PGP-Certificate-Directory instance

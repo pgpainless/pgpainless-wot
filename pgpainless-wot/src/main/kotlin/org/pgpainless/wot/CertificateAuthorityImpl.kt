@@ -23,7 +23,7 @@ import java.util.*
 /**
  * Implementation of PGPainless' [CertificateAuthority] using pgpainless-wot.
  *
- * @param network Flow-Network, e.g. from [WebOfTrust.buildNetwork].
+ * @param network Flow-Network, e.g. from [PGPNetworkParser.buildNetwork].
  * @param trustRoots some trust anchors
  * @param certificateStore certificate store to extract certificates for path nodes from
  */
@@ -46,7 +46,7 @@ class CertificateAuthorityImpl(private val network: Network,
          */
         @JvmStatic
         fun webOfTrustFromCertificateStore(certificateStore: PGPCertificateStore, trustRoots: Roots, referenceTime: Date): CertificateAuthorityImpl {
-            val network = WebOfTrust(certificateStore).buildNetwork(referenceTime = ReferenceTime.timestamp(referenceTime))
+            val network = PGPNetworkParser(certificateStore).buildNetwork(referenceTime = ReferenceTime.timestamp(referenceTime))
             return CertificateAuthorityImpl(network, trustRoots, certificateStore)
         }
     }

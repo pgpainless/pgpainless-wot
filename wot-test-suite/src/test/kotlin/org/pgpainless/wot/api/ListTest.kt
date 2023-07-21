@@ -7,7 +7,7 @@ package org.pgpainless.wot.api
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
 import org.pgpainless.wot.KeyRingCertificateStore
-import org.pgpainless.wot.WebOfTrust
+import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.network.Root
 import org.pgpainless.wot.network.Roots
 import org.sequoia_pgp.wot.vectors.BestViaRootVectors
@@ -20,7 +20,7 @@ class ListTest {
         val v = BestViaRootVectors()
         val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(v.keyRingInputStream())
         val store = KeyRingCertificateStore(keyRing)
-        val network = WebOfTrust(store).buildNetwork(referenceTime = v.t0)
+        val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t0)
 
         val roots = Roots(Root(v.aliceFpr))
         val api = WoTAPI(network, roots, false, false, 120, v.t0)
@@ -33,7 +33,7 @@ class ListTest {
         val v = BestViaRootVectors()
         val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(v.keyRingInputStream())
         val store = KeyRingCertificateStore(keyRing)
-        val network = WebOfTrust(store).buildNetwork(referenceTime = v.t1)
+        val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t1)
 
         val roots = Roots(Root(v.aliceFpr))
         val api = WoTAPI(network, roots, false, false, 120, v.t1)
