@@ -33,7 +33,7 @@ class CertificateAuthorityImplTest {
 
     @Test
     fun testSuccessfulAuthentication() {
-        val authenticity = certAuthority.authenticate(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), v.targetUID, false, Date(), 120)
+        val authenticity = certAuthority.authenticateBinding(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), v.targetUID, false, Date(), 120)
         assertTrue { authenticity.isAuthenticated }
         assertEquals(v.targetFingerprint, Fingerprint(authenticity.certificate))
         assertEquals(
@@ -45,7 +45,7 @@ class CertificateAuthorityImplTest {
 
     @Test
     fun testUnsuccessfulAuthentication() {
-        val authenticity = certAuthority.authenticate(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), "Imposter <imposter@example.org>", false, Date() , 120)
+        val authenticity = certAuthority.authenticateBinding(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), "Imposter <imposter@example.org>", false, Date() , 120)
         assertFalse { authenticity.isAuthenticated }
     }
 

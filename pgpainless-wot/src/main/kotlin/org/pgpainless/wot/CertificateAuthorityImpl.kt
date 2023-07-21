@@ -50,7 +50,7 @@ class CertificateAuthorityImpl(private val network: Network,
         }
     }
 
-    override fun authenticate(fingerprint: OpenPgpFingerprint, userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): CertificateAuthenticity {
+    override fun authenticateBinding(fingerprint: OpenPgpFingerprint, userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): CertificateAuthenticity {
         val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.authenticate(AuthenticateAPI.Arguments(Fingerprint(fingerprint.toString()), userId, email))
@@ -58,14 +58,14 @@ class CertificateAuthorityImpl(private val network: Network,
         return mapToAuthenticity(result.binding, targetAmount)
     }
 
-    override fun lookup(userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
+    override fun lookupByUserId(userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
         val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.lookup(LookupAPI.Arguments(userId, email))
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
-    override fun identify(fingerprint: OpenPgpFingerprint, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
+    override fun identifyByFingerprint(fingerprint: OpenPgpFingerprint, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
         val api = WoTAPI(network, trustRoots, gossip = false, certificationNetwork = false,
             targetAmount, ReferenceTime.timestamp(referenceTime))
         val result = api.identify(IdentifyAPI.Arguments(Fingerprint(fingerprint.toString())))
