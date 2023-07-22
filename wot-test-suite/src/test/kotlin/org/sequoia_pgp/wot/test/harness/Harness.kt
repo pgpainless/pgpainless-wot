@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package org.sequoia_pgp.wot.suite.harness
+package org.sequoia_pgp.wot.test.harness
 
-import org.sequoia_pgp.wot.suite.ExecutionCallback
-import org.sequoia_pgp.wot.suite.SimpleTestCase
+import org.sequoia_pgp.wot.test.ExecutionCallback
+import org.sequoia_pgp.wot.test.SimpleTestCase
 
 /**
  * Abstract class to produce [SimpleTestCase.ExecutionCallback] instances for WOT CLI implementations.

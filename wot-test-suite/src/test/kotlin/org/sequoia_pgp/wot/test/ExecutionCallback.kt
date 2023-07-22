@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package org.sequoia_pgp.wot.suite
+package org.sequoia_pgp.wot.test
 
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
 

@@ -18,6 +18,11 @@ interface Formatter {
 
     fun format(authenticateResult: AuthenticateAPI.Result): String {
         return buildString {
+
+            if (authenticateResult.binding.paths.paths.isEmpty()) {
+                return "No paths found."
+            }
+
             append(format(authenticateResult.binding, authenticateResult.targetAmount))
             if (!authenticateResult.acceptable) {
                 appendLine()

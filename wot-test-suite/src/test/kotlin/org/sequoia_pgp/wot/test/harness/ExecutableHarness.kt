@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package org.sequoia_pgp.wot.suite.harness
+package org.sequoia_pgp.wot.test.harness
 
 import org.bouncycastle.util.io.Streams
-import org.sequoia_pgp.wot.suite.ExecutionCallback
+import org.sequoia_pgp.wot.test.ExecutionCallback
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
 import java.io.ByteArrayOutputStream
 
@@ -26,8 +26,11 @@ class ExecutableHarness(val executable: String, val environment: Array<String>):
                     val bOut = ByteArrayOutputStream()
                     Streams.pipeAll(it, bOut)
                     bOut.toString()
-                }
-                Streams.pipeAll(p.errorStream, System.err)
+                }.plus(p.errorStream.let {
+                    val bOut = ByteArrayOutputStream()
+                    Streams.pipeAll(it, bOut)
+                    bOut.toString()
+                })
                 val exit = p.waitFor()
                 return output to exit
             }

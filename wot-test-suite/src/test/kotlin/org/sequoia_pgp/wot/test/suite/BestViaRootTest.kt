@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package org.sequoia_pgp.wot.suite
+package org.sequoia_pgp.wot.test.suite
 
+import org.sequoia_pgp.wot.test.SimpleTestCase
 import org.sequoia_pgp.wot.vectors.BestViaRootVectors
 
-class BestViaRoot : SimpleTestCase(BestViaRootVectors()) {
+class BestViaRootTest : SimpleTestCase(BestViaRootVectors()) {
 
     override fun arguments(): Array<String> {
         val v = vectors as BestViaRootVectors

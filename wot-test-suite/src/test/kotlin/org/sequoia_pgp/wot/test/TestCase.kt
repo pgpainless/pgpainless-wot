@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package org.sequoia_pgp.wot.suite
+package org.sequoia_pgp.wot.test
 
 import org.junit.jupiter.api.Named
 import org.junit.jupiter.params.provider.Arguments
-import org.sequoia_pgp.wot.suite.harness.ExecutableHarness
-import org.sequoia_pgp.wot.suite.harness.WotCLIHarness
+import org.sequoia_pgp.wot.test.harness.ExecutableHarness
+import org.sequoia_pgp.wot.test.harness.WotCLIHarness
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
 import java.io.File
 import kotlin.test.assertEquals
@@ -33,10 +33,10 @@ open class TestCase(val vectors: ArtifactVectors) {
             vectors.tempKeyRingFile.absolutePath
 
     fun assertResultEquals(
-            callback: ExecutionCallback,
-            arguments: Array<String>,
-            expectedOutput: String,
-            expectedExitCode: Int) {
+        callback: ExecutionCallback,
+        arguments: Array<String>,
+        expectedOutput: String,
+        expectedExitCode: Int) {
         val result = callback.execute(vectors, arguments)
 
         assertEquals(expectedOutput, result.first)
