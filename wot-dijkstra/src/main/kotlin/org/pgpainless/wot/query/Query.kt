@@ -201,7 +201,7 @@ class Query(private val rawNetwork: Network,
                     Cost(1, amount)
                 } else {
                     // XX: temp hack, see above
-                    if (ec.trustDepth < signeeCost.length) {
+                    if (!certificationNetwork && ec.trustDepth < signeeCost.length) {
                         logger.debug("      Certification does not allow enough depth ({}, needed: {}), skipping",
                                 ec.trustDepth, signeeCost.length)
                         continue
@@ -271,7 +271,7 @@ class Query(private val rawNetwork: Network,
 
         while (true) {
             val ec = fp.next ?: break
-            p.append(ec)
+            p.append(ec, certificationNetwork)
 
             if (ec.userId == targetUserid) {
                 // We've arrived (the target node may have an extra self-sig forward pointer to itself, but we don't

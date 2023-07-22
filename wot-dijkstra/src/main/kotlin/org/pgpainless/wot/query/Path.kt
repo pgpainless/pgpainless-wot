@@ -86,6 +86,10 @@ class Path(
             min
         }
 
+    fun append(nComponent: EdgeComponent) {
+        append(nComponent, false)
+    }
+
     /**
      * Append an edge to the path and decrease the [residualDepth] of the path by 1.
      *
@@ -93,11 +97,11 @@ class Path(
      * @throws IllegalArgumentException if the path runs out of residual depth
      * @throws IllegalArgumentException if the addition of the [EdgeComponent] would result in a cyclic path
      */
-    fun append(nComponent: EdgeComponent) {
+    fun append(nComponent: EdgeComponent, certificationNetwork: Boolean) {
         require(target.fingerprint == nComponent.issuer.fingerprint) {
             "Cannot append edge to path: Path's tail is not issuer of the edge."
         }
-        require(residualDepth > 0) {
+        require(certificationNetwork || residualDepth > 0) {
             "Not enough depth."
         }
 
@@ -130,7 +134,8 @@ class Path(
         }
         require(!cyclic) { "Adding the edge to the path would create a cycle." }
 
-        residualDepth = nComponent.trustDepth.min(residualDepth.decrease(1))
+        if (!certificationNetwork)
+            residualDepth = nComponent.trustDepth.min(residualDepth.decrease(1))
         edges.add(nComponent)
     }
 
