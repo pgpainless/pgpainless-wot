@@ -12,11 +12,11 @@ import org.sequoia_pgp.wot.vectors.CertificationNetworkVectors
 
 class CertificationNetworkTest: TestCase(CertificationNetworkVectors()) {
 
-    val v = vectors as CertificationNetworkVectors
+    private val v = vectors as CertificationNetworkVectors
 
     @ParameterizedTest
     @MethodSource("instances")
-    fun `without --certification-network we can only authenticate Bob`(callback: ExecutionCallback) {
+    fun `without --certification-network Alice can only authenticate Bob`(callback: ExecutionCallback) {
         val bobArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 authenticate ${v.bobFpr} ${v.bobUid}".split(" ").toTypedArray()
         val carolArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 authenticate ${v.carolFpr} ${v.carolUid}".split(" ").toTypedArray()
         val daveArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 authenticate ${v.daveFpr} ${v.daveUid}".split(" ").toTypedArray()
@@ -37,7 +37,7 @@ class CertificationNetworkTest: TestCase(CertificationNetworkVectors()) {
 
     @ParameterizedTest
     @MethodSource("instances")
-    fun `with --certification-network we can authenticate all`(callback: ExecutionCallback) {
+    fun `with --certification-network Alice can authenticate all`(callback: ExecutionCallback) {
         val bobArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 --certification-network authenticate ${v.bobFpr} ${v.bobUid}".split(" ").toTypedArray()
         val carolArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 --certification-network authenticate ${v.carolFpr} ${v.carolUid}".split(" ").toTypedArray()
         val daveArgs = "-k ${keyRingPath()} -r ${v.aliceFpr} -a 120 --certification-network authenticate ${v.daveFpr} ${v.daveUid}".split(" ").toTypedArray()
