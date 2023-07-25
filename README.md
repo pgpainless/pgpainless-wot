@@ -7,6 +7,7 @@ SPDX-License-Identifier: CC0-1.0
 [![status-badge](https://ci.codeberg.org/api/badges/PGPainless/pgpainless-wot/status.svg)](https://ci.codeberg.org/PGPainless/pgpainless-wot)
 [![REUSE status](https://api.reuse.software/badge/codeberg.org/PGPainless/pgpainless-wot)](https://api.reuse.software/info/codeberg.org/PGPainless/pgpainless-wot)
 [![Coverage Status](https://coveralls.io/repos/github/pgpainless/pgpainless-wot/badge.svg?branch=main)](https://coveralls.io/github/pgpainless/pgpainless-wot?branch=main)
+[![Maven Central](https://badgen.net/maven/v/maven-central/org.pgpainless/pgpainless-wot)](https://search.maven.org/artifact/org.pgpainless/pgpainless-wot)
 
 An implementation of the [OpenPGP Web of Trust](https://sequoia-pgp.gitlab.io/sequoia-wot/) using [PGPainless](https://pgpainless.org).
 
