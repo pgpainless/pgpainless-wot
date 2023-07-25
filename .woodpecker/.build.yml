@@ -9,5 +9,5 @@ pipeline:
       # Code is clean
       - gradle check javadocAll
       # Code has coverage
-      - gradle jacocoRootReport coveralls
+      - gradle jacocoRootReport coverallsJacoco
     secrets: [COVERALLS_REPO_TOKEN]
