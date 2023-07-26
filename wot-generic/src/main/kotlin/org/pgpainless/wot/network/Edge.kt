@@ -6,6 +6,10 @@ package org.pgpainless.wot.network
 
 import java.util.*
 
+/**
+ * Edge between two nodes.
+ * The edge is made up of at least one delegation or certification, but can contain multiple components.
+ */
 class Edge(val issuer: Node,
            val target: Node,
            val delegations: MutableSet<Delegation>,
@@ -23,7 +27,10 @@ class Edge(val issuer: Node,
                     if (component is Certification) put(component.userId, mutableSetOf(component))
                 }.toMutableMap())
 
-    fun unite(other: Edge): Edge {
+    /**
+     * Join this edge with another one.
+     */
+    fun join(other: Edge): Edge {
         require(issuer.fingerprint == other.issuer.fingerprint)
         require(target.fingerprint == other.target.fingerprint)
 
@@ -41,6 +48,9 @@ class Edge(val issuer: Node,
         }
     }
 
+    /**
+     * Add a singe component to the edge.
+     */
     fun addComponent(component: Component) {
         require(issuer.fingerprint == component.issuer.fingerprint)
         require(target.fingerprint == component.target.fingerprint)
@@ -73,6 +83,10 @@ class Edge(val issuer: Node,
         }
     }
 
+    /**
+     * Return a joined map of all components of this edge. Certifications are keyed by userId, while delegations
+     * are keyed with null.
+     */
     fun components(): Map<String?, List<Component>> {
         return mutableMapOf<String?, List<Component>>()
                 .apply {
@@ -105,6 +119,9 @@ class Edge(val issuer: Node,
 
     }
 
+    /**
+     * Delegation made as a direct-key signature.
+     */
     class Delegation(
             issuer: Node,
             target: Node,
@@ -121,6 +138,9 @@ class Edge(val issuer: Node,
         }
     }
 
+    /**
+     * Certification made over a user-id.
+     */
     class Certification(issuer: Node,
                         target: Node,
                         val userId: String,

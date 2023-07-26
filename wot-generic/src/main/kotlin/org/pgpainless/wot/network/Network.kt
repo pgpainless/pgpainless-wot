@@ -4,23 +4,45 @@
 
 package org.pgpainless.wot.network
 
+/**
+ * Flow-Network containing nodes and edges between them.
+ *
+ * @param nodes map of nodes keyed by their identifier
+ * @param edges map of issuer/target pairs to edges
+ */
 class Network(
         val nodes: Map<Identifier, Node>,
         val edges: Map<Pair<Identifier, Identifier>, Edge>) {
 
     constructor(): this(mapOf(), mapOf())
 
-    fun getIssuedBy(identifier: Identifier): List<Edge> {
-        return edges.filter { it.key.first == identifier }.map { it.value }
+    /**
+     * Return all edges issued by the node with the given identifier.
+     *
+     * @param issuer identifier of the issuer node
+     */
+    fun getIssuedBy(issuer: Identifier): List<Edge> {
+        return edges.filter { it.key.first == issuer }.map { it.value }
     }
 
-    fun getIssuedFor(identifier: Identifier): List<Edge> {
-        return edges.filter { it.key.second == identifier }.map { it.value }
+    /**
+     * Return all edges issued over the node with the given identifier.
+     *
+     * @param target identifier of the target node
+     */
+    fun getIssuedFor(target: Identifier): List<Edge> {
+        return edges.filter { it.key.second == target }.map { it.value }
     }
 
+    /**
+     * The total number of edges in the network.
+     */
     val numberOfEdges: Int
         get() = edges.size
 
+    /**
+     * The total number of edge-components (signatures) that make up the network.
+     */
     val numberOfSignatures: Int
         get() = edges.values.sumOf { edge ->
             edge.components().values.sumOf { it.size }
@@ -34,6 +56,10 @@ class Network(
     }
 
     companion object {
+
+        /**
+         * Return a [Builder] for the Network.
+         */
         @JvmStatic
         fun builder(): Builder = Builder()
     }

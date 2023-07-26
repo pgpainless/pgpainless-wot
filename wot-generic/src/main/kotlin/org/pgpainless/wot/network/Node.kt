@@ -6,6 +6,9 @@ package org.pgpainless.wot.network
 
 import java.util.*
 
+/**
+ * A node in the network.
+ */
 class Node(val fingerprint: Identifier,
            val expirationTime: Date? = null,
            val revocationState: RevocationState = RevocationState.notRevoked(),

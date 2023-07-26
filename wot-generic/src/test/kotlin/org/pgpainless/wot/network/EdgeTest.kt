@@ -61,7 +61,7 @@ class EdgeTest: NetworkDSL {
         val set = Edge(aliceSignsBob)
         val others = Edge(aliceSignsBobUserId)
 
-        set.unite(others)
+        set.join(others)
         assertEquals(2, set.components().size)
         assertTrue { set.components()[null]!!.contains(aliceSignsBob) }
         assertTrue { set.components()["Bob <bob@example.org>"]!!.contains(aliceSignsBobUserId) }
@@ -72,7 +72,7 @@ class EdgeTest: NetworkDSL {
         val set = Edge(aliceSignsBob)
         val issuerMismatch = Edge(charlieSignsBob)
 
-        assertThrows<IllegalArgumentException> { set.unite(issuerMismatch) }
+        assertThrows<IllegalArgumentException> { set.join(issuerMismatch) }
     }
 
     @Test
@@ -80,14 +80,14 @@ class EdgeTest: NetworkDSL {
         val set = Edge(aliceSignsBob)
         val targetMismatch = Edge(aliceSignsCharlie)
 
-        assertThrows<IllegalArgumentException> { set.unite(targetMismatch) }
+        assertThrows<IllegalArgumentException> { set.join(targetMismatch) }
     }
 
     @Test
     fun `verify that merge()ing an edge with itself is idempotent`() {
         val set = Edge(aliceSignsBob)
         assertEquals(1, set.components().size)
-        set.unite(set)
+        set.join(set)
         assertEquals(1, set.components().size)
     }
 
