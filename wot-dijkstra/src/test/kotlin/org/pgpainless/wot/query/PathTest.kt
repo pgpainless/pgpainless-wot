@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2023 Paul Schaub <vanitasvitae@fsfe.org>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.pgpainless.wot.dsl.NetworkDSL
-import org.pgpainless.wot.network.Depth
+import org.pgpainless.wot.network.TrustDepth
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -18,26 +18,26 @@ class PathTest : NetworkDSL {
     private val bob = Node("1111111111111111111111111111111111111111")
 
     // Root -(255, 255)-> Alice
-    private val root_alice__fully_trusted = EdgeComponent(root, alice, 255, Depth.unconstrained())
+    private val root_alice__fully_trusted = Delegation(root, alice, 255, TrustDepth.unlimited())
 
     // Root -(60,0)-> Alice
-    private val root_alice__marginally_trusted = EdgeComponent(root, alice, 60, Depth.limited(0))
+    private val root_alice__marginally_trusted = Delegation(root, alice, 60, TrustDepth.limited(0))
 
     // Alice -(255,255)-> Root
-    private val alice_root = EdgeComponent(alice, root, 255, Depth.unconstrained())
+    private val alice_root = Delegation(alice, root, 255, TrustDepth.unlimited())
 
     // Alice -(120, 0)-> Bob
-    private val alice_bob = EdgeComponent(alice, bob)
+    private val alice_bob = Delegation(alice, bob)
 
     // Alice -(120, 1)-> Bob
-    private val alice_bob_depth_1 = EdgeComponent(alice, bob, 120, Depth.auto(1))
+    private val alice_bob_depth_1 = Delegation(alice, bob, 120, TrustDepth.auto(1))
 
     // Root -> Root
-    private val root_root = EdgeComponent(root, root, 120, Depth.limited(1))
+    private val root_root = Delegation(root, root, 120, TrustDepth.limited(1))
 
-    private val root_selfsig = EdgeComponent(root, root, "root@example.org")
+    private val root_selfsig = Certification(root, root, "root@example.org")
 
-    private val bob_selfsig = EdgeComponent(bob, bob, "bob@example.org")
+    private val bob_selfsig = Certification(bob, bob, "bob@example.org")
 
     @Test
     fun `longer path that ends in a selfsig`() {
@@ -47,7 +47,7 @@ class PathTest : NetworkDSL {
         path.append(bob_selfsig)
 
         assertEquals(120, path.amount)
-        assertEquals(0, path.residualDepth.value())
+        assertEquals(0, path.residualDepth.value)
     }
 
     @Test

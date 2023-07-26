@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * Creates 4 10 element cliques.  To authenticate the target, the path
@@ -69,40 +69,40 @@ import org.pgpainless.wot.network.Fingerprint
  */
 open class CliquesVectors: ArtifactVectors {
 
-    val rootFpr = Fingerprint("D2B0C3835C01B0C120BC540DA4AA8F880BA512B5")
+    val rootFpr = Identifier("D2B0C3835C01B0C120BC540DA4AA8F880BA512B5")
     val rootUid = "<root@example.org>"
 
-    val a0Fpr = Fingerprint("363082E9EEB22E50AD303D8B1BFE9BA3F4ABD40E")
+    val a0Fpr = Identifier("363082E9EEB22E50AD303D8B1BFE9BA3F4ABD40E")
     val a0Uid = "<a-0@example.org>"
 
-    val a1Fpr = Fingerprint("7974C04E8D5B540D23CD4E62DDFA779D91C69894")
+    val a1Fpr = Identifier("7974C04E8D5B540D23CD4E62DDFA779D91C69894")
     val a1Uid = "<a-1@example.org>"
 
-    val b0Fpr = Fingerprint("25D8EAAB894705BB64D4A6A89649EF81AEFE5162")
+    val b0Fpr = Identifier("25D8EAAB894705BB64D4A6A89649EF81AEFE5162")
     val b0Uid = "<b-0@example.org>"
 
-    val b1Fpr = Fingerprint("46D2F5CED9BD3D63A11DDFEE1BA019506BE67FBB")
+    val b1Fpr = Identifier("46D2F5CED9BD3D63A11DDFEE1BA019506BE67FBB")
     val b1Uid = "<b-1@example.org>"
 
-    val c0Fpr = Fingerprint("A0CD87582C21743C0E30637F7FADB1C3FEFBFE59")
+    val c0Fpr = Identifier("A0CD87582C21743C0E30637F7FADB1C3FEFBFE59")
     val c0Uid = "<c-0@example.org>"
 
-    val c1Fpr = Fingerprint("5277C14F9D37A0F4D615DD9CCDCC1AC8464C8FE5")
+    val c1Fpr = Identifier("5277C14F9D37A0F4D615DD9CCDCC1AC8464C8FE5")
     val c1Uid = "<c-1@example.org>"
 
-    val d0Fpr = Fingerprint("C24CC09102D22E38E8393C55166982561E140C03")
+    val d0Fpr = Identifier("C24CC09102D22E38E8393C55166982561E140C03")
     val d0Uid = "<d-0@example.org>"
 
-    val d1Fpr = Fingerprint("7A80DB5330B7D900D5BD1F82EAD72FF7914078B2")
+    val d1Fpr = Identifier("7A80DB5330B7D900D5BD1F82EAD72FF7914078B2")
     val d1Uid = "<d-1@example.org>"
 
-    val e0Fpr = Fingerprint("D1E9F85CEF6271699FBDE5AB26EFE0E035AC522E")
+    val e0Fpr = Identifier("D1E9F85CEF6271699FBDE5AB26EFE0E035AC522E")
     val e0Uid = "<e-0@example.org>"
 
-    val f0Fpr = Fingerprint("C0FFAEDEF0928B181265775A222B480EB43E0AFF")
+    val f0Fpr = Identifier("C0FFAEDEF0928B181265775A222B480EB43E0AFF")
     val f0Uid = "<f-0@example.org>"
 
-    val targetFpr = Fingerprint("CE22ECD282F219AA99598BA3B58A7DA61CA97F55")
+    val targetFpr = Identifier("CE22ECD282F219AA99598BA3B58A7DA61CA97F55")
     val targetUid = "<target@example.org>"
 
     /**

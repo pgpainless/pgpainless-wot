@@ -39,6 +39,7 @@ dependencies {
 
     // Web of Trust
     implementation(project(":pgpainless-wot"))
+    implementation(project(":wot-dijkstra"))
 
     // Web Key Directory
     // implementation("org.pgpainless:wkd-java:0.1.2")

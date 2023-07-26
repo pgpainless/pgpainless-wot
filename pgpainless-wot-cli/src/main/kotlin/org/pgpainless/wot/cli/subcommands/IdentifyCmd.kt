@@ -6,7 +6,7 @@ package org.pgpainless.wot.cli.subcommands
 
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
@@ -19,7 +19,7 @@ class IdentifyCmd: Callable<Int> {
     lateinit var parent: WebOfTrustCLI
 
     @Parameters(index = "0", description = ["Certificate fingerprint."], paramLabel = "FINGERPRINT", converter = [FingerprintConverter::class])
-    lateinit var fingerprint: Fingerprint
+    lateinit var fingerprint: Identifier
 
     /**
      * Execute the command.

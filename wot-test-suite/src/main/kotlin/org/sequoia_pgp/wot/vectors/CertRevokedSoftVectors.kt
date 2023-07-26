@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * If a certificate is revoked, this impacts the validity of a
@@ -105,18 +105,18 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class CertRevokedSoftVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("66037F98B444BBAFDFE98E871738DFAB86878262")
+    val aliceFpr = Identifier("66037F98B444BBAFDFE98E871738DFAB86878262")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("4CD8737F76C2B897C4F058DBF28C47540FA2C3B3")
+    val bobFpr = Identifier("4CD8737F76C2B897C4F058DBF28C47540FA2C3B3")
     val bobUid = "<bob@example.org>"
     // Certified by: 66037F98B444BBAFDFE98E871738DFAB86878262
 
-    val carolFpr = Fingerprint("AB4E3F8EE8BBD3459754D75ACE570F9B8C7DC75D")
+    val carolFpr = Identifier("AB4E3F8EE8BBD3459754D75ACE570F9B8C7DC75D")
     val carolUid = "<carol@example.org>"
     // Certified by: 66037F98B444BBAFDFE98E871738DFAB86878262
 
-    val daveFpr = Fingerprint("DF6A440ED9DE723B0EBC7F50E24FBB1B9FADC999")
+    val daveFpr = Identifier("DF6A440ED9DE723B0EBC7F50E24FBB1B9FADC999")
     val daveUid = "<dave@example.org>"
     // Certified by: 4CD8737F76C2B897C4F058DBF28C47540FA2C3B3
     // Certified by: AB4E3F8EE8BBD3459754D75ACE570F9B8C7DC75D

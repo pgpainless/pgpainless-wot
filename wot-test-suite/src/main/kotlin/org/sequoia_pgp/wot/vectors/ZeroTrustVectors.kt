@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * If the most recent certification has a trust amount of 0, then that
@@ -27,15 +27,15 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class ZeroTrustVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("931E51F99B89649783A1DFF265266E28246040C2")
+    val aliceFpr = Identifier("931E51F99B89649783A1DFF265266E28246040C2")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("A1042B157AFA71F005208D645915549D8D21A97B")
+    val bobFpr = Identifier("A1042B157AFA71F005208D645915549D8D21A97B")
     val bobUid = "<bob@example.org>"
     // Certified by: 931E51F99B89649783A1DFF265266E28246040C2
     // Certified by: 931E51F99B89649783A1DFF265266E28246040C2
 
-    val carolFpr = Fingerprint("E06DB0539D99759681D7EC8508A267AE8FA838F4")
+    val carolFpr = Identifier("E06DB0539D99759681D7EC8508A267AE8FA838F4")
     val carolUid = "<carol@example.org>"
     // Certified by: A1042B157AFA71F005208D645915549D8D21A97B
 

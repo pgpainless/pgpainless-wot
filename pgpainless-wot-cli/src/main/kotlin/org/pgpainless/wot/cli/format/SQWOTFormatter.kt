@@ -6,7 +6,7 @@ package org.pgpainless.wot.cli.format
 
 import org.pgpainless.wot.api.AuthenticationLevel
 import org.pgpainless.wot.api.Binding
-import org.pgpainless.wot.network.EdgeComponent
+import org.pgpainless.wot.network.Edge
 import java.text.SimpleDateFormat
 
 class SQWOTFormatter: Formatter {
@@ -48,7 +48,7 @@ class SQWOTFormatter: Formatter {
                 append(indent); appendLine("◯ ${path.root.fingerprint}$originUserId")
 
                 for ((eIndex, edge) in path.certifications.withIndex()) {
-                    val targetUserId = if (edge.userId == null)
+                    val targetUserId = if (edge !is Edge.Certification)
                         ""
                     else if (eIndex == path.certifications.lastIndex)
                         " \"${edge.userId}\""
@@ -78,8 +78,8 @@ class SQWOTFormatter: Formatter {
         }
     }
 
-    private fun introducerType(edge: EdgeComponent): String {
-        if (edge.trustDepth.value() <= 0) {
+    private fun introducerType(edge: Edge.Component): String {
+        if (edge.trustDepth <= 0) {
             return ""
         }
 
@@ -91,10 +91,10 @@ class SQWOTFormatter: Formatter {
                 append("fully trusted ")
             }
 
-            if (edge.trustDepth.value() == 1) {
-                append("introducer (depth: ${edge.trustDepth.value()})")
+            if (edge.trustDepth.value == 1) {
+                append("introducer (depth: ${edge.trustDepth})")
             } else {
-                append("meta-introducer (depth: ${edge.trustDepth.value()})")
+                append("meta-introducer (depth: ${edge.trustDepth})")
             }
         }
     }

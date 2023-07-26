@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * If a User ID is revoked, then that overrides any later positive
@@ -41,15 +41,15 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class UserIdRevokedVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("01672BB67E4B4047E5A4EC0A731CEA092C465FC8")
+    val aliceFpr = Identifier("01672BB67E4B4047E5A4EC0A731CEA092C465FC8")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("EA479A77CD074458EAFE56B4861BF42FF490C581")
+    val bobFpr = Identifier("EA479A77CD074458EAFE56B4861BF42FF490C581")
     val bobUid = "<bob@example.org>"
     // Certified by: 01672BB67E4B4047E5A4EC0A731CEA092C465FC8
     // Certified by: 01672BB67E4B4047E5A4EC0A731CEA092C465FC8
 
-    val carolFpr = Fingerprint("212873BB9C4CC49F8E5A6FEA78BC5397470BA7F0")
+    val carolFpr = Identifier("212873BB9C4CC49F8E5A6FEA78BC5397470BA7F0")
     val carolUid = "<carol@example.org>"
     // Certified by: EA479A77CD074458EAFE56B4861BF42FF490C581
     // Certified by: EA479A77CD074458EAFE56B4861BF42FF490C581

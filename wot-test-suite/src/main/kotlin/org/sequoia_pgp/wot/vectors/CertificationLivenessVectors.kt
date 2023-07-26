@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * Consider the following timeline:
@@ -62,15 +62,15 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class CertificationLivenessVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("77C077250C26357E5E64A58A41426350B1D7F738")
+    val aliceFpr = Identifier("77C077250C26357E5E64A58A41426350B1D7F738")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("840891562819D3A108C4DA1BB31438DE34F8CF69")
+    val bobFpr = Identifier("840891562819D3A108C4DA1BB31438DE34F8CF69")
     val bobUid = "<bob@example.org>"
     // Certified by: 77C077250C26357E5E64A58A41426350B1D7F738
     // Certified by: 77C077250C26357E5E64A58A41426350B1D7F738
 
-    val carolFpr = Fingerprint("E8BB154D000C17AC87291D7271553C836973FE01")
+    val carolFpr = Identifier("E8BB154D000C17AC87291D7271553C836973FE01")
     val carolUid = "<carol@example.org>"
     // Certified by: 840891562819D3A108C4DA1BB31438DE34F8CF69
     // Certified by: 840891562819D3A108C4DA1BB31438DE34F8CF69

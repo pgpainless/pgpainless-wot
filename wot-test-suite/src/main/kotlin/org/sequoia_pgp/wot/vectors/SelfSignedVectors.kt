@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * B tsigns <C, c1> and we want to authenticate c1.  This should work
@@ -24,19 +24,19 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class SelfSignedVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("838454E0D61D046300B408A908A4FDB4F368ECB9")
+    val aliceFpr = Identifier("838454E0D61D046300B408A908A4FDB4F368ECB9")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("7A7B5DE6C8F464CAB78BEFB9CE14BEE51D4DEC01")
+    val bobFpr = Identifier("7A7B5DE6C8F464CAB78BEFB9CE14BEE51D4DEC01")
     val bobUid = "<bob@example.org>"
     // Certified by: 838454E0D61D046300B408A908A4FDB4F368ECB9
 
-    val carolFpr = Fingerprint("830230061426EE99A0455E6ADA869CF879A5630D")
+    val carolFpr = Identifier("830230061426EE99A0455E6ADA869CF879A5630D")
     val carolUid = "<carol@example.org>"
     // Certified by: 7A7B5DE6C8F464CAB78BEFB9CE14BEE51D4DEC01
     val carolOtherOrgUid = "<carol@other.org>"
 
-    val daveFpr = Fingerprint("51A5E15F87AC6ECAFBEA930FA5F30AF6EB6EF14A")
+    val daveFpr = Identifier("51A5E15F87AC6ECAFBEA930FA5F30AF6EB6EF14A")
     val daveUid = "<dave@example.org>"
     // Certified by: 830230061426EE99A0455E6ADA869CF879A5630D
 

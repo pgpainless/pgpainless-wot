@@ -6,19 +6,18 @@ package org.pgpainless.wot.cli
 
 import org.pgpainless.PGPainless
 import org.pgpainless.certificate_store.PGPainlessCertD
+import org.pgpainless.wot.DijkstraAlgorithmFactory
 import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.api.WebOfTrustAPI
-import org.pgpainless.wot.cli.converters.ReferenceTimeConverter
-import org.pgpainless.wot.cli.converters.RootConverter
+import org.pgpainless.wot.cli.converters.DateConverter
+import org.pgpainless.wot.cli.converters.TrustRootsConverter
 import org.pgpainless.wot.cli.format.Formatter
 import org.pgpainless.wot.cli.format.SQWOTFormatter
 import org.pgpainless.wot.cli.subcommands.*
 import org.pgpainless.wot.letIf
-import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.network.ReferenceTime
-import org.pgpainless.wot.network.Root
-import org.pgpainless.wot.network.Roots
+import org.pgpainless.wot.network.Identifier
+import org.pgpainless.wot.network.TrustRoot
 import pgp.cert_d.BaseDirectoryProvider
 import pgp.cert_d.PGPCertificateStoreAdapter
 import pgp.cert_d.SpecialNames
@@ -27,7 +26,9 @@ import pgp.certificate_store.PGPCertificateStore
 import picocli.CommandLine
 import picocli.CommandLine.*
 import java.io.File
+import java.util.*
 import java.util.concurrent.Callable
+import kotlin.NoSuchElementException
 import kotlin.system.exitProcess
 
 /**
@@ -36,19 +37,19 @@ import kotlin.system.exitProcess
  * @see <a href="https://gitlab.com/sequoia-pgp/sequoia-wot/">Sequoia Web of Trust Reference Implementation</a>
  */
 @Command(name = "pgpainless-wot",
-    subcommands = [
-        AuthenticateCmd::class,
-        IdentifyCmd::class,
-        ListCmd::class,
-        LookupCmd::class,
-        PathCmd::class,
-        HelpCommand::class
-    ]
+        subcommands = [
+            AuthenticateCmd::class,
+            IdentifyCmd::class,
+            ListCmd::class,
+            LookupCmd::class,
+            PathCmd::class,
+            HelpCommand::class
+        ]
 )
 class WebOfTrustCLI: Callable<Int> {
 
-    @Option(names = ["--trust-root", "-r"], description = ["One or more certificates to use as trust-roots."], converter = [RootConverter::class], paramLabel = "FINGERPRINT")
-    var optTrustRoot: List<Root> = listOf()
+    @Option(names = ["--trust-root", "-r"], description = ["One or more certificates to use as trust-roots."], converter = [TrustRootsConverter::class], paramLabel = "FINGERPRINT")
+    var optTrustRoot: List<TrustRoot> = listOf()
 
     @ArgGroup(exclusive = true)
     var optTrustAmount: TrustAmount = TrustAmount()
@@ -74,8 +75,8 @@ class WebOfTrustCLI: Callable<Int> {
     var optGossip = false
 
     @Option(names = ["--time"], description = ["Reference time."],
-        converter = [ReferenceTimeConverter::class], paramLabel = "TIMESTAMP")
-    val optReferenceTime: ReferenceTime = ReferenceTime.now()
+            converter = [DateConverter::class], paramLabel = "TIMESTAMP")
+    val optReferenceTime: Date = Date()
 
     @Option(names = ["--known-notation"], description = ["Add a notation to the list of known notations."], paramLabel = "NOTATION NAME")
     var optKnownNotations: Array<String> = arrayOf()
@@ -109,8 +110,8 @@ class WebOfTrustCLI: Callable<Int> {
         var optKeyring: Array<File>? = null
 
         @Option(names = ["--cert-d"],
-            description = ["Specify a pgp-cert-d base directory. Leave empty to fallback to the default pgp-cert-d location."],
-            arity = "0..1", fallbackValue = "", paramLabel = "PATH")
+                description = ["Specify a pgp-cert-d base directory. Leave empty to fallback to the default pgp-cert-d location."],
+                arity = "0..1", fallbackValue = "", paramLabel = "PATH")
         var optPgpCertD: String? = null
 
         @Option(names = ["--gpg"], description = ["Read trust roots and keyring from GnuPG."])
@@ -123,52 +124,53 @@ class WebOfTrustCLI: Callable<Int> {
                 }
                 if (optKeyring != null) {
                     return KeyRingCertificateStore(
-                        optKeyring!!.map {
-                            PGPainless.readKeyRing().publicKeyRingCollection(it.inputStream())
-                        }
+                            optKeyring!!.map {
+                                PGPainless.readKeyRing().publicKeyRingCollection(it.inputStream())
+                            }
                     )
                 }
 
                 if (optPgpCertD == "") {
                     val certDFile = BaseDirectoryProvider.getDefaultBaseDir()
                     val certD = PGPainlessCertD.fileBased(
-                        certDFile,
-                        InMemorySubkeyLookupFactory())
+                            certDFile,
+                            InMemorySubkeyLookupFactory())
                     return PGPCertificateStoreAdapter(certD)
                 }
                 val certD = PGPainlessCertD.fileBased(
-                    File(optPgpCertD!!),
-                    InMemorySubkeyLookupFactory())
+                        File(optPgpCertD!!),
+                        InMemorySubkeyLookupFactory())
                 return PGPCertificateStoreAdapter(certD)
             }
     }
 
     val outputFormatter: Formatter = SQWOTFormatter()
 
-    private val trustRoots: Roots
+    private val trustRoots: Set<TrustRoot>
         get() {
             return optTrustRoot
-                .letIf(optKeyRing.optGpg || optGpgOwnerTrust) {
-                    plus(gpgHelper.readGpgOwnertrust())
-                }.letIf(optKeyRing.optPgpCertD != null) {
-                    try {
-                        val rootCert = optKeyRing.get.getCertificate(SpecialNames.TRUST_ROOT)
-                        plus(Root(Fingerprint(rootCert.fingerprint), Int.MAX_VALUE))
-                    } catch (e: NoSuchElementException) { this }
-                }.let { Roots(it) }
+                    .letIf(optKeyRing.optGpg || optGpgOwnerTrust) {
+                        plus(gpgHelper.readGpgOwnertrust())
+                    }.letIf(optKeyRing.optPgpCertD != null) {
+                        try {
+                            val rootCert = optKeyRing.get.getCertificate(SpecialNames.TRUST_ROOT)
+                            plus(TrustRoot(Identifier(rootCert.fingerprint), Int.MAX_VALUE))
+                        } catch (e: NoSuchElementException) { this }
+                    }.toSet()
         }
 
     val api: WebOfTrustAPI
         get() {
             val network = PGPNetworkParser(optKeyRing.get)
-                .buildNetwork(referenceTime = optReferenceTime)
+                    .buildNetwork(referenceTime = optReferenceTime)
             return WebOfTrustAPI(
-                network = network,
-                trustRoots = trustRoots,
-                gossip = optGossip,
-                certificationNetwork = optCertificationNetwork,
-                trustAmount = optTrustAmount.get(optCertificationNetwork),
-                referenceTime = optReferenceTime)
+                    network = network,
+                    trustRoots = trustRoots,
+                    gossip = optGossip,
+                    certificationNetwork = optCertificationNetwork,
+                    trustAmount = optTrustAmount.get(optCertificationNetwork),
+                    referenceTime = optReferenceTime,
+                    shortestPathAlgorithmFactory = DijkstraAlgorithmFactory())
         }
 
     /**
@@ -192,7 +194,7 @@ class WebOfTrustCLI: Callable<Int> {
 
         @JvmStatic
         fun main(args: Array<String>): Unit = exitProcess(
-            execute(args)
+                execute(args)
         )
 
         @JvmStatic
@@ -211,6 +213,6 @@ class WebOfTrustCLI: Callable<Int> {
             optKeyRing.optPgpCertD ?: optKeyRing.optKeyring?.contentToString() ?: "null"
         }
         return "trustroot=${trustRoots}, source=$source, gossip=$optGossip, amount=${optTrustAmount.get(optCertificationNetwork)}," +
-                " referenceTime=${optReferenceTime.timestamp}, notations=${optKnownNotations.contentToString()}"
+                " referenceTime=${optReferenceTime}, notations=${optKnownNotations.contentToString()}"
     }
 }

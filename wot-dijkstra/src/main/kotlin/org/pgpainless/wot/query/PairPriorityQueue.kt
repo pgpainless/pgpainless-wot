@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 Heiko Schäfer <heiko@schaefer.name>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 

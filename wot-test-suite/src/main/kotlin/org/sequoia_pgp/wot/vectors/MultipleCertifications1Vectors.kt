@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * This test is similar to the `multiple-userids` tests, but the two
@@ -26,20 +26,20 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class MultipleCertifications1Vectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("9219941467AA737C6EC1207959A2CEFC112C359A")
+    val aliceFpr = Identifier("9219941467AA737C6EC1207959A2CEFC112C359A")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("72CAA0F0A4A020F5FA20CD8CB5CC04473AA88123")
+    val bobFpr = Identifier("72CAA0F0A4A020F5FA20CD8CB5CC04473AA88123")
     val bobUid = "<bob@example.org>"
     // Certified by: 9219941467AA737C6EC1207959A2CEFC112C359A
     // Certified by: 9219941467AA737C6EC1207959A2CEFC112C359A
     // Certified by: 9219941467AA737C6EC1207959A2CEFC112C359A
 
-    val carolFpr = Fingerprint("853304031E7B0B116BBD0B398734F11945313904")
+    val carolFpr = Identifier("853304031E7B0B116BBD0B398734F11945313904")
     val carolUid = "<carol@example.org>"
     // Certified by: 72CAA0F0A4A020F5FA20CD8CB5CC04473AA88123
 
-    val daveFpr = Fingerprint("4C77ABDBE4F855E0C3C7A7D549F6B2BFDA83E424")
+    val daveFpr = Identifier("4C77ABDBE4F855E0C3C7A7D549F6B2BFDA83E424")
     val daveUid = "<dave@example.org>"
     // Certified by: 853304031E7B0B116BBD0B398734F11945313904
 

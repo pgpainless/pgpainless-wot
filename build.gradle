@@ -157,6 +157,13 @@ subprojects {
                     }
 
                     licenses {
+                        if (project.name == "wot-dijkstra") {
+                            license {
+                                name = 'GNU Library General Public License v2 only'
+                                url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.0-standalone.html'
+                                distribution = 'repo'
+                            }
+                        }
                         if (project.name == "wot-test-suite") {
                             license {
                                 name = 'The 3-Clause BSD License'

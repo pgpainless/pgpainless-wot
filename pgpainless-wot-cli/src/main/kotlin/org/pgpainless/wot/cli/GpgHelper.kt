@@ -6,8 +6,8 @@ package org.pgpainless.wot.cli
 
 import org.pgpainless.PGPainless
 import org.pgpainless.wot.KeyRingCertificateStore
-import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.network.Root
+import org.pgpainless.wot.network.Identifier
+import org.pgpainless.wot.network.TrustRoot
 import pgp.certificate_store.PGPCertificateStore
 
 class GpgHelper(val executable: String) {
@@ -20,7 +20,7 @@ class GpgHelper(val executable: String) {
         )
     }
 
-    fun readGpgOwnertrust(): List<Root> = Runtime.getRuntime()
+    fun readGpgOwnertrust(): List<TrustRoot> = Runtime.getRuntime()
         .exec("$executable --export-ownertrust")
         .inputStream
         .bufferedReader()
@@ -29,7 +29,7 @@ class GpgHelper(val executable: String) {
         .filterNot { it.startsWith("#") }
         .filterNot { it.isBlank() }
         .map {
-            Fingerprint(it.substring(0, it.indexOf(':'))) to it.elementAt(it.indexOf(':') + 1) }
+            Identifier(it.substring(0, it.indexOf(':'))) to it.elementAt(it.indexOf(':') + 1) }
         .map {
             it.first to when (it.second.digitToInt()) {
                 2 -> null   // unknown
@@ -42,7 +42,7 @@ class GpgHelper(val executable: String) {
         }
         .filterNot { it.second == null }
         .map {
-            Root(it.first, it.second!!)
+            TrustRoot(it.first, it.second!!)
         }
         .toList()
 }

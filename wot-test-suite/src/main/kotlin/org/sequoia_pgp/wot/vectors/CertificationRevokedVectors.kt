@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * Alice may realize that she made a certification in error, e.g., she
@@ -44,15 +44,15 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class CertificationRevokedVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("817C2BE18D9FF48FFE58FF39B699FC21AD92EFDC")
+    val aliceFpr = Identifier("817C2BE18D9FF48FFE58FF39B699FC21AD92EFDC")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("4258ACF6C3C8FCE130D6EBAB0CC5158AEA25F24A")
+    val bobFpr = Identifier("4258ACF6C3C8FCE130D6EBAB0CC5158AEA25F24A")
     val bobUid = "<bob@example.org>"
     // Certified by: 817C2BE18D9FF48FFE58FF39B699FC21AD92EFDC
     // Certified by: 817C2BE18D9FF48FFE58FF39B699FC21AD92EFDC
 
-    val carolFpr = Fingerprint("36766215FFD2FA000B0804BFF54577580DDC1741")
+    val carolFpr = Identifier("36766215FFD2FA000B0804BFF54577580DDC1741")
     val carolUid = "<carol@example.org>"
     // Certified by: 4258ACF6C3C8FCE130D6EBAB0CC5158AEA25F24A
 

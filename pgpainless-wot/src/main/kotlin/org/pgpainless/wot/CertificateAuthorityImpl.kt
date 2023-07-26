@@ -13,10 +13,10 @@ import org.pgpainless.authentication.CertificateAuthority
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.api.Binding
 import org.pgpainless.wot.api.WebOfTrustAPI
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 import org.pgpainless.wot.network.Network
-import org.pgpainless.wot.network.ReferenceTime
-import org.pgpainless.wot.network.Roots
+import org.pgpainless.wot.network.TrustRoot
+import org.pgpainless.wot.query.ShortestPathAlgorithmFactory
 import pgp.certificate_store.PGPCertificateStore
 import java.util.*
 
@@ -28,9 +28,10 @@ import java.util.*
  * @param certificateStore certificate store to extract certificates for path nodes from
  */
 class CertificateAuthorityImpl(private val network: Network,
-                               private val trustRoots: Roots,
-                               private val certificateStore: PGPCertificateStore):
-    CertificateAuthority {
+                               private val trustRoots: Set<TrustRoot>,
+                               private val certificateStore: PGPCertificateStore,
+                               private val shortestPathAlgorithmFactory: ShortestPathAlgorithmFactory):
+        CertificateAuthority {
 
     companion object {
 
@@ -45,31 +46,35 @@ class CertificateAuthorityImpl(private val network: Network,
          * @return certificate authority using the Web of Trust
          */
         @JvmStatic
-        fun webOfTrustFromCertificateStore(certificateStore: PGPCertificateStore, trustRoots: Roots, referenceTime: Date): CertificateAuthorityImpl {
-            val network = PGPNetworkParser(certificateStore).buildNetwork(referenceTime = ReferenceTime.timestamp(referenceTime))
-            return CertificateAuthorityImpl(network, trustRoots, certificateStore)
+        fun webOfTrustFromCertificateStore(
+                certificateStore: PGPCertificateStore,
+                trustRoots: Set<TrustRoot>,
+                referenceTime: Date,
+                shortestPathAlgorithmFactory: ShortestPathAlgorithmFactory): CertificateAuthorityImpl {
+            val network = PGPNetworkParser(certificateStore).buildNetwork(referenceTime = referenceTime)
+            return CertificateAuthorityImpl(network, trustRoots, certificateStore, shortestPathAlgorithmFactory)
         }
     }
 
     override fun authenticateBinding(fingerprint: OpenPgpFingerprint, userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): CertificateAuthenticity {
         val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
-            targetAmount, ReferenceTime.timestamp(referenceTime))
-        val result = api.authenticate(Fingerprint(fingerprint.toString()), userId, email)
+                targetAmount, referenceTime, shortestPathAlgorithmFactory)
+        val result = api.authenticate(Identifier(fingerprint.toString()), userId, email)
 
         return mapToAuthenticity(result.binding, targetAmount)
     }
 
     override fun lookupByUserId(userId: String, email: Boolean, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
         val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
-            targetAmount, ReferenceTime.timestamp(referenceTime))
+                targetAmount, referenceTime, shortestPathAlgorithmFactory)
         val result = api.lookup(userId, email)
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
     override fun identifyByFingerprint(fingerprint: OpenPgpFingerprint, referenceTime: Date, targetAmount: Int): List<CertificateAuthenticity> {
         val api = WebOfTrustAPI(network, trustRoots, gossip = false, certificationNetwork = false,
-            targetAmount, ReferenceTime.timestamp(referenceTime))
-        val result = api.identify(Fingerprint(fingerprint.toString()))
+                targetAmount, referenceTime, shortestPathAlgorithmFactory)
+        val result = api.identify(Identifier(fingerprint.toString()))
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
@@ -92,7 +97,7 @@ class CertificateAuthorityImpl(private val network: Network,
         return CertificateAuthenticity(publicKeyRing, binding.userId, certificationChains, targetAmount)
     }
 
-    private fun readPublicKeyRing(fingerprint: Fingerprint): PGPPublicKeyRing {
+    private fun readPublicKeyRing(fingerprint: Identifier): PGPPublicKeyRing {
         val certificate = certificateStore.getCertificate(fingerprint.toString())
         return PGPainless.readKeyRing().publicKeyRing(certificate.inputStream)!!
     }

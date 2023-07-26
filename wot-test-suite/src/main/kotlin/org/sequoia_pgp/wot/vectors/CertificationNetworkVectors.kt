@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * Four certificates that only make certifications (depth is always 0).
@@ -24,16 +24,16 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class CertificationNetworkVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("B2B371214EF71AFD16E42C62D81360B4C0489225")
+    val aliceFpr = Identifier("B2B371214EF71AFD16E42C62D81360B4C0489225")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("A68DF00EB82F9C49C27CC7723C5F5BBE6B790C05")
+    val bobFpr = Identifier("A68DF00EB82F9C49C27CC7723C5F5BBE6B790C05")
     val bobUid = "<bob@example.org>"
 
-    val carolFpr = Fingerprint("AB9EF1C89631519842ED559697557DD147D99C97")
+    val carolFpr = Identifier("AB9EF1C89631519842ED559697557DD147D99C97")
     val carolUid = "<carol@example.org>"
 
-    val daveFpr = Fingerprint("9A1AE937B5CB8BC46048AB63023CC01973ED9DF3")
+    val daveFpr = Identifier("9A1AE937B5CB8BC46048AB63023CC01973ED9DF3")
     val daveUid = "<dave@example.org>"
 
     /**

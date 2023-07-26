@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * When doing backwards propagation, we find paths from all nodes to the
@@ -26,27 +26,27 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class BestViaRootVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("B95FF5B1D055D26F758FD4E3BF12C4D1D28FDFFB")
+    val aliceFpr = Identifier("B95FF5B1D055D26F758FD4E3BF12C4D1D28FDFFB")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("6A8B9EC7D0A1B297B5D4A7A1C048DFF96601D9BD")
+    val bobFpr = Identifier("6A8B9EC7D0A1B297B5D4A7A1C048DFF96601D9BD")
     val bobUid = "<bob@example.org>"
     // Certified by: B95FF5B1D055D26F758FD4E3BF12C4D1D28FDFFB
 
-    val carolFpr = Fingerprint("77A6F7D4BEE0369F70B249579D2987669F792B35")
+    val carolFpr = Identifier("77A6F7D4BEE0369F70B249579D2987669F792B35")
     val carolUid = "<carol@example.org>"
     // Certified by: 6A8B9EC7D0A1B297B5D4A7A1C048DFF96601D9BD
 
-    val targetFpr = Fingerprint("2AB08C06FC795AC26673B23CAD561ABDCBEBFDF0")
+    val targetFpr = Identifier("2AB08C06FC795AC26673B23CAD561ABDCBEBFDF0")
     val targetUid = "<target@example.org>"
     // Certified by: 77A6F7D4BEE0369F70B249579D2987669F792B35
     // Certified by: 56D44411F982758169E4681B402E8D5D9D7D6567
 
-    val yellowFpr = Fingerprint("86CB4639D1FE096BA941D05822B8AF50198C49DD")
+    val yellowFpr = Identifier("86CB4639D1FE096BA941D05822B8AF50198C49DD")
     val yellowUid = "<yellow@example.org>"
     // Certified by: B95FF5B1D055D26F758FD4E3BF12C4D1D28FDFFB
 
-    val zebraFpr = Fingerprint("56D44411F982758169E4681B402E8D5D9D7D6567")
+    val zebraFpr = Identifier("56D44411F982758169E4681B402E8D5D9D7D6567")
     val zebraUid = "<zebra@example.org>"
     // Certified by: 86CB4639D1FE096BA941D05822B8AF50198C49DD
 

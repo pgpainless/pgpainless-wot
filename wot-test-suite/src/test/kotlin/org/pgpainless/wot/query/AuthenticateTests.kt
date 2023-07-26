@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Heiko Schaefer <heiko@schaefer.name>
 //
-// SPDX-License-Identifier: LGPL-2.0-or-later
+// SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 
@@ -20,16 +20,22 @@ import kotlin.test.assertEquals
  */
 class AuthenticateTest {
 
+    fun Query(network: Network, trustRoot: Identifier, certificationNetwork: Boolean = false, referenceTime: Date = Date()): Dijkstra =
+            Dijkstra(network, setOf(TrustRoot(trustRoot)), certificationNetwork, referenceTime)
+
+    fun Query(network: Network, vararg trustRoots: Identifier): Dijkstra =
+            Dijkstra(network, trustRoots.map { TrustRoot(it) }.toSet(), false, Date())
+
     // Authenticates the target.
-    private fun sp(q: Query,
-                   targetFpr: Fingerprint,
+    private fun sp(q: Dijkstra,
+                   targetFpr: Identifier,
                    targetUserid: String,
-                   expected: List<Pair<Int, List<Fingerprint>>>,
+                   expected: List<Pair<Int, List<Identifier>>>,
                    minTrustAmount: Int?) {
 
         println("Authenticating: $targetFpr, $targetUserid");
 
-        val got = q.authenticate(targetFpr, targetUserid, (minTrustAmount ?: 120))
+        val got = q.search(targetFpr, targetUserid, (minTrustAmount ?: 120))
 
         when (Pair(got.paths.isNotEmpty(), expected.isNotEmpty())) {
             Pair(false, false) -> {
@@ -88,7 +94,7 @@ class AuthenticateTest {
 
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr))), null)
@@ -98,7 +104,7 @@ class AuthenticateTest {
         sp(q1, t.frankFpr, t.frankUid, listOf(), null)
         sp(q1, t.carolFpr, t.bobUid, listOf(), null) // No one authenticated Bob's User ID on Carol's key.
 
-        val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+        val q2 = Query(n, t.bobFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(), null)
         sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
@@ -116,7 +122,7 @@ class AuthenticateTest {
 
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr))), null)
@@ -125,7 +131,7 @@ class AuthenticateTest {
         sp(q1, t.edFpr, t.edUid, listOf(Pair(30, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr, t.edFpr))), null)
         sp(q1, t.frankFpr, t.frankUid, listOf(), null)
 
-        val q2 = Query(n, Roots(listOf(Root(t.aliceFpr), Root(t.daveFpr))), false)
+        val q2 = Query(n, t.aliceFpr, t.daveFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
@@ -147,14 +153,14 @@ class AuthenticateTest {
         val n1 = t1.getNetworkAt()
         printNetwork(n1)
 
-        val q1 = Query(n1, Roots(listOf(Root(t1.rootFpr))), false)
+        val q1 = Query(n1, t1.rootFpr)
 
         // root -> a-0 -> a-1 -> b-0 -> ... -> f-0 -> target
         sp(q1, t1.targetFpr, t1.targetUid,
                 listOf(Pair(120, listOf(t1.rootFpr, t1.a0Fpr, t1.a1Fpr, t1.b0Fpr, t1.b1Fpr, t1.c0Fpr, t1.c1Fpr, t1.d0Fpr, t1.d1Fpr, t1.e0Fpr, t1.f0Fpr, t1.targetFpr))),
                 null)
 
-        val q2 = Query(n1, Roots(listOf(Root(t1.a1Fpr))), false)
+        val q2 = Query(n1, t1.a1Fpr)
 
         sp(q2, t1.targetFpr, t1.targetUid,
                 listOf(Pair(120, listOf(t1.a1Fpr, t1.b0Fpr, t1.b1Fpr, t1.c0Fpr, t1.c1Fpr, t1.d0Fpr, t1.d1Fpr, t1.e0Fpr, t1.f0Fpr, t1.targetFpr))),
@@ -164,7 +170,7 @@ class AuthenticateTest {
         val n2 = t2.getNetworkAt()
         printNetwork(n2)
 
-        val q3 = Query(n2, Roots(listOf(Root(t2.rootFpr))), false)
+        val q3 = Query(n2, t2.rootFpr)
 
         // root -> b-0 -> ... -> f-0 -> target
         sp(q3, t2.targetFpr, t2.targetUid,
@@ -173,7 +179,7 @@ class AuthenticateTest {
                         Pair(60, listOf(t2.rootFpr, t2.a0Fpr, t2.a1Fpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr))),
                 null)
 
-        val q4 = Query(n2, Roots(listOf(Root(t2.a1Fpr))), false)
+        val q4 = Query(n2, t2.a1Fpr)
 
         sp(q4, t2.targetFpr, t2.targetUid,
                 listOf(Pair(120, listOf(t2.a1Fpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr))),
@@ -184,7 +190,7 @@ class AuthenticateTest {
         val n3 = t3.getNetworkAt()
         printNetwork(n3)
 
-        val q5 = Query(n3, Roots(listOf(Root(t3.rootFpr))), false)
+        val q5 = Query(n3, t3.rootFpr)
 
         // root -> b-0 -> ... -> f-0 -> target
         sp(q5, t3.targetFpr, t3.targetUid,
@@ -193,7 +199,7 @@ class AuthenticateTest {
                         Pair(60, listOf(t3.rootFpr, t3.a0Fpr, t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c0Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr))),
                 null)
 
-        val q6 = Query(n3, Roots(listOf(Root(t3.a1Fpr))), false)
+        val q6 = Query(n3, t3.a1Fpr)
 
         sp(q6, t3.targetFpr, t3.targetUid,
                 listOf(Pair(30, listOf(t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr)),
@@ -207,7 +213,7 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
@@ -244,7 +250,7 @@ class AuthenticateTest {
         sp(q1, t.jennyFpr, t.jennyUid, listOf(), null)
 
 
-        val q2 = Query(n, Roots(listOf(Root(t.jennyFpr))), false)
+        val q2 = Query(n, t.jennyFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(), null)
 
@@ -273,7 +279,7 @@ class AuthenticateTest {
         sp(q2, t.jennyFpr, t.jennyUid, listOf(Pair(120, listOf(t.jennyFpr))), null)
 
 
-        val q3 = Query(n, Roots(listOf(Root(t.aliceFpr), Root(t.jennyFpr))), false)
+        val q3 = Query(n, t.aliceFpr, t.jennyFpr)
 
         sp(q3, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
@@ -348,7 +354,7 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
@@ -379,7 +385,7 @@ class AuthenticateTest {
                 ), null)
 
 
-        val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+        val q2 = Query(n, t.bobFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(), null)
 
@@ -409,7 +415,7 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
 
         sp(q1, t.frankFpr, t.frankUid,
                 listOf(
@@ -426,10 +432,10 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
-            val q = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q = Query(n, t.aliceFpr, false, date)
 
             val amount = when (i + 1) {
                 1 -> 60
@@ -458,17 +464,17 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
             // Consider just the code path where B is the issuer.
             //
             // Covers scenarios #1 at t1, #3 at t2 and t3
-            val q1 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q1 = Query(n, t.bobFpr, false, date)
             sp(q1, t.daveFpr, t.daveUid, listOf(Pair(60, listOf(t.bobFpr, t.daveFpr))), null)
 
 
-            val q2 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q2 = Query(n, t.aliceFpr, false, date)
 
             // Consider just the code path where B is the target.
             //
@@ -504,16 +510,16 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
             // Consider just the code path where B is the issuer.
             //
             // Covers scenarios #5 at t1, #7 at t2 and t3
-            val q1 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q1 = Query(n, t.bobFpr, false, date)
             sp(q1, t.daveFpr, t.daveUid, listOf(), null)
 
-            val q2 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q2 = Query(n, t.aliceFpr, false, date)
 
             // Consider just the code path where B is the target.
             //
@@ -535,10 +541,10 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
-            val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q1 = Query(n, t.aliceFpr, false, date)
 
             // Bob as target.
             // (Once Bob has expired, it can be used as a trusted introducer for prior certifications, but
@@ -553,7 +559,7 @@ class AuthenticateTest {
             sp(q1, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
 
             // Bob as root.
-            val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q2 = Query(n, t.bobFpr, false, date)
             sp(q2, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.bobFpr, t.carolFpr))), null)
 
             // Bob's self signature.
@@ -574,11 +580,11 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
             // Revoked User ID on the root.
-            val q1 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q1 = Query(n, t.bobFpr, false, date)
 
             if (i + 1 == 1) {
                 sp(q1, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
@@ -586,7 +592,7 @@ class AuthenticateTest {
                 sp(q1, t.bobFpr, t.bobUid, listOf(), null)
             }
 
-            val q2 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q2 = Query(n, t.aliceFpr, false, date)
 
             if (i + 1 == 1) {
                 sp(q2, t.bobFpr, t.bobUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr))), null)
@@ -612,11 +618,11 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
             // Revoked User ID on the root.
-            val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q1 = Query(n, t.aliceFpr, false, date)
 
             sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
@@ -640,7 +646,7 @@ class AuthenticateTest {
             }
 
             // Alice, not Bob, revokes Bob's user id. So when Bob is the root, the self-signature should still be good.
-            val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q2 = Query(n, t.bobFpr, false, date)
             sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
         }
     }
@@ -651,7 +657,7 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.u1Fpr))), false)
+        val q1 = Query(n, t.u1Fpr)
 
         // This should always work.
         sp(q1, t.u254Fpr, t.u254Uid, listOf(Pair(120, t.fprs.subList(0, 254))), null)
@@ -669,10 +675,10 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
-            val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q1 = Query(n, t.aliceFpr, false, date)
 
             if (i + 1 == 1) {
                 sp(q1, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
@@ -681,7 +687,7 @@ class AuthenticateTest {
             }
 
             // Start with bob and make sure that a certification by a root with a 0 trust amount is also respected.
-            val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+            val q2 = Query(n, t.bobFpr, false, date)
 
             if (i + 1 == 1) {
                 sp(q2, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.bobFpr, t.carolFpr))), null)
@@ -697,7 +703,7 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr, 90))), false)
+        val q1 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 90)), false, Date())
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(90, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr))), null)
         sp(q1, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
@@ -709,7 +715,7 @@ class AuthenticateTest {
         sp(q1, t.carolFpr, t.bobUid, listOf(), null)
 
         // Multiple partially trusted roots. Check that together they can fully certify a self-signature.
-        val q2 = Query(n, Roots(listOf(Root(t.aliceFpr, 90), Root(t.bobFpr, 90))), false)
+        val q2 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 90), TrustRoot(t.bobFpr, 90)), false, Date())
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(Pair(90, listOf(t.aliceFpr))), null)
 
@@ -733,13 +739,13 @@ class AuthenticateTest {
         val n = t.getNetworkAt()
         printNetwork(n)
 
-        val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+        val q1 = Query(n, t.aliceFpr)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr))), null)
         sp(q1, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
         sp(q1, t.carolFpr, t.carolOtherOrgUid, listOf(), null)
         sp(q1, t.daveFpr, t.daveUid, listOf(), null)
 
-        val q2 = Query(n, Roots(listOf(Root(t.bobFpr))), false)
+        val q2 = Query(n, t.bobFpr)
         sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
         sp(q2, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.bobFpr, t.carolFpr))), null)
         sp(q2, t.carolFpr, t.carolOtherOrgUid, listOf(Pair(90, listOf(t.bobFpr, t.carolFpr, t.carolFpr))), null)
@@ -754,10 +760,10 @@ class AuthenticateTest {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
             println("Trying at #$i $date");
 
-            val n = t.getNetworkAt(ReferenceTime.timestamp(date))
+            val n = t.getNetworkAt(date)
             printNetwork(n)
 
-            val q1 = Query(n, Roots(listOf(Root(t.aliceFpr))), false)
+            val q1 = Query(n, t.aliceFpr, false, date)
 
             if (i == 0) {
                 sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
@@ -768,5 +774,4 @@ class AuthenticateTest {
             sp(q1, t.aliceFpr, t.aliceOtherOrgUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
         }
     }
-
 }

@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2023 Paul Schaub <vanitasvitae@fsfe.org>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.pgpainless.wot.dsl.NetworkDSL
-import org.pgpainless.wot.network.Depth
+import org.pgpainless.wot.network.TrustDepth
 import kotlin.test.assertEquals
 
 class PathsTest: NetworkDSL {
@@ -15,8 +15,8 @@ class PathsTest: NetworkDSL {
     private val alice = Node("0000000000000000000000000000000000000000")
     private val bob = Node("1111111111111111111111111111111111111111")
 
-    private val alice_bob_1 = EdgeComponent(alice, bob, 140, Depth.unconstrained())
-    private val alice_bob_2 = EdgeComponent(alice, bob, 160, Depth.limited(1))
+    private val alice_bob_1 = Delegation(alice, bob, 140, TrustDepth.unlimited())
+    private val alice_bob_2 = Delegation(alice, bob, 160, TrustDepth.limited(1))
 
     @Test
     fun `verify that an empty Paths object has an amount of zero`() {

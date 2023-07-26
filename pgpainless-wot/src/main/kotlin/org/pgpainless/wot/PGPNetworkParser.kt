@@ -18,8 +18,10 @@ import org.pgpainless.policy.Policy
 import org.pgpainless.signature.SignatureUtils
 import org.pgpainless.signature.consumer.SignatureValidator
 import org.pgpainless.signature.subpackets.SignatureSubpacketsUtil
-import org.pgpainless.wot.network.*
-import org.pgpainless.wot.network.ReferenceTime.Companion.now
+import org.pgpainless.wot.network.Identifier
+import org.pgpainless.wot.network.Network
+import org.pgpainless.wot.network.Node
+import org.pgpainless.wot.network.RevocationState
 import org.pgpainless.wot.util.CertificationFactory.Companion.fromCertification
 import org.pgpainless.wot.util.CertificationFactory.Companion.fromDelegation
 import org.slf4j.LoggerFactory
@@ -51,7 +53,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
      *
      */
     fun buildNetwork(policy: Policy = PGPainless.getPolicy(),
-                     referenceTime: ReferenceTime = now()): Network {
+                     referenceTime: Date = Date()): Network {
         val certificates = getAllCertificatesFromTheStore()
         val networkFactory = PGPNetworkFactory.fromCertificates(certificates, policy, referenceTime)
         return networkFactory.buildNetwork()
@@ -86,17 +88,17 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
      */
     private class PGPNetworkFactory private constructor(validatedCertificates: List<KeyRingInfo>,
                                                         private val policy: Policy,
-                                                        private val referenceTime: ReferenceTime) {
-        private val networkBuilder: Network.Builder = Network.builder().setReferenceTime(referenceTime)
+                                                        private val referenceTime: Date) {
+        private val networkBuilder: Network.Builder = Network.builder()
 
         // certificates keyed by fingerprint
-        private val byFingerprint: MutableMap<Fingerprint, KeyRingInfo> = HashMap()
+        private val byFingerprint: MutableMap<Identifier, KeyRingInfo> = HashMap()
 
         // certificates keyed by (sub-) key-id
         private val byKeyId: MutableMap<Long, MutableList<KeyRingInfo>> = HashMap()
 
         // nodes keyed by fingerprint
-        private val nodeMap: MutableMap<Fingerprint, Node> = HashMap()
+        private val nodeMap: MutableMap<Identifier, Node> = HashMap()
 
         init {
             validatedCertificates.forEach { indexAsNode(it) }
@@ -104,7 +106,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
         }
 
         /**
-         * Index the certificate by its [Fingerprint] and subkey-IDs and add it as a node to
+         * Index the certificate by its [Identifier] and subkey-IDs and add it as a node to
          * the [Network.Builder].
          *
          * @param cert validated certificate
@@ -269,7 +271,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
                 SignatureValidator.signatureDoesNotHaveCriticalUnknownSubpackets().verify(signature)
             }
             // check for signature effectiveness at reference time (was created before reference time, is not expired)
-            SignatureValidator.signatureIsEffective(referenceTime.timestamp).verify(signature)
+            SignatureValidator.signatureIsEffective(referenceTime).verify(signature)
             // check if signature is not invalidated by hard-revoked cert
             if (issuer.revocationState == org.pgpainless.algorithm.RevocationState.hardRevoked()) {
                 // cert is hard revoked
@@ -295,11 +297,11 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
         }
 
         /**
-         * Map an [OpenPgpFingerprint] to a [Fingerprint].
+         * Map an [OpenPgpFingerprint] to a [Identifier].
          *
          * @param fingerprint [OpenPgpFingerprint]
          */
-        private fun Fingerprint(fingerprint: OpenPgpFingerprint) = Fingerprint(fingerprint.toString())
+        private fun Fingerprint(fingerprint: OpenPgpFingerprint) = Identifier(fingerprint.toString())
 
         /**
          * Return the constructed, initialized [Network].
@@ -326,7 +328,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
             @JvmStatic
             fun fromCertificates(certificates: Sequence<Certificate>,
                                  policy: Policy,
-                                 referenceTime: ReferenceTime): PGPNetworkFactory {
+                                 referenceTime: Date): PGPNetworkFactory {
                 return fromValidCertificates(
                         parseValidCertificates(certificates, policy, referenceTime),
                         policy,
@@ -344,7 +346,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
             @JvmStatic
             fun fromValidCertificates(certificates: List<KeyRingInfo>,
                                       policy: Policy,
-                                      referenceTime: ReferenceTime): PGPNetworkFactory {
+                                      referenceTime: Date): PGPNetworkFactory {
                 return PGPNetworkFactory(certificates, policy, referenceTime)
             }
 
@@ -359,13 +361,13 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
             @JvmStatic
             private fun parseValidCertificates(certificates: Sequence<Certificate>,
                                                policy: Policy,
-                                               referenceTime: ReferenceTime): List<KeyRingInfo> {
+                                               referenceTime: Date): List<KeyRingInfo> {
                 return certificates
                         .mapNotNull {
                             try { PGPainless.readKeyRing().publicKeyRing(it.inputStream) }
                             catch (e: IOException) { null }
                         }
-                        .map { KeyRingInfo(it, policy, referenceTime.timestamp) }
+                        .map { KeyRingInfo(it, policy, referenceTime) }
                         .toList()
             }
         }

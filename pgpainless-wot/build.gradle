@@ -45,7 +45,7 @@ dependencies {
     }
 
     api("org.pgpainless:pgpainless-core:$pgpainlessVersion")
-    api(project(":wot-dijkstra"))
+    api(project(":wot-generic"))
 }
 
 test {

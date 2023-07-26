@@ -17,10 +17,10 @@ class SQWOTFormatterTest {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     private val formatter = SQWOTFormatter() as Formatter
 
-    private val nodeAlice = Node(fingerprint = Fingerprint("A".repeat(40)),
+    private val nodeAlice = Node(fingerprint = Identifier("A".repeat(40)),
             userIds = mapOf("Alice <alice@pgpainless.org>" to RevocationState.notRevoked()))
-    private val nodeBob = Node(fingerprint = Fingerprint("B".repeat(40)))
-    private val nodeCharlie = Node(fingerprint = Fingerprint("C".repeat(40)),
+    private val nodeBob = Node(fingerprint = Identifier("B".repeat(40)))
+    private val nodeCharlie = Node(fingerprint = Identifier("C".repeat(40)),
             userIds = mapOf("Charlie <charlie@example.org>" to RevocationState.notRevoked()))
 
     @Test
@@ -31,7 +31,7 @@ class SQWOTFormatterTest {
                 "Alice <alice@pgpainless.org>",
                 Paths().apply {
                     add(
-                            Path(nodeBob, mutableListOf((EdgeComponent(
+                            Path(nodeBob, mutableListOf((Edge.Certification(
                                     nodeBob,
                                     nodeAlice,
                                     "Alice <alice@pgpainless.org>",
@@ -39,10 +39,9 @@ class SQWOTFormatterTest {
                                     null,
                                     true,
                                     120,
-                                    Depth.auto(0),
-                                    RegexSet.wildcard())
+                                    TrustDepth.auto(0))
                                     )),
-                                    Depth.auto(0)),
+                                    TrustDepth.auto(0)),
                             120)
                 }
         )

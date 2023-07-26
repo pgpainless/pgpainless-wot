@@ -6,7 +6,7 @@ package org.pgpainless.wot.cli.subcommands
 
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 import picocli.CommandLine
 import picocli.CommandLine.*
 import java.util.concurrent.Callable
@@ -27,7 +27,7 @@ class AuthenticateCmd: Callable<Int> {
      * Fingerprint of the certificate.
      */
     @Parameters(index = "0", description = ["Fingerprint of the certificate"], converter = [FingerprintConverter::class], paramLabel = "FINGERPRINT")
-    lateinit var fingerprint: Fingerprint
+    lateinit var fingerprint: Identifier
 
     /**
      * User-ID to authenticate.

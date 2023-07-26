@@ -7,9 +7,8 @@ package org.pgpainless.wot
 import org.bouncycastle.openpgp.PGPPublicKeyRing
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.network.Edge
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 import org.pgpainless.wot.network.Network
-import org.pgpainless.wot.network.ReferenceTime
 import org.pgpainless.wot.testfixtures.TestCertificateStores
 import org.pgpainless.wot.testfixtures.WotTestVectors
 import kotlin.test.*
@@ -22,8 +21,8 @@ class PGPNetworkParserTest {
     private val barBankCa = fingerprintOf(WotTestVectors.freshBarBankCaCert)
     private val barBankEmployee = fingerprintOf(WotTestVectors.freshBarBankEmployeeCert)
 
-    private fun fingerprintOf(cert: PGPPublicKeyRing): Fingerprint {
-        return Fingerprint(OpenPgpFingerprint.of(cert).toString())
+    private fun fingerprintOf(cert: PGPPublicKeyRing): Identifier {
+        return Identifier(OpenPgpFingerprint.of(cert).toString())
     }
 
     @Test
@@ -33,10 +32,8 @@ class PGPNetworkParserTest {
 
         assertEquals(2, network.nodes.size)
         assertHasEdge(network, fooBankAdmin, barBankCa)
-        assertHasReverseEdge(network, fooBankAdmin, barBankCa)
 
         assertHasNoEdge(network, barBankCa, fooBankAdmin)
-        assertHasNoReverseEdge(network, barBankCa, fooBankAdmin)
     }
 
     @Test
@@ -51,7 +48,7 @@ class PGPNetworkParserTest {
             }
         }
 
-        val fooBankCaEdges = network.edges[fooBankCa]!!
+        val fooBankCaEdges = network.getIssuedBy(fooBankCa)!!
         assertEquals(2, fooBankCaEdges.size)
 
         val fbc2fbe = getEdgeFromTo(network, fooBankCa, fooBankEmployee)
@@ -64,10 +61,8 @@ class PGPNetworkParserTest {
         assertHasIssuerAndTarget(fbc2fba, fooBankCa, fooBankAdmin)
 
         assertHasEdge(network, barBankCa, barBankEmployee)
-        assertHasReverseEdge(network, barBankCa, barBankEmployee)
 
         assertHasNoEdge(network, fooBankCa, barBankCa)
-        assertHasNoReverseEdge(network, fooBankCa, barBankCa)
     }
 
     @Test
@@ -77,7 +72,6 @@ class PGPNetworkParserTest {
 
         assertTrue { network.nodes.isEmpty() }
         assertTrue { network.edges.isEmpty() }
-        assertTrue { network.reverseEdges.isEmpty() }
     }
 
     @Test
@@ -88,50 +82,25 @@ class PGPNetworkParserTest {
         assertEquals(1, network.nodes.size)
     }
 
-    @Test
-    fun `referenceTime is propagated properly`() {
-        val referenceTime = ReferenceTime.now()
-
-        val network = PGPNetworkParser(KeyRingCertificateStore(listOf()))
-                .buildNetwork(referenceTime = referenceTime)
-
-        assertEquals(referenceTime, network.referenceTime)
-    }
-
-
     private fun assertHasIssuerAndTarget(
             certifications: Edge,
-            issuer: Fingerprint,
-            target: Fingerprint) {
+            issuer: Identifier,
+            target: Identifier) {
         assertEquals(issuer, certifications.issuer.fingerprint)
         assertEquals(target, certifications.target.fingerprint)
     }
 
-    private fun assertHasEdge(network: Network, issuer: Fingerprint, target: Fingerprint) {
+    private fun assertHasEdge(network: Network, issuer: Identifier, target: Identifier) {
         assertNotNull(getEdgeFromTo(network, issuer, target), "Expected edge from $issuer to $target but got none.")
     }
 
-    private fun assertHasReverseEdge(network: Network, issuer: Fingerprint, target: Fingerprint) {
-        assertNotNull(getReverseEdgeFromTo(network, issuer, target), "Expected reverse edge to $target from $issuer but got none.")
-    }
-
-    private fun assertHasNoEdge(network: Network, issuer: Fingerprint, target: Fingerprint) {
+    private fun assertHasNoEdge(network: Network, issuer: Identifier, target: Identifier) {
         val edge = getEdgeFromTo(network, issuer, target)
         assertNull(edge, "Expected no edge from $issuer to $target but got $edge")
     }
 
-    private fun assertHasNoReverseEdge(network: Network, issuer: Fingerprint, target: Fingerprint) {
-        val reverseEdge = getReverseEdgeFromTo(network, issuer, target)
-        assertNull(reverseEdge, "Expected no reverse edge on $target from $issuer but got $reverseEdge")
+    private fun getEdgeFromTo(network: Network, issuer: Identifier, target: Identifier): Edge? {
+        return network.edges[issuer to target]
     }
 
-    private fun getEdgeFromTo(network: Network, issuer: Fingerprint, target: Fingerprint): Edge? {
-        val edges = network.edges[issuer] ?: return null
-        return edges.find { target == it.target.fingerprint }
-    }
-
-    private fun getReverseEdgeFromTo(network: Network, issuer: Fingerprint, target: Fingerprint): Edge? {
-        val revEdges = network.reverseEdges[target] ?: return null
-        return revEdges.find { issuer == it.issuer.fingerprint }
-    }
 }

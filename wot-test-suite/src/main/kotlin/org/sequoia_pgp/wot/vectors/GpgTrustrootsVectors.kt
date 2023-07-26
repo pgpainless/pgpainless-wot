@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * How gpg interprets ownertrust is a bit complicated.  For a certificate
@@ -30,22 +30,22 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class GpgTrustrootsVectors: ArtifactVectors {
 
-    val rootFpr = Fingerprint("D8330354E99DB503729A68D4AAE7E9EC2129CEC3")
+    val rootFpr = Identifier("D8330354E99DB503729A68D4AAE7E9EC2129CEC3")
     val rootUid = "<root@example.org>"
 
-    val a1Fpr = Fingerprint("80666EDD21A008D467243E47444D4C0F515D269A")
+    val a1Fpr = Identifier("80666EDD21A008D467243E47444D4C0F515D269A")
     val a1Uid = "<a1@example.org>"
 
-    val a2Fpr = Fingerprint("A6D2F50B1C9544A717B7625395FD89DA7093B735")
+    val a2Fpr = Identifier("A6D2F50B1C9544A717B7625395FD89DA7093B735")
     val a2Uid = "<a2@example.org>"
 
-    val a3Fpr = Fingerprint("AFDD8AECD999F5CDC7027B23EECC4F0EA03A5F35")
+    val a3Fpr = Identifier("AFDD8AECD999F5CDC7027B23EECC4F0EA03A5F35")
     val a3Uid = "<a3@example.org>"
 
-    val dFpr = Fingerprint("BB0333A98A05430FF6A784A706D474BF36A3D4F9")
+    val dFpr = Identifier("BB0333A98A05430FF6A784A706D474BF36A3D4F9")
     val dUid = "<d@example.org>"
 
-    val targetFpr = Fingerprint("30A185EA9319FF1D0BCBDBFCF2CD31DCC3DCAA02")
+    val targetFpr = Identifier("30A185EA9319FF1D0BCBDBFCF2CD31DCC3DCAA02")
     val targetUid = "<target@example.org>"
 
     /**

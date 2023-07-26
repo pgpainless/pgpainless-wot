@@ -7,10 +7,10 @@ package org.sequoia_pgp.wot.vectors
 import org.bouncycastle.util.io.Streams
 import org.pgpainless.PGPainless
 import org.pgpainless.policy.Policy
+import org.pgpainless.util.DateUtil
 import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.network.Network
-import org.pgpainless.wot.network.ReferenceTime
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
@@ -50,13 +50,13 @@ interface ArtifactVectors {
         }
     }
 
-    fun parseReferenceTime(string: String): ReferenceTime {
-        return ReferenceTime.timestamp(parseDate(string))
+    fun parseReferenceTime(string: String): Date {
+        return DateUtil.parseUTCDate(string)
     }
 
     fun getResourceName(): String
 
-    fun getNetworkAt(referenceTime: ReferenceTime = ReferenceTime.now(), policy: Policy = PGPainless.getPolicy()): Network {
+    fun getNetworkAt(referenceTime: Date = Date(), policy: Policy = PGPainless.getPolicy()): Network {
         val inputStream = keyRingInputStream()
         val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(inputStream)
         val store = KeyRingCertificateStore(keyRing)

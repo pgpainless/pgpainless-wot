@@ -36,6 +36,7 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
     api(project(":pgpainless-wot"))
+    testImplementation(testFixtures(project(":wot-generic")))
 }
 
 test {

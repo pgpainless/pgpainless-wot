@@ -4,15 +4,15 @@
 
 package org.pgpainless.wot.cli.converters
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 import picocli.CommandLine.ITypeConverter
 
-class FingerprintConverter: ITypeConverter<Fingerprint> {
+class FingerprintConverter: ITypeConverter<Identifier> {
 
-    override fun convert(value: String?): Fingerprint? {
+    override fun convert(value: String?): Identifier? {
         return when(value) {
             null -> null
-            else -> Fingerprint(value)
+            else -> Identifier(value)
         }
     }
 }

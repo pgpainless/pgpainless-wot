@@ -6,6 +6,7 @@ rootProject.name = 'PGPainless-WOT'
 
 include 'pgpainless-wot',
         'pgpainless-wot-cli',
+        'wot-generic',
         'wot-dijkstra',
         'wot-test-suite'
 

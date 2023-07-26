@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * Check that an expired certificate can't be authenticated and can't be
@@ -32,14 +32,14 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class CertExpiredVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("1FA62523FB7C06E71EEFB82BB5159F3FC3EB3AC9")
+    val aliceFpr = Identifier("1FA62523FB7C06E71EEFB82BB5159F3FC3EB3AC9")
     val aliceUid = "<alice@example.org>"
 
-    val bobFpr = Fingerprint("B166B31AE5F95600B3F7184FE74C6CE62821686F")
+    val bobFpr = Identifier("B166B31AE5F95600B3F7184FE74C6CE62821686F")
     val bobUid = "<bob@example.org>"
     // Certified by: 1FA62523FB7C06E71EEFB82BB5159F3FC3EB3AC9
 
-    val carolFpr = Fingerprint("81CD118AC5BD9156DC113772626222D76ACDFFCF")
+    val carolFpr = Identifier("81CD118AC5BD9156DC113772626222D76ACDFFCF")
     val carolUid = "<carol@example.org>"
     // Certified by: B166B31AE5F95600B3F7184FE74C6CE62821686F
 

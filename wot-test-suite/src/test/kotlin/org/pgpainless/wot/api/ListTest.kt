@@ -6,10 +6,10 @@ package org.pgpainless.wot.api
 
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
+import org.pgpainless.wot.DijkstraAlgorithmFactory
 import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.PGPNetworkParser
-import org.pgpainless.wot.network.Root
-import org.pgpainless.wot.network.Roots
+import org.pgpainless.wot.network.TrustRoot
 import org.sequoia_pgp.wot.vectors.BestViaRootVectors
 import kotlin.test.assertEquals
 
@@ -22,8 +22,9 @@ class ListTest {
         val store = KeyRingCertificateStore(keyRing)
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t0)
 
-        val roots = Roots(Root(v.aliceFpr))
-        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t0)
+        val roots = setOf(TrustRoot(v.aliceFpr))
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t0,
+                DijkstraAlgorithmFactory())
 
         assertEquals(1, api.list().bindings.size)
     }
@@ -35,8 +36,9 @@ class ListTest {
         val store = KeyRingCertificateStore(keyRing)
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t1)
 
-        val roots = Roots(Root(v.aliceFpr))
-        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1)
+        val roots = setOf(TrustRoot(v.aliceFpr))
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1,
+                DijkstraAlgorithmFactory())
 
         assertEquals(6, api.list().bindings.size)
     }

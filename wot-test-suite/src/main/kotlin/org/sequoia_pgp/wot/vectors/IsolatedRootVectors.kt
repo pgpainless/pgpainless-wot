@@ -4,7 +4,7 @@
 
 package org.sequoia_pgp.wot.vectors
 
-import org.pgpainless.wot.network.Fingerprint
+import org.pgpainless.wot.network.Identifier
 
 /**
  * If a root is isolated, make sure we can still answer queries about it.
@@ -14,7 +14,7 @@ import org.pgpainless.wot.network.Fingerprint
  */
 class IsolatedRootVectors: ArtifactVectors {
 
-    val aliceFpr = Fingerprint("DCF3020AAB76ECC7F0E5AC0D375DCE1BEE264B87")
+    val aliceFpr = Identifier("DCF3020AAB76ECC7F0E5AC0D375DCE1BEE264B87")
     val aliceUid = "<alice@example.org>"
     val aliceOtherOrgUid = "<alice@other.org>"
 

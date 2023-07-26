@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Heiko Schaefer <heiko@schaefer.name>
 //
-// SPDX-License-Identifier: LGPL-2.0-or-later
+// SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 
-import org.pgpainless.wot.network.Fingerprint
-import org.pgpainless.wot.network.Root
-import org.pgpainless.wot.network.Roots
+import org.pgpainless.wot.network.Identifier
+import org.pgpainless.wot.network.TrustRoot
 import org.sequoia_pgp.wot.vectors.*
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -24,9 +24,9 @@ internal const val DEPTH_UNCONSTRAINED = 255
 class BackPropagateTest {
 
     // Compares a computed path and a trust amount with the expected result.
-    private fun checkResult(result: Pair<Path, Int>, residualDepth: Int, amount: Int, expectedPath: List<Fingerprint>) {
+    private fun checkResult(result: Pair<Path, Int>, residualDepth: Int, amount: Int, expectedPath: List<Identifier>) {
         val (gotPath, gotAmount) = result;
-        val gotCerts: List<Fingerprint> = gotPath.certificates.map { it.fingerprint }
+        val gotCerts: List<Identifier> = gotPath.certificates.map { it.fingerprint }
 
         assertEquals(expectedPath.size, gotCerts.size)
         assert(gotCerts.zip(expectedPath).none { it.first != it.second }) // FIXME: debug output?
@@ -35,7 +35,7 @@ class BackPropagateTest {
         println("expected $expectedPath")
 
         assertEquals(amount, gotAmount, "Trust amount mismatch")
-        assertEquals(residualDepth, gotPath.residualDepth.value(), "Residual depth mismatch")
+        assertEquals(residualDepth, gotPath.residualDepth.value, "Residual depth mismatch")
 
         // NOTE: The Rust tests also check for validity of the path, but we're separating those concerns here.
         // This package only deals with WoT calculations.
@@ -49,7 +49,7 @@ class BackPropagateTest {
         println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from " + n.numberOfSignatures + " signatures.")
         println(n)
 
-        val q = Query(n, Roots(), false)
+        val q = Dijkstra(n, setOf(), false, Date())
 
         val a1 = q.backwardPropagate(t.ellenFpr, t.ellenUid)
         checkResult(a1[t.daveFpr]!!, 1, 100, listOf(t.daveFpr, t.ellenFpr));
@@ -86,7 +86,7 @@ class BackPropagateTest {
         assertNull(a5[t.aliceFpr]);
 
         // A target that is not in the network.
-        val fpr = Fingerprint("0123456789ABCDEF0123456789ABCDEF01234567")
+        val fpr = Identifier("0123456789ABCDEF0123456789ABCDEF01234567")
         val a6 = q.backwardPropagate(fpr, t.ellenUid);
         assertNull(a6[t.ellenFpr]);
         assertNull(a6[t.daveFpr]);
@@ -103,7 +103,7 @@ class BackPropagateTest {
         println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from " + n.numberOfSignatures + " signatures.")
         println(n)
 
-        val q = Query(n, Roots(), false)
+        val q = Dijkstra(n, setOf(), false, Date())
 
         val a1 = q.backwardPropagate(t.frankFpr, t.frankUid);
         checkResult(a1[t.edFpr]!!, 0, 120, listOf(t.edFpr, t.frankFpr));
@@ -145,7 +145,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
         val a1 = q1.backwardPropagate(t1.targetFpr, t1.targetUid);
 
         // root -> a-0 -> b-0 -> ... -> f-0 -> target
@@ -169,7 +169,7 @@ class BackPropagateTest {
         println("Network contains " + n2.nodes.size + " nodes with " + n2.numberOfEdges + " edges built from " + n2.numberOfSignatures + " signatures.")
         println(n2)
 
-        val q2 = Query(n2, Roots(), false)
+        val q2 = Dijkstra(n2, setOf(), false)
         val a2 = q2.backwardPropagate(t2.targetFpr, t2.targetUid);
 
         // root -> a-0 -> b-0 -> ... -> f-0 -> target
@@ -192,7 +192,7 @@ class BackPropagateTest {
         println("Network contains " + n3.nodes.size + " nodes with " + n3.numberOfEdges + " edges built from " + n3.numberOfSignatures + " signatures.")
         println(n3)
 
-        val q3 = Query(n3, Roots(), false)
+        val q3 = Dijkstra(n3, setOf(), false)
         val a3 = q3.backwardPropagate(t3.targetFpr, t3.targetUid);
 
         // root -> a-0 -> b-0 -> ... -> f-0 -> target
@@ -216,7 +216,7 @@ class BackPropagateTest {
         println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from " + n.numberOfSignatures + " signatures.")
         println(n)
 
-        val q1 = Query(n, Roots(), false)
+        val q1 = Dijkstra(n, setOf(), false)
         val a1 = q1.backwardPropagate(t.isaacFpr, t.isaacUid);
 
         checkResult(a1[t.aliceFpr]!!, 0, 60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr, t.isaacFpr));
@@ -238,7 +238,7 @@ class BackPropagateTest {
         println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from " + n.numberOfSignatures + " signatures.")
         println(n)
 
-        val q = Query(n, Roots(), false)
+        val q = Dijkstra(n, setOf(), false)
 
         val a1 = q.backwardPropagate(t.henryFpr, t.henryUid);
         checkResult(a1[t.aliceFpr]!!, 0, 100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr, t.henryFpr));
@@ -269,7 +269,7 @@ class BackPropagateTest {
         println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from " + n.numberOfSignatures + " signatures.")
         println(n)
 
-        val q1 = Query(n, Roots(), false)
+        val q1 = Dijkstra(n, setOf(), false)
 
         val a1 = q1.backwardPropagate(t.targetFpr, t.targetUid);
 
@@ -285,14 +285,14 @@ class BackPropagateTest {
 
 
         // Again, but this time we specify the roots.
-        val q2 = Query(n, Roots(listOf(Root(t.aliceFpr, 120))), false)
+        val q2 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 120)), false)
         val a3 = q2.backwardPropagate(t.targetFpr, t.targetUid);
 
         checkResult(a3[t.aliceFpr]!!, 8, 120, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.targetFpr));
 
         // As seen above, the best path from alice to the target is via bob. But when both alice and bob are both fully
         // trusted roots, the returned path is not via bob, but one that is less optimal.
-        val q3 = Query(n, Roots(listOf(Root(t.aliceFpr), Root(t.bobFpr))), false)
+        val q3 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr), TrustRoot(t.bobFpr)), false)
         val a4 = q3.backwardPropagate(t.targetFpr, t.targetUid);
 
         checkResult(a4[t.bobFpr]!!, 9, 120, listOf(t.bobFpr, t.carolFpr, t.targetFpr));
@@ -307,7 +307,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " t.edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
         // alice as root.
         val a1 = q1.backwardPropagate(t.bobFpr, t.bobUid);
@@ -362,7 +362,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " t.edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
         val a1 = q1.backwardPropagate(t.bobFpr, t.bobUid)
         checkResult(a1[t.aliceFpr]!!, 7, 100, listOf(t.aliceFpr, t.bobFpr))
@@ -405,7 +405,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " t.edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
         // alice as root.
         val a1 = q1.backwardPropagate(t.bobFpr, t.bobUid)
@@ -471,7 +471,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " t.edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
         val a1 = q1.backwardPropagate(t.carolFpr, t.carolUid)
         checkResult(a1[t.aliceFpr]!!, 0, 70, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))
@@ -488,7 +488,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " t.edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
 
         val a1 = q1.backwardPropagate(t.bobFpr, t.bobUid)
@@ -518,7 +518,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false)
 
         val auth = q1.backwardPropagate(t.frankFpr, t.frankUid)
         checkResult(auth[t.aliceFpr]!!, 0, 20, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.frankFpr))
@@ -532,7 +532,7 @@ class BackPropagateTest {
         println("Network contains " + n1.nodes.size + " nodes with " + n1.numberOfEdges + " edges built from " + n1.numberOfSignatures + " signatures.")
         println(n1)
 
-        val q1 = Query(n1, Roots(), false)
+        val q1 = Dijkstra(n1, setOf(), false, t.t0)
 
         val a1 = q1.backwardPropagate(t.carolFpr, t.carolUid)
         checkResult(a1[t.aliceFpr]!!, 0, 70, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))
