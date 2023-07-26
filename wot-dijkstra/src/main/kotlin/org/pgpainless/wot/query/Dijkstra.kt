@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 Heiko Schäfer <heiko@schaefer.name>
+// SPDX-FileCopyrightText: 2023 Heiko Schäfer <heiko@schaefer.name>, 2022-2023, pep foundation
 //
 // SPDX-License-Identifier: LGPL-2.0-only
 

@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2023 Paul Schaub <info@pgpainless.org>
+SPDX-FileCopyrightText: 2023 Paul Schaub <info@pgpainless.org>, 2022-2023, pep foundation
 
 SPDX-License-Identifier: LGPL-2.0-only
 -->
