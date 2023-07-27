@@ -4,8 +4,8 @@
 
 allprojects {
     ext {
-        shortVersion = '1.0.1'
-        isSnapshot = true
+        shortVersion = '1.1.0'
+        isSnapshot = false
         javaSourceCompatibility = 1.8
         junitVersion = '5.8.2'
         kotlinVersion = '1.8.10'
@@ -15,6 +15,5 @@ allprojects {
         pgpainlessVersion = '1.6.1'
         mockitoVersion = '4.5.1'
         slf4jVersion = '1.7.36'
-        sopJavaVersion = '7.0.0'
     }
 }
