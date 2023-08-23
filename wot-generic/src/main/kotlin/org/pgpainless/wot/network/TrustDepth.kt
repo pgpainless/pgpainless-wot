@@ -10,15 +10,9 @@ class TrustDepth: Comparable<Int> {
     val value: Int
 
     private constructor(value: Int) {
-        if (value < 0) {
-            throw IllegalArgumentException("Trust Depth cannot be smaller than 0.")
-        }
-        this.value = if (value < 255) {
-            value
-        } else if (value == 255) {
-            255
-        } else {
-            throw IllegalArgumentException("Trust Depth cannot be larger than 255.")
+        this.value = when (value) {
+            in validRange -> value
+            else -> throw IllegalArgumentException("Trust Depth MUST be a value from 0 to 255.")
         }
     }
 
@@ -47,6 +41,9 @@ class TrustDepth: Comparable<Int> {
     }
 
     companion object {
+        @JvmStatic
+        private val validRange = 0..255
+
         @JvmStatic
         fun unlimited(): TrustDepth {
             return TrustDepth(255)
