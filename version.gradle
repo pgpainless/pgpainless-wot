@@ -6,10 +6,10 @@ allprojects {
     ext {
         shortVersion = '1.1.1'
         isSnapshot = true
-        javaSourceCompatibility = 1.8
+        javaSourceCompatibility = 11
         junitVersion = '5.8.2'
-        kotlinVersion = '1.8.10'
-        logbackVersion = '1.2.11'
+        kotlinVersion = '1.9.21'
+        logbackVersion = '1.5.13'
         certDJavaVersion = '0.2.2'
         pgpainlessCertDVersion = '0.2.2'
         pgpainlessVersion = '1.6.1'

@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 group 'org.pgpainless'

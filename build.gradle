@@ -12,12 +12,15 @@ buildscript {
         mavenLocal()
         mavenCentral()
     }
+
+    dependencies {
+        classpath "gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.12.0"
+    }
 }
 
 plugins {
-    id("com.github.nbaztec.coveralls-jacoco") version "1.2.16"
-    id 'org.jetbrains.kotlin.jvm' version "1.8.10"
-    id 'jacoco-report-aggregation'
+    id 'org.jetbrains.kotlin.jvm' version "1.9.21"
+    id 'com.diffplug.spotless' version '6.22.0' apply false
 }
 
 apply from: 'version.gradle'
@@ -29,10 +32,7 @@ allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'checkstyle'
     apply plugin: 'kotlin'
-
-    compileJava {
-        options.release = 8
-    }
+    apply plugin: 'com.diffplug.spotless'
 
     // Only generate jar for submodules
     // without this we would generate an empty pgpainless.jar for the project root
@@ -43,14 +43,18 @@ allprojects {
 
     // checkstyle
     checkstyle {
-        toolVersion = '10.12.1'
+        toolVersion = '10.25.0'
+    }
+
+    spotless {
+        kotlin {
+            ktfmt().dropboxStyle()
+        }
     }
 
     group 'org.pgpainless'
     description = "Web of Trust Implementation using PGPainless"
     version = shortVersion
-
-    sourceCompatibility = javaSourceCompatibility
 
     repositories {
         mavenCentral()
@@ -66,6 +70,17 @@ allprojects {
         fileMode = 0644
     }
 
+    kotlin {
+        jvmToolchain(javaSourceCompatibility)
+    }
+
+    // Compatibility of default implementations in kotlin interfaces with Java implementations.
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += ["-Xjvm-default=all-compatibility"]
+        }
+    }
+
     project.ext {
         rootConfigDir = new File(rootDir, 'config')
         gitCommit = getGitCommit()
@@ -73,8 +88,7 @@ allprojects {
         isReleaseVersion = !isSnapshot
         signingRequired = !(isSnapshot || isContinuousIntegrationEnvironment)
         sonatypeCredentialsAvailable = project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
-        sonatypeSnapshotUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
-        sonatypeStagingUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+        sonatypeStagingUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
     }
 
     if (isSnapshot) {
@@ -99,7 +113,7 @@ allprojects {
         sourceDirectories.setFrom(project.files(sourceSets.main.allSource.srcDirs))
         classDirectories.setFrom(project.files(sourceSets.main.output))
         reports {
-            xml.enabled true
+            xml.required = true
         }
     }
 
@@ -112,28 +126,21 @@ allprojects {
     }
 }
 
-dependencies {
-    jacocoAggregation project(":pgpainless-wot")
-    jacocoAggregation project(":pgpainless-wot-cli")
-    jacocoAggregation project(":wot-dijkstra")
-    jacocoAggregation project(":wot-test-suite")
-}
-
 subprojects {
 
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
 
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
     task testsJar(type: Jar, dependsOn: testClasses) {
-        classifier = 'tests'
+        archiveClassifier = 'tests'
         from sourceSets.test.output
     }
 
@@ -198,7 +205,7 @@ subprojects {
         repositories {
             if (sonatypeCredentialsAvailable) {
                 maven {
-                    url isSnapshot ? sonatypeSnapshotUrl : sonatypeStagingUrl
+                    url sonatypeStagingUrl
                     credentials {
                         username = sonatypeUsername
                         password = sonatypePassword
@@ -240,8 +247,9 @@ def getGitCommit() {
     gitCommit
 }
 
-coverallsJacoco {
-    reportPath = "build/reports/jacoco/test/jacocoTestReport.xml"
+apply plugin: "com.github.kt3k.coveralls"
+coveralls {
+    sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
 }
 
 task jacocoRootReport(type: JacocoReport) {
@@ -250,7 +258,7 @@ task jacocoRootReport(type: JacocoReport) {
     classDirectories.setFrom(files(subprojects.sourceSets.main.output))
     executionData.setFrom(files(subprojects.jacocoTestReport.executionData))
     reports {
-        xml.enabled true
+        xml.required = true
         xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
     // We could remove the following setOnlyIf line, but then
@@ -261,10 +269,6 @@ task jacocoRootReport(type: JacocoReport) {
 }
 
 task javadocAll(type: Javadoc) {
-    def currentJavaVersion = JavaVersion.current()
-    if (currentJavaVersion.compareTo(JavaVersion.VERSION_1_9) >= 0) {
-        options.addStringOption("-release", "8");
-    }
     source subprojects.collect {project ->
         project.sourceSets.main.allJava }
     destinationDir = new File(buildDir, 'javadoc')
@@ -276,16 +280,4 @@ task javadocAll(type: Javadoc) {
     options.links = [
             "https://docs.oracle.com/javase/${sourceCompatibility.getMajorVersion()}/docs/api/",
     ] as String[]
-}
-
-if (JavaVersion.current().isJava8Compatible()) {
-    tasks.withType(Javadoc) {
-        // The '-quiet' as second argument is actually a hack,
-        // since the one paramater addStringOption doesn't seem to
-        // work, we extra add '-quiet', which is added anyway by
-        // gradle. See https://github.com/gradle/gradle/issues/2354
-        // See JDK-8200363 (https://bugs.openjdk.java.net/browse/JDK-8200363)
-        // for information about the -Xwerror option.
-        options.addStringOption('Xwerror', '-quiet')
-    }
 }
