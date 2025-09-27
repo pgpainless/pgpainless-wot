@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -24,7 +25,7 @@ import org.pgpainless.wot.network.Identifier
  *          Frank
  * ```
  */
-class CycleVectors: ArtifactVectors {
+class CycleVectors : ArtifactVectors {
     val aliceFpr = Identifier("BFC5CA10FB55A4B790E2A1DBA5CFAB9A9E34E183")
     val aliceUid = "<alice@example.org>"
 
@@ -49,9 +50,7 @@ class CycleVectors: ArtifactVectors {
     val frankUid = "<frank@example.org>"
     // Certified by: 78C3814EFD16E68F4F1AB4B874E30AE11FFCFB1B
 
-    /**
-     * A few minutes after the network has been generated.
-     */
+    /** A few minutes after the network has been generated. */
     val t0 = parseReferenceTime("2021-10-01 12:00:00 UTC")
 
     override val tempFilePrefix: String

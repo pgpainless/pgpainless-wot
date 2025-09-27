@@ -4,11 +4,11 @@
 
 package org.pgpainless.wot.cli.converters
 
+import java.util.*
 import org.pgpainless.util.DateUtil
 import picocli.CommandLine.ITypeConverter
-import java.util.*
 
-class DateConverter: ITypeConverter<Date> {
+class DateConverter : ITypeConverter<Date> {
 
     override fun convert(value: String?): Date {
         if (value == null) {

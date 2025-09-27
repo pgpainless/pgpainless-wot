@@ -4,6 +4,7 @@
 
 package org.pgpainless.wot
 
+import kotlin.test.*
 import org.bouncycastle.openpgp.PGPPublicKeyRing
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.network.Edge
@@ -11,7 +12,6 @@ import org.pgpainless.wot.network.Identifier
 import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.testfixtures.TestCertificateStores
 import org.pgpainless.wot.testfixtures.WotTestVectors
-import kotlin.test.*
 
 class PGPNetworkParserTest {
 
@@ -83,15 +83,18 @@ class PGPNetworkParserTest {
     }
 
     private fun assertHasIssuerAndTarget(
-            certifications: Edge,
-            issuer: Identifier,
-            target: Identifier) {
+        certifications: Edge,
+        issuer: Identifier,
+        target: Identifier
+    ) {
         assertEquals(issuer, certifications.issuer.fingerprint)
         assertEquals(target, certifications.target.fingerprint)
     }
 
     private fun assertHasEdge(network: Network, issuer: Identifier, target: Identifier) {
-        assertNotNull(getEdgeFromTo(network, issuer, target), "Expected edge from $issuer to $target but got none.")
+        assertNotNull(
+            getEdgeFromTo(network, issuer, target),
+            "Expected edge from $issuer to $target but got none.")
     }
 
     private fun assertHasNoEdge(network: Network, issuer: Identifier, target: Identifier) {
@@ -102,5 +105,4 @@ class PGPNetworkParserTest {
     private fun getEdgeFromTo(network: Network, issuer: Identifier, target: Identifier): Edge? {
         return network.edges[issuer to target]
     }
-
 }

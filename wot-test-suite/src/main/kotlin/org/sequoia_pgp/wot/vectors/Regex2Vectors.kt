@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,7 +8,7 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * A - B - C should be valid.  The regex only applies to the target.
+ * A - B - C should be valid. The regex only applies to the target.
  *
  * ```
  *        alice@some.org
@@ -21,7 +22,7 @@ import org.pgpainless.wot.network.Identifier
  *        ed@example.org
  * ```
  */
-class Regex2Vectors: ArtifactVectors {
+class Regex2Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("5C396C920399898461F17CB747FDBF3EB3453919")
     val aliceUid = "<alice@some.org>"

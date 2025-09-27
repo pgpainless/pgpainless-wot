@@ -4,14 +4,14 @@
 
 package org.pgpainless.wot.network
 
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.pgpainless.wot.dsl.NetworkDSL
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.pgpainless.wot.dsl.NetworkDSL
 
-class EdgeTest: NetworkDSL {
+class EdgeTest : NetworkDSL {
 
     private val alice = Node(Identifier("A"), null, RevocationState.notRevoked(), mapOf())
     private val bob = Node(Identifier("B"), null, RevocationState.notRevoked(), mapOf())
@@ -35,13 +35,9 @@ class EdgeTest: NetworkDSL {
         val set = Edge(alice, bob)
 
         set.addComponent(aliceSignsBob)
-        assertTrue {
-            set.components().any { it.value.contains(aliceSignsBob) }
-        }
+        assertTrue { set.components().any { it.value.contains(aliceSignsBob) } }
         set.addComponent(aliceSignsBobUserId)
-        assertTrue {
-            set.components()["Bob <bob@example.org>"]!!.contains(aliceSignsBobUserId)
-        }
+        assertTrue { set.components()["Bob <bob@example.org>"]!!.contains(aliceSignsBobUserId) }
     }
 
     @Test
@@ -102,17 +98,21 @@ class EdgeTest: NetworkDSL {
         val twoCerts = Edge(aliceSignsBob)
         twoCerts.addComponent(aliceSignsBobUserId)
 
-        assertEquals("A certifies binding: Bob <bob@example.org> <-> B [120]\n" +
-                "A certifies binding: null <-> B [120]\n", twoCerts.toString())
+        assertEquals(
+            "A certifies binding: Bob <bob@example.org> <-> B [120]\n" +
+                "A certifies binding: null <-> B [120]\n",
+            twoCerts.toString())
     }
-    
+
     @Test
     fun `verify that for multiple components over the same datum, only the most recent components are preserved`() {
         val now = Date()
         val fiveSecondsBefore = Date(now.time - 5000)
         val old = Certification(alice, bob, "Bob <bob@example.org>", fiveSecondsBefore)
         val new = Certification(alice, bob, "Bob <bob@example.org>", now)
-        val new2 = Edge.Certification(alice, bob, "Bob <bob@example.org>", now, null, true, 44, TrustDepth.auto(10))
+        val new2 =
+            Edge.Certification(
+                alice, bob, "Bob <bob@example.org>", now, null, true, 44, TrustDepth.auto(10))
 
         var set = Edge(alice, bob)
         set.addComponent(old)

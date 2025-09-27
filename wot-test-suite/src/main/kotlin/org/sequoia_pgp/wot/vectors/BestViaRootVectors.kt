@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,24 +8,22 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * When doing backwards propagation, we find paths from all nodes to the
- * target.  Since we don't stop when we reach a root, the returned path
- * should still be optimal.  Consider:
- *
+ * When doing backwards propagation, we find paths from all nodes to the target. Since we don't stop
+ * when we reach a root, the returned path should still be optimal. Consider:
  * ```text
  * A --- 120/10 ---> B --- 120/10 ---> C --- 120/10 ---> Target
  *  \                                                      /
  *   `--- 50/10 ---> Y --- 50/10 ---> Z --- 50/10 --------'
  * ```
  *
- * When the root is B, then the path that we find for A should be `A -> B
- * -> C -> Target`, not `A -> Y -> Z -> Target`.
+ * When the root is B, then the path that we find for A should be `A -> B -> C -> Target`, not `A ->
+ * Y -> Z -> Target`.
  *
  * Timeline:
  * - t0: keys are generated.
  * - t1: third-party certifications are issued.
  */
-class BestViaRootVectors: ArtifactVectors {
+class BestViaRootVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("B95FF5B1D055D26F758FD4E3BF12C4D1D28FDFFB")
     val aliceUid = "<alice@example.org>"
@@ -50,16 +49,12 @@ class BestViaRootVectors: ArtifactVectors {
     val zebraUid = "<zebra@example.org>"
     // Certified by: 86CB4639D1FE096BA941D05822B8AF50198C49DD
 
-    /**
-     * Create A, B, C, Y, Z, Target.
-     */
+    /** Create A, B, C, Y, Z, Target. */
     val t0 = parseReferenceTime("2021-09-27 12:51:50 UTC")
 
-    /**
-     * Create certifications.
-     */
+    /** Create certifications. */
     val t1 = parseReferenceTime("2021-09-27 12:52:50 UTC")
-    
+
     override val tempFilePrefix: String
         get() = "best-via-root"
 

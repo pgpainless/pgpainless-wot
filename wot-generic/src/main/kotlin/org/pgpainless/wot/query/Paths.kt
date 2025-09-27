@@ -11,10 +11,8 @@ package org.pgpainless.wot.query
  */
 class Paths(private val _paths: MutableMap<Path, Int>) {
 
-    /**
-     * Empty collection of paths.
-     */
-    constructor(): this(mutableMapOf<Path, Int>())
+    /** Empty collection of paths. */
+    constructor() : this(mutableMapOf<Path, Int>())
 
     val paths: List<Path>
         get() {
@@ -29,7 +27,8 @@ class Paths(private val _paths: MutableMap<Path, Int>) {
      *
      * @param path path to add
      * @param amount effective amount of the path (might be smaller than the paths actual amount)
-     * @throws IllegalArgumentException if the given amount is smaller or equal to the paths trust amount.
+     * @throws IllegalArgumentException if the given amount is smaller or equal to the paths trust
+     *   amount.
      */
     fun add(path: Path, amount: Int) {
         require(amount <= path.amount) {
@@ -38,9 +37,7 @@ class Paths(private val _paths: MutableMap<Path, Int>) {
         _paths[path] = amount
     }
 
-    /**
-     * The summed trust amount of all paths in this collection.
-     */
+    /** The summed trust amount of all paths in this collection. */
     val amount: Int
         get() {
             return _paths.values.sumOf { it }

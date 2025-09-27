@@ -16,39 +16,41 @@ class CertificationFactory {
 
     companion object {
         @JvmStatic
-        fun fromDelegation(issuer: Node,
-                           target: Node,
-                           signature: PGPSignature): Edge.Component {
-            return Edge.Delegation(issuer,
-                    target,
-                    SignatureSubpacketsUtil.getSignatureCreationTime(signature)!!.time,
-                    SignatureSubpacketsUtil.getSignatureExpirationTimeAsDate(signature),
-                    SignatureSubpacketsUtil.isExportable(signature),
-                    getTrustAmountFrom(signature),
-                    getTrustDepthFrom(signature),
-                    regexSetFrom(signature)
-            )
+        fun fromDelegation(issuer: Node, target: Node, signature: PGPSignature): Edge.Component {
+            return Edge.Delegation(
+                issuer,
+                target,
+                SignatureSubpacketsUtil.getSignatureCreationTime(signature)!!.time,
+                SignatureSubpacketsUtil.getSignatureExpirationTimeAsDate(signature),
+                SignatureSubpacketsUtil.isExportable(signature),
+                getTrustAmountFrom(signature),
+                getTrustDepthFrom(signature),
+                regexSetFrom(signature))
         }
 
         @JvmStatic
-        fun fromCertification(issuer: Node,
-                              target: Node,
-                              targetUserId: String,
-                              signature: PGPSignature): Edge.Component {
-            return Edge.Certification(issuer,
-                    target,
-                    targetUserId,
-                    SignatureSubpacketsUtil.getSignatureCreationTime(signature)!!.time,
-                    SignatureSubpacketsUtil.getSignatureExpirationTimeAsDate(signature),
-                    SignatureSubpacketsUtil.isExportable(signature),
-                    getTrustAmountFrom(signature),
-                    getTrustDepthFrom(signature),
-                    regexSetFrom(signature))
+        fun fromCertification(
+            issuer: Node,
+            target: Node,
+            targetUserId: String,
+            signature: PGPSignature
+        ): Edge.Component {
+            return Edge.Certification(
+                issuer,
+                target,
+                targetUserId,
+                SignatureSubpacketsUtil.getSignatureCreationTime(signature)!!.time,
+                SignatureSubpacketsUtil.getSignatureExpirationTimeAsDate(signature),
+                SignatureSubpacketsUtil.isExportable(signature),
+                getTrustAmountFrom(signature),
+                getTrustDepthFrom(signature),
+                regexSetFrom(signature))
         }
 
         @JvmStatic
         private fun getTrustAmountFrom(signature: PGPSignature): Int {
-            if (signature.signatureType in intArrayOf(PGPSignature.KEY_REVOCATION, PGPSignature.CERTIFICATION_REVOCATION)) {
+            if (signature.signatureType in
+                intArrayOf(PGPSignature.KEY_REVOCATION, PGPSignature.CERTIFICATION_REVOCATION)) {
                 return 0
             }
             val packet = SignatureSubpacketsUtil.getTrustSignature(signature)
@@ -57,7 +59,8 @@ class CertificationFactory {
 
         @JvmStatic
         private fun getTrustDepthFrom(signature: PGPSignature): TrustDepth {
-            if (signature.signatureType in intArrayOf(PGPSignature.KEY_REVOCATION, PGPSignature.CERTIFICATION_REVOCATION)) {
+            if (signature.signatureType in
+                intArrayOf(PGPSignature.KEY_REVOCATION, PGPSignature.CERTIFICATION_REVOCATION)) {
                 return TrustDepth.limited(0)
             }
             val packet = SignatureSubpacketsUtil.getTrustSignature(signature)

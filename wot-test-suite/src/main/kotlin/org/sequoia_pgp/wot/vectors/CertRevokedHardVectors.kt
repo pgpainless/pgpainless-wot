@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -6,10 +7,8 @@ package org.sequoia_pgp.wot.vectors
 
 import org.pgpainless.wot.network.Identifier
 
-/**
- * The same as [CertRevokedSoftVectors], but using hard revocations.
- */
-class CertRevokedHardVectors: ArtifactVectors {
+/** The same as [CertRevokedSoftVectors], but using hard revocations. */
+class CertRevokedHardVectors : ArtifactVectors {
     val aliceFpr = Identifier("219AAB661C8AAF4526DBC31AA751A7A0532863BA")
     val aliceUid = "<alice@example.org>"
 
@@ -28,28 +27,16 @@ class CertRevokedHardVectors: ArtifactVectors {
     // Certified by: BF680710128E6BCCB2268154569F5F6BFB95C544
     // Certified by: 90E02BFB03FAA04714D1D3D87543157EF3B12BE9
 
-    /**
-     * A, B, C, D are generated.
-     */
+    /** A, B, C, D are generated. */
     val t0 = parseReferenceTime("2020-01-01 00:00:00 UTC")
 
-    /**
-     * A certifies B - 2/120.
-     * B certifies D - 1/60.
-     * A certifies C - 2/30.
-     * C certifies D - 1/120.
-     */
+    /** A certifies B - 2/120. B certifies D - 1/60. A certifies C - 2/30. C certifies D - 1/120. */
     val t1 = parseReferenceTime("2020-02-01 00:00:00 UTC")
 
-    /**
-     * B is hard revoked.
-     */
+    /** B is hard revoked. */
     val t2 = parseReferenceTime("2020-03-01 00:00:00 UTC")
 
-    /**
-     * A certifies B (amount = 120).
-     * B certifies D (amount = 120).
-     */
+    /** A certifies B (amount = 120). B certifies D (amount = 120). */
     val t3 = parseReferenceTime("2020-04-01 00:00:00 UTC")
 
     override val tempFilePrefix: String

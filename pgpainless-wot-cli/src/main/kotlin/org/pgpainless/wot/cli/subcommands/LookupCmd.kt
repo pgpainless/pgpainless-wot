@@ -4,17 +4,20 @@
 
 package org.pgpainless.wot.cli.subcommands
 
+import java.util.concurrent.Callable
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine.*
-import java.util.concurrent.Callable
 
-@Command(name = "lookup", description = ["Lookup authentic certificates by finding bindings for a given user ID."])
-class LookupCmd: Callable<Int> {
+@Command(
+    name = "lookup",
+    description = ["Lookup authentic certificates by finding bindings for a given user ID."])
+class LookupCmd : Callable<Int> {
 
-    @ParentCommand
-    lateinit var parent: WebOfTrustCLI
+    @ParentCommand lateinit var parent: WebOfTrustCLI
 
-    @Option(names = ["--email"], description = ["Consider all user-IDs that contain the given email address."])
+    @Option(
+        names = ["--email"],
+        description = ["Consider all user-IDs that contain the given email address."])
     var email = false
 
     @Parameters(index = "0", description = ["User-ID"], paramLabel = "USERID")

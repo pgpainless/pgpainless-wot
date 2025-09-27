@@ -7,9 +7,7 @@ package org.pgpainless.wot.network
 import java.util.*
 import kotlin.math.abs
 
-/**
- * Revocation State of a certificate.
- */
+/** Revocation State of a certificate. */
 class RevocationState private constructor(val type: Type, val timestamp: Date?) {
 
     enum class Type {
@@ -20,26 +18,22 @@ class RevocationState private constructor(val type: Type, val timestamp: Date?) 
         Soft,
 
         /**
-         * Signatures issued at any time by a hard-revoked certificate are no longer considered valid,
-         * even if the creation time is before [timestamp].
+         * Signatures issued at any time by a hard-revoked certificate are no longer considered
+         * valid, even if the creation time is before [timestamp].
          */
         Hard,
 
-        /**
-         * The certificate is still valid.
-         */
+        /** The certificate is still valid. */
         None
     }
 
     companion object {
-        @JvmStatic
-        fun notRevoked(): RevocationState = RevocationState(Type.None, null)
+        @JvmStatic fun notRevoked(): RevocationState = RevocationState(Type.None, null)
 
         @JvmStatic
         fun softRevoked(timestamp: Date): RevocationState = RevocationState(Type.Soft, timestamp)
 
-        @JvmStatic
-        fun hardRevoked(): RevocationState = RevocationState(Type.Hard, null)
+        @JvmStatic fun hardRevoked(): RevocationState = RevocationState(Type.Hard, null)
     }
 
     fun isHardRevocation(): Boolean = type == Type.Hard
@@ -57,7 +51,8 @@ class RevocationState private constructor(val type: Type, val timestamp: Date?) 
                 return true
             }
             // return equal
-            return abs(referenceTime.time / 1000 - timestamp!!.time / 1000) == 0L // less than one second diff
+            return abs(referenceTime.time / 1000 - timestamp!!.time / 1000) ==
+                0L // less than one second diff
         }
         return false
     }

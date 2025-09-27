@@ -4,22 +4,24 @@
 
 package org.pgpainless.wot.cli.subcommands
 
+import java.util.concurrent.Callable
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
-import java.util.concurrent.Callable
 
 @Command(name = "path", description = ["Verify and lint a path."])
-class PathCmd: Callable<Int> {
+class PathCmd : Callable<Int> {
 
-    @CommandLine.ParentCommand
-    lateinit var parent: WebOfTrustCLI
+    @CommandLine.ParentCommand lateinit var parent: WebOfTrustCLI
 
-    @Parameters(index = "*",
-            arity = "2..*",
-            description = ["List of fingerprints starting with the roots fingerprint or key ID and ending with the target certificates fingerprint or key ID and a user ID."],
-            )
+    @Parameters(
+        index = "*",
+        arity = "2..*",
+        description =
+            [
+                "List of fingerprints starting with the roots fingerprint or key ID and ending with the target certificates fingerprint or key ID and a user ID."],
+    )
     lateinit var keyIdsOrFingerprints: Array<String>
 
     /**

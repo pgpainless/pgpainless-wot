@@ -4,6 +4,8 @@
 
 package org.pgpainless.wot.api
 
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
 import org.pgpainless.wot.DijkstraAlgorithmFactory
@@ -12,10 +14,8 @@ import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.dsl.NetworkDSL
 import org.pgpainless.wot.network.TrustRoot
 import org.sequoia_pgp.wot.vectors.BestViaRootVectors
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-class AuthenticateTest: NetworkDSL {
+class AuthenticateTest : NetworkDSL {
 
     @Test
     fun `best-via-root - verify that we can authenticate 'target@example_com'`() {

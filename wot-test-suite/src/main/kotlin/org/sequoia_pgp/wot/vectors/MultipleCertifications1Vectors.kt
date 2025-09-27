@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,9 +8,8 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * This test is similar to the `multiple-userids` tests, but the two
- * certifications are for the same User ID and key.  This works if the
- * certifications have the same timestamp.
+ * This test is similar to the `multiple-userids` tests, but the two certifications are for the same
+ * User ID and key. This works if the certifications have the same timestamp.
  *
  * There is also an old certification, which should be ignored.
  *
@@ -24,7 +24,7 @@ import org.pgpainless.wot.network.Identifier
  *                     dave
  * ```
  */
-class MultipleCertifications1Vectors: ArtifactVectors {
+class MultipleCertifications1Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("9219941467AA737C6EC1207959A2CEFC112C359A")
     val aliceUid = "<alice@example.org>"
@@ -43,9 +43,7 @@ class MultipleCertifications1Vectors: ArtifactVectors {
     val daveUid = "<dave@example.org>"
     // Certified by: 853304031E7B0B116BBD0B398734F11945313904
 
-    /**
-     * A few moments after the network has been generated.
-     */
+    /** A few moments after the network has been generated. */
     val t0 = parseReferenceTime("2021-10-06 12:20:00 UTC")
 
     override val tempFilePrefix: String

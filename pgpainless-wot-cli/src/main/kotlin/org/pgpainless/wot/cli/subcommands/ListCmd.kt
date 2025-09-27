@@ -4,16 +4,17 @@
 
 package org.pgpainless.wot.cli.subcommands
 
+import java.util.concurrent.Callable
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import picocli.CommandLine
 import picocli.CommandLine.Command
-import java.util.concurrent.Callable
 
-@Command(name = "list", description = ["Find all bindings that can be authenticated for all certificates."])
-class ListCmd: Callable<Int> {
+@Command(
+    name = "list",
+    description = ["Find all bindings that can be authenticated for all certificates."])
+class ListCmd : Callable<Int> {
 
-    @CommandLine.ParentCommand
-    lateinit var parent: WebOfTrustCLI
+    @CommandLine.ParentCommand lateinit var parent: WebOfTrustCLI
 
     /**
      * Execute the command.

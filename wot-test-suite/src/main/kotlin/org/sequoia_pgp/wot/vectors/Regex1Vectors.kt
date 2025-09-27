@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -11,9 +12,8 @@ import org.pgpainless.wot.network.Identifier
  *
  * bob makes dave a trusted introducer for the "other.org" domain.
  *
- * This means that A - B - D - E is invalid, because ed@example.org is
- * out of scope of the B - D delegation (i.e., it does not match
- * other.org).
+ * This means that A - B - D - E is invalid, because ed@example.org is out of scope of the B - D
+ * delegation (i.e., it does not match other.org).
  *
  * ```
  *                    alice@some.org
@@ -25,7 +25,7 @@ import org.pgpainless.wot.network.Identifier
  *                       ed@example.org   frank@other.org
  * ```
  */
-class Regex1Vectors: ArtifactVectors {
+class Regex1Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("3AD1F297E4B150F75DBFC43476FB81BFE0665C3A")
     val aliceUid = "<alice@some.org>"

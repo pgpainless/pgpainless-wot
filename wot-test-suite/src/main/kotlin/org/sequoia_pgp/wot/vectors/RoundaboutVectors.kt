@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,8 +8,8 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * The best way from A to B, G and H is via C-D-E-F.  The best way from A
- * to I is via B!  (A has two local optima.)
+ * The best way from A to B, G and H is via C-D-E-F. The best way from A to I is via B! (A has two
+ * local optima.)
  *
  * J complicates things a bit when doing a backwards propagation.
  *
@@ -34,9 +35,8 @@ import org.pgpainless.wot.network.Identifier
  *         v
  *         I
  * ```
- *
  */
-class RoundaboutVectors: ArtifactVectors {
+class RoundaboutVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("41E9B069C96EB6D47525294B10BBBD00912BEA02")
     val aliceUid = "<alice@example.org>"

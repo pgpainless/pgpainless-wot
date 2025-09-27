@@ -4,13 +4,13 @@
 
 package org.pgpainless.wot.query
 
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.pgpainless.wot.dsl.NetworkDSL
 import org.pgpainless.wot.network.TrustDepth
-import kotlin.test.assertEquals
 
-class PathsTest: NetworkDSL {
+class PathsTest : NetworkDSL {
 
     private val alice = Node("0000000000000000000000000000000000000000")
     private val bob = Node("1111111111111111111111111111111111111111")
@@ -36,10 +36,11 @@ class PathsTest: NetworkDSL {
     fun `verify that the amounts of two Path objects sum up`() {
         val path1 = Path(alice).apply { append(alice_bob_1) }
         val path2 = Path(alice).apply { append(alice_bob_2) }
-        val twoPaths = Paths().apply {
-            add(path1, 140)
-            add(path2, 160)
-        }
+        val twoPaths =
+            Paths().apply {
+                add(path1, 140)
+                add(path2, 160)
+            }
 
         assertEquals(300, twoPaths.amount)
     }
@@ -48,8 +49,6 @@ class PathsTest: NetworkDSL {
     fun `verify that a Path cannot be added if its amount is less than the method argument armound`() {
         val path = Path(alice).apply { append(alice_bob_1) }
         val paths = Paths()
-        assertThrows<IllegalArgumentException> {
-            paths.add(path, 250)
-        }
+        assertThrows<IllegalArgumentException> { paths.add(path, 250) }
     }
 }

@@ -4,10 +4,7 @@
 
 package org.pgpainless.wot.network
 
-/**
- * Identifier for a node.
- * With OpenPGP, this is a fingerprint.
- */
+/** Identifier for a node. With OpenPGP, this is a fingerprint. */
 class Identifier(fingerprint: String) : Comparable<Identifier> {
 
     val fingerprint: String

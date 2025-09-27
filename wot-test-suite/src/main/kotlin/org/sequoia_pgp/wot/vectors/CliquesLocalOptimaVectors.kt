@@ -1,10 +1,11 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
 package org.sequoia_pgp.wot.vectors
 
-class CliquesLocalOptimaVectors: CliquesVectors() {
+class CliquesLocalOptimaVectors : CliquesVectors() {
 
     override val tempFilePrefix: String
         get() = "cliques-local-optima"

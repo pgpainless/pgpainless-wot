@@ -9,9 +9,10 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
 
 /**
- * Simple test case, which tests a single WOT query invocation and compares the output to the expected result.
+ * Simple test case, which tests a single WOT query invocation and compares the output to the
+ * expected result.
  */
-abstract class SimpleTestCase(vectors: ArtifactVectors): TestCase(vectors)  {
+abstract class SimpleTestCase(vectors: ArtifactVectors) : TestCase(vectors) {
 
     @ParameterizedTest
     @MethodSource("instances")

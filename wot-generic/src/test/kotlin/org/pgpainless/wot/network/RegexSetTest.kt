@@ -4,13 +4,13 @@
 
 package org.pgpainless.wot.network
 
-import org.junit.jupiter.api.Test
-import org.pgpainless.wot.dsl.NetworkDSL
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import org.pgpainless.wot.dsl.NetworkDSL
 
-class RegexSetTest: NetworkDSL {
+class RegexSetTest : NetworkDSL {
 
     private val exampleComRegex = "<[^>]+[@.]example\\.com>\$"
     private val pgpainlessOrgRegex = "<[^>]+[@.]pgpainless\\.org>\$"
@@ -18,7 +18,7 @@ class RegexSetTest: NetworkDSL {
     @Test
     fun simpleMatch() {
         val stringList: List<String> = listOf("<[^>]+[@.]foobank\\.com>$")
-        val rs = RegexSet.fromExpressions(stringList);
+        val rs = RegexSet.fromExpressions(stringList)
 
         assert(rs.matches("Foo Bank Employee <employee@foobank.com>"))
         assert(rs.matches("<employee@foobank.com>"))
@@ -27,7 +27,7 @@ class RegexSetTest: NetworkDSL {
     @Test
     fun simpleNonMatch() {
         val stringList: List<String> = listOf("<[^>]+[@.]foobank\\.com>$")
-        val rs = RegexSet.fromExpressions(stringList);
+        val rs = RegexSet.fromExpressions(stringList)
 
         assert(!rs.matches("Bar Bank Employee <employee@barbank.com>"))
         assert(!rs.matches("<employee@barbank.com>"))

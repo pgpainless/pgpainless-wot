@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,11 +8,9 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * This test is similar to [MultipleUserIds1Vectors], but it uses regular
- * expressions.  Specifically, Alice certifies two different User IDs for
- * Bob.  One of them with a depth of 1 and no regular expression, and the
- * other scoped to other.org, but with a higher trust amount and more
- * depth.
+ * This test is similar to [MultipleUserIds1Vectors], but it uses regular expressions. Specifically,
+ * Alice certifies two different User IDs for Bob. One of them with a depth of 1 and no regular
+ * expression, and the other scoped to other.org, but with a higher trust amount and more depth.
  *
  * ```
  *                 alice
@@ -27,7 +26,7 @@ import org.pgpainless.wot.network.Identifier
  * dave@other.org    ed
  * ```
  */
-class MultipleUserIds2Vectors: ArtifactVectors {
+class MultipleUserIds2Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("F1C99C4019837703DD17C45440F8A0141DF278EA")
     val aliceUid = "<alice@example.org>"

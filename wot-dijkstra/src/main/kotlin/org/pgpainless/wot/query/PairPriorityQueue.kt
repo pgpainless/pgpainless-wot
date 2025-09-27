@@ -9,12 +9,11 @@ import java.util.*
 /**
  * A de-duplicating min-priority queue for key-value pairs.
  *
- * When an element is popped, the queue entry with the *most desirable
- * value* (that is: low cost) is popped (if there are multiple elements
- * with the same minimal value, one of them is returned.)
+ * When an element is popped, the queue entry with the *most desirable value* (that is: low cost) is
+ * popped (if there are multiple elements with the same minimal value, one of them is returned.)
  *
- * When inserting an element, if there is already an element with the same
- * key, the element with the smaller value is kept.
+ * When inserting an element, if there is already an element with the same key, the element with the
+ * smaller value is kept.
  */
 internal class PairPriorityQueue<K, V : Comparable<V>>() {
 

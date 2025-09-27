@@ -4,38 +4,44 @@
 
 package org.sequoia_pgp.wot.test.harness
 
+import java.io.ByteArrayOutputStream
 import org.bouncycastle.util.io.Streams
 import org.sequoia_pgp.wot.test.ExecutionCallback
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
-import java.io.ByteArrayOutputStream
 
 /**
  * Harness for a WOT executable (e.g. sq-wot).
+ *
  * @param executable full path to the executable file
  * @param environment set of environment variables in the format 'key=value'
  */
-class ExecutableHarness(val executable: String, val environment: Array<String>): Harness() {
+class ExecutableHarness(val executable: String, val environment: Array<String>) : Harness() {
 
     override fun runner(): ExecutionCallback {
-        return object: ExecutionCallback {
+        return object : ExecutionCallback {
 
-            override fun execute(vectors: ArtifactVectors, arguments: Array<String>): Pair<String, Int> {
+            override fun execute(
+                vectors: ArtifactVectors,
+                arguments: Array<String>
+            ): Pair<String, Int> {
                 val command = arrayOf(executable).plus(arguments)
                 val p = Runtime.getRuntime().exec(command, environment)
-                val output = p.inputStream.let {
-                    val bOut = ByteArrayOutputStream()
-                    Streams.pipeAll(it, bOut)
-                    bOut.toString()
-                }.plus(p.errorStream.let {
-                    val bOut = ByteArrayOutputStream()
-                    Streams.pipeAll(it, bOut)
-                    bOut.toString()
-                })
+                val output =
+                    p.inputStream
+                        .let {
+                            val bOut = ByteArrayOutputStream()
+                            Streams.pipeAll(it, bOut)
+                            bOut.toString()
+                        }
+                        .plus(
+                            p.errorStream.let {
+                                val bOut = ByteArrayOutputStream()
+                                Streams.pipeAll(it, bOut)
+                                bOut.toString()
+                            })
                 val exit = p.waitFor()
                 return output to exit
             }
         }
     }
-
-
 }

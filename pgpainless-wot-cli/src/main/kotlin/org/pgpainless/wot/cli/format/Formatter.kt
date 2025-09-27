@@ -10,6 +10,7 @@ interface Formatter {
 
     /**
      * Format a binding.
+     *
      * @param binding binding to format
      * @param amountMin minimum trust amount to accept the binding
      * @param amountReference reference value to compare the amount against to calculate percentage
@@ -18,7 +19,6 @@ interface Formatter {
 
     fun format(authenticateResult: AuthenticateAPI.Result): String {
         return buildString {
-
             if (authenticateResult.binding.paths.paths.isEmpty()) {
                 return "No paths found."
             }
@@ -33,9 +33,7 @@ interface Formatter {
 
     fun format(identifyResult: IdentifyAPI.Result): String {
         return buildString {
-            identifyResult.bindings.forEach {
-                appendLine(format(it, identifyResult.targetAmount))
-            }
+            identifyResult.bindings.forEach { appendLine(format(it, identifyResult.targetAmount)) }
             if (!identifyResult.acceptable) {
                 appendLine("Could not authenticate any paths.")
             }
@@ -44,17 +42,13 @@ interface Formatter {
 
     fun format(listResult: ListAPI.Result): String {
         return buildString {
-            listResult.bindings.forEach {
-                appendLine(format(it, listResult.targetAmount))
-            }
+            listResult.bindings.forEach { appendLine(format(it, listResult.targetAmount)) }
         }
     }
 
     fun format(lookupResult: LookupAPI.Result): String {
         return buildString {
-            lookupResult.bindings.forEach {
-                appendLine(format(it, lookupResult.targetAmount))
-            }
+            lookupResult.bindings.forEach { appendLine(format(it, lookupResult.targetAmount)) }
             if (!lookupResult.acceptable) {
                 appendLine("Could not authenticate any paths.")
             }

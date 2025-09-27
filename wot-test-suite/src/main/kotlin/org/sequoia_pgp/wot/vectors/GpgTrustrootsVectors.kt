@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,13 +8,10 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * How gpg interprets ownertrust is a bit complicated.  For a certificate
- * that is marked as "fully trusted" or "partially trusted" to be
- * considered a trust root, it also has to be reachable from an
- * ultimately trusted trust root.  Further, it is permissible for that to
- * happen via fully trusted or marginally trusted trust roots.  Consider:
- *
- *
+ * How gpg interprets ownertrust is a bit complicated. For a certificate that is marked as "fully
+ * trusted" or "partially trusted" to be considered a trust root, it also has to be reachable from
+ * an ultimately trusted trust root. Further, it is permissible for that to happen via fully trusted
+ * or marginally trusted trust roots. Consider:
  * ```
  *              root
  * 0/120    /    |     \
@@ -24,11 +22,10 @@ import org.pgpainless.wot.network.Identifier
  *             target
  * ```
  *
- * Clearly, d cannot be authenticated from the root.  But if a1, a2, and
- * a3 are partially trusted trust roots, then it can be.  This means that
- * sq-wot has to iterate when adding gpg trust roots.
+ * Clearly, d cannot be authenticated from the root. But if a1, a2, and a3 are partially trusted
+ * trust roots, then it can be. This means that sq-wot has to iterate when adding gpg trust roots.
  */
-class GpgTrustrootsVectors: ArtifactVectors {
+class GpgTrustrootsVectors : ArtifactVectors {
 
     val rootFpr = Identifier("D8330354E99DB503729A68D4AAE7E9EC2129CEC3")
     val rootUid = "<root@example.org>"
@@ -48,14 +45,10 @@ class GpgTrustrootsVectors: ArtifactVectors {
     val targetFpr = Identifier("30A185EA9319FF1D0BCBDBFCF2CD31DCC3DCAA02")
     val targetUid = "<target@example.org>"
 
-    /**
-     * Certificates are generated.
-     */
+    /** Certificates are generated. */
     val t0 = parseReferenceTime("2020-01-01 00:00:00 UTC")
 
-    /**
-     * Certifications are made.
-     */
+    /** Certifications are made. */
     val t1 = parseReferenceTime("2020-02-01 00:00:00 UTC")
 
     override val tempFilePrefix: String

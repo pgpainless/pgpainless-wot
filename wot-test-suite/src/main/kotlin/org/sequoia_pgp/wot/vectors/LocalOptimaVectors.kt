@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,17 +8,14 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * The best path from A to F is: A - B - C - E - F (amount: 100).  Back
- * propagation will choose: A - B - F (amount: 75), because it is
- * shorter.  Make sure we don't choose A - B - D - E - F.
+ * The best path from A to F is: A - B - C - E - F (amount: 100). Back propagation will choose: A -
+ * B - F (amount: 75), because it is shorter. Make sure we don't choose A - B - D - E - F.
  *
- * For F, A - B - C - E is optimal (amount: 100).  Back propagation will
- * choose it, because at B, C - E and D - E have the same depth, but C -
- * E has a larger trust amount.
+ * For F, A - B - C - E is optimal (amount: 100). Back propagation will choose it, because at B, C -
+ * E and D - E have the same depth, but C - E has a larger trust amount.
  *
- * For G, A - B - C - E - G and A - B - D - E - G are equally good.  But,
- * we will select the latter, because when we have a choice (at E), we
- * prefer more residual depth.
+ * For G, A - B - C - E - G and A - B - D - E - G are equally good. But, we will select the latter,
+ * because when we have a choice (at E), we prefer more residual depth.
  *
  * For H, A - B - C - E - H is better.
  *
@@ -40,7 +38,7 @@ import org.pgpainless.wot.network.Identifier
  *          H       G
  * ```
  */
-class LocalOptimaVectors: ArtifactVectors {
+class LocalOptimaVectors : ArtifactVectors {
     val aliceFpr = Identifier("EAAE12F98D39F38BF0D1B4C5C46A428ADEFBB2F8")
     val aliceUid = "<alice@example.org>"
 
@@ -78,9 +76,7 @@ class LocalOptimaVectors: ArtifactVectors {
     val henryUid = "<henry@example.org>"
     // Certified by: 70507A9058A57FEAE18CC3CE6A398AC9051D9CA8
 
-    /**
-     * A few minutes after the network has been generated.
-     */
+    /** A few minutes after the network has been generated. */
     val t0 = parseReferenceTime("2021-10-01 10:27:00 UTC")
 
     override val tempFilePrefix: String

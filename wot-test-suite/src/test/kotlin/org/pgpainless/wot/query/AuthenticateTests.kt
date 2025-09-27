@@ -1,78 +1,90 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Heiko Schaefer <heiko@schaefer.name>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Heiko Schaefer
+// <heiko@schaefer.name>
 //
 // SPDX-License-Identifier: LGPL-2.0-only
 
 package org.pgpainless.wot.query
 
-import org.pgpainless.wot.network.*
-import org.sequoia_pgp.wot.vectors.*
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.pgpainless.wot.network.*
+import org.sequoia_pgp.wot.vectors.*
 
 /**
  * Tests for the authenticate function of the Web of Trust algorithm, as outlined in
  * https://gitlab.com/sequoia-pgp/sequoia-wot/-/blob/main/spec/sequoia-wot.md
  *
- * These tests are ported from https://gitlab.com/sequoia-pgp/sequoia-wot/-/blob/main/src/lib.rs
- * by Neal H. Walfield <neal@pep.foundation>, licensed under LGPL-2.0-or-later.
+ * These tests are ported from https://gitlab.com/sequoia-pgp/sequoia-wot/-/blob/main/src/lib.rs by
+ * Neal H. Walfield <neal@pep.foundation>, licensed under LGPL-2.0-or-later.
  */
 class AuthenticateTest {
 
-    fun Query(network: Network, trustRoot: Identifier, certificationNetwork: Boolean = false, referenceTime: Date = Date()): Dijkstra =
-            Dijkstra(network, setOf(TrustRoot(trustRoot)), certificationNetwork, referenceTime)
+    fun Query(
+        network: Network,
+        trustRoot: Identifier,
+        certificationNetwork: Boolean = false,
+        referenceTime: Date = Date()
+    ): Dijkstra =
+        Dijkstra(network, setOf(TrustRoot(trustRoot)), certificationNetwork, referenceTime)
 
     fun Query(network: Network, vararg trustRoots: Identifier): Dijkstra =
-            Dijkstra(network, trustRoots.map { TrustRoot(it) }.toSet(), false, Date())
+        Dijkstra(network, trustRoots.map { TrustRoot(it) }.toSet(), false, Date())
 
     // Authenticates the target.
-    private fun sp(q: Dijkstra,
-                   targetFpr: Identifier,
-                   targetUserid: String,
-                   expected: List<Pair<Int, List<Identifier>>>,
-                   minTrustAmount: Int?) {
+    private fun sp(
+        q: Dijkstra,
+        targetFpr: Identifier,
+        targetUserid: String,
+        expected: List<Pair<Int, List<Identifier>>>,
+        minTrustAmount: Int?
+    ) {
 
-        println("Authenticating: $targetFpr, $targetUserid");
+        println("Authenticating: $targetFpr, $targetUserid")
 
         val got = q.search(targetFpr, targetUserid, (minTrustAmount ?: 120))
 
         when (Pair(got.paths.isNotEmpty(), expected.isNotEmpty())) {
             Pair(false, false) -> {
-                println("Can't authenticate == can't authenticate (good)");
+                println("Can't authenticate == can't authenticate (good)")
             }
-
             Pair(false, true) -> {
                 throw RuntimeException("Couldn't authenticate. Expected paths: $expected")
             }
-
             Pair(true, false) -> {
                 throw RuntimeException("Unexpectedly authenticated binding. Got: $got")
             }
-
             Pair(true, true) -> {
                 println("Got paths: ${got.items}")
                 println("Expected: $expected")
 
-                assertEquals(expected.size, got.paths.size, "Expected $expected paths, got ${got.paths} [${got.amount}]")
-                got.items.map { (path, amount) ->
-                    Pair(amount, path.certificates.map { it.fingerprint }.toList())
-                }.zip(expected).withIndex()
-                        .forEach { (i, b) ->
-                            val g = b.first
-                            var e = b.second
+                assertEquals(
+                    expected.size,
+                    got.paths.size,
+                    "Expected $expected paths, got ${got.paths} [${got.amount}]")
+                got.items
+                    .map { (path, amount) ->
+                        Pair(amount, path.certificates.map { it.fingerprint }.toList())
+                    }
+                    .zip(expected)
+                    .withIndex()
+                    .forEach { (i, b) ->
+                        val g = b.first
+                        var e = b.second
 
-                            // Adjust test expectations: sequoia-wot returns 1-step paths for self-signed roots.
-                            // We return a 2-step path.
-                            if (e.second.size == 1) {
-                                val list = e.second.toMutableList()
-                                list.add(list[0])
-                                e = Pair(e.first, list.toList())
-                            }
-
-                            assertEquals(e, g, "got vs. expected path (#$i)")
-                            assertEquals(e.first, g.first, "got vs. expected trust amount (#$i)")
+                        // Adjust test expectations: sequoia-wot returns 1-step paths for
+                        // self-signed roots.
+                        // We return a 2-step path.
+                        if (e.second.size == 1) {
+                            val list = e.second.toMutableList()
+                            list.add(list[0])
+                            e = Pair(e.first, list.toList())
                         }
+
+                        assertEquals(e, g, "got vs. expected path (#$i)")
+                        assertEquals(e.first, g.first, "got vs. expected trust amount (#$i)")
+                    }
 
                 assertEquals(expected.sumOf { it.first }, got.amount)
             }
@@ -82,8 +94,14 @@ class AuthenticateTest {
     }
 
     private fun printNetwork(n: Network) {
-        println("Network contains " + n.nodes.size + " nodes with " + n.numberOfEdges + " edges built from "
-                + n.numberOfSignatures + " signatures.")
+        println(
+            "Network contains " +
+                n.nodes.size +
+                " nodes with " +
+                n.numberOfEdges +
+                " edges built from " +
+                n.numberOfSignatures +
+                " signatures.")
         println(n)
     }
 
@@ -98,21 +116,46 @@ class AuthenticateTest {
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr))), null)
-        sp(q1, t.carolFpr, t.carolUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
-        sp(q1, t.daveFpr, t.daveUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q1,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
+        sp(
+            q1,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))),
+            null)
         sp(q1, t.ellenFpr, t.ellenUid, listOf(), null)
         sp(q1, t.frankFpr, t.frankUid, listOf(), null)
-        sp(q1, t.carolFpr, t.bobUid, listOf(), null) // No one authenticated Bob's User ID on Carol's key.
+        sp(
+            q1,
+            t.carolFpr,
+            t.bobUid,
+            listOf(),
+            null) // No one authenticated Bob's User ID on Carol's key.
 
         val q2 = Query(n, t.bobFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(), null)
         sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
         sp(q2, t.carolFpr, t.carolUid, listOf(Pair(100, listOf(t.bobFpr, t.carolFpr))), null)
-        sp(q2, t.daveFpr, t.daveUid, listOf(Pair(100, listOf(t.bobFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q2,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(100, listOf(t.bobFpr, t.carolFpr, t.daveFpr))),
+            null)
         sp(q2, t.ellenFpr, t.ellenUid, listOf(), null)
         sp(q2, t.frankFpr, t.frankUid, listOf(), null)
-        sp(q2, t.carolFpr, t.bobUid, listOf(), null) // No one authenticated Bob's User ID on Carol's key.
+        sp(
+            q2,
+            t.carolFpr,
+            t.bobUid,
+            listOf(),
+            null) // No one authenticated Bob's User ID on Carol's key.
     }
 
     @Test
@@ -126,9 +169,24 @@ class AuthenticateTest {
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr))), null)
-        sp(q1, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
-        sp(q1, t.daveFpr, t.daveUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))), null)
-        sp(q1, t.edFpr, t.edUid, listOf(Pair(30, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr, t.edFpr))), null)
+        sp(
+            q1,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
+        sp(
+            q1,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))),
+            null)
+        sp(
+            q1,
+            t.edFpr,
+            t.edUid,
+            listOf(Pair(30, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr, t.edFpr))),
+            null)
         sp(q1, t.frankFpr, t.frankUid, listOf(), null)
 
         val q2 = Query(n, t.aliceFpr, t.daveFpr)
@@ -137,14 +195,26 @@ class AuthenticateTest {
 
         // The following paths are identical and the sorting depends on the fingerprint.
         // Thus, regenerating the keys could create a failure.
-        sp(q2, t.bobFpr, t.bobUid,
-                listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr)),
-                        Pair(120, listOf(t.daveFpr, t.bobFpr))),
-                300)
+        sp(
+            q2,
+            t.bobFpr,
+            t.bobUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr)), Pair(120, listOf(t.daveFpr, t.bobFpr))),
+            300)
 
-        sp(q2, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+        sp(
+            q2,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
         sp(q2, t.edFpr, t.edUid, listOf(Pair(30, listOf(t.daveFpr, t.edFpr))), null)
-        sp(q2, t.frankFpr, t.frankUid, listOf(Pair(30, listOf(t.daveFpr, t.edFpr, t.frankFpr))), null)
+        sp(
+            q2,
+            t.frankFpr,
+            t.frankUid,
+            listOf(Pair(30, listOf(t.daveFpr, t.edFpr, t.frankFpr))),
+            null)
     }
 
     @Test
@@ -156,15 +226,49 @@ class AuthenticateTest {
         val q1 = Query(n1, t1.rootFpr)
 
         // root -> a-0 -> a-1 -> b-0 -> ... -> f-0 -> target
-        sp(q1, t1.targetFpr, t1.targetUid,
-                listOf(Pair(120, listOf(t1.rootFpr, t1.a0Fpr, t1.a1Fpr, t1.b0Fpr, t1.b1Fpr, t1.c0Fpr, t1.c1Fpr, t1.d0Fpr, t1.d1Fpr, t1.e0Fpr, t1.f0Fpr, t1.targetFpr))),
-                null)
+        sp(
+            q1,
+            t1.targetFpr,
+            t1.targetUid,
+            listOf(
+                Pair(
+                    120,
+                    listOf(
+                        t1.rootFpr,
+                        t1.a0Fpr,
+                        t1.a1Fpr,
+                        t1.b0Fpr,
+                        t1.b1Fpr,
+                        t1.c0Fpr,
+                        t1.c1Fpr,
+                        t1.d0Fpr,
+                        t1.d1Fpr,
+                        t1.e0Fpr,
+                        t1.f0Fpr,
+                        t1.targetFpr))),
+            null)
 
         val q2 = Query(n1, t1.a1Fpr)
 
-        sp(q2, t1.targetFpr, t1.targetUid,
-                listOf(Pair(120, listOf(t1.a1Fpr, t1.b0Fpr, t1.b1Fpr, t1.c0Fpr, t1.c1Fpr, t1.d0Fpr, t1.d1Fpr, t1.e0Fpr, t1.f0Fpr, t1.targetFpr))),
-                null)
+        sp(
+            q2,
+            t1.targetFpr,
+            t1.targetUid,
+            listOf(
+                Pair(
+                    120,
+                    listOf(
+                        t1.a1Fpr,
+                        t1.b0Fpr,
+                        t1.b1Fpr,
+                        t1.c0Fpr,
+                        t1.c1Fpr,
+                        t1.d0Fpr,
+                        t1.d1Fpr,
+                        t1.e0Fpr,
+                        t1.f0Fpr,
+                        t1.targetFpr))),
+            null)
 
         val t2 = CliquesLocalOptimaVectors()
         val n2 = t2.getNetworkAt()
@@ -173,18 +277,76 @@ class AuthenticateTest {
         val q3 = Query(n2, t2.rootFpr)
 
         // root -> b-0 -> ... -> f-0 -> target
-        sp(q3, t2.targetFpr, t2.targetUid,
-                listOf(Pair(30, listOf(t2.rootFpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr)),
-                        Pair(30, listOf(t2.rootFpr, t2.a1Fpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr)),
-                        Pair(60, listOf(t2.rootFpr, t2.a0Fpr, t2.a1Fpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr))),
-                null)
+        sp(
+            q3,
+            t2.targetFpr,
+            t2.targetUid,
+            listOf(
+                Pair(
+                    30,
+                    listOf(
+                        t2.rootFpr,
+                        t2.b0Fpr,
+                        t2.b1Fpr,
+                        t2.c0Fpr,
+                        t2.c1Fpr,
+                        t2.d0Fpr,
+                        t2.d1Fpr,
+                        t2.e0Fpr,
+                        t2.f0Fpr,
+                        t2.targetFpr)),
+                Pair(
+                    30,
+                    listOf(
+                        t2.rootFpr,
+                        t2.a1Fpr,
+                        t2.b0Fpr,
+                        t2.b1Fpr,
+                        t2.c0Fpr,
+                        t2.c1Fpr,
+                        t2.d0Fpr,
+                        t2.d1Fpr,
+                        t2.e0Fpr,
+                        t2.f0Fpr,
+                        t2.targetFpr)),
+                Pair(
+                    60,
+                    listOf(
+                        t2.rootFpr,
+                        t2.a0Fpr,
+                        t2.a1Fpr,
+                        t2.b0Fpr,
+                        t2.b1Fpr,
+                        t2.c0Fpr,
+                        t2.c1Fpr,
+                        t2.d0Fpr,
+                        t2.d1Fpr,
+                        t2.e0Fpr,
+                        t2.f0Fpr,
+                        t2.targetFpr))),
+            null)
 
         val q4 = Query(n2, t2.a1Fpr)
 
-        sp(q4, t2.targetFpr, t2.targetUid,
-                listOf(Pair(120, listOf(t2.a1Fpr, t2.b0Fpr, t2.b1Fpr, t2.c0Fpr, t2.c1Fpr, t2.d0Fpr, t2.d1Fpr, t2.e0Fpr, t2.f0Fpr, t2.targetFpr))),
-                null)
-
+        sp(
+            q4,
+            t2.targetFpr,
+            t2.targetUid,
+            listOf(
+                Pair(
+                    120,
+                    listOf(
+                        t2.a1Fpr,
+                        t2.b0Fpr,
+                        t2.b1Fpr,
+                        t2.c0Fpr,
+                        t2.c1Fpr,
+                        t2.d0Fpr,
+                        t2.d1Fpr,
+                        t2.e0Fpr,
+                        t2.f0Fpr,
+                        t2.targetFpr))),
+            null)
 
         val t3 = CliquesLocalOptima2Vectors()
         val n3 = t3.getNetworkAt()
@@ -193,18 +355,87 @@ class AuthenticateTest {
         val q5 = Query(n3, t3.rootFpr)
 
         // root -> b-0 -> ... -> f-0 -> target
-        sp(q5, t3.targetFpr, t3.targetUid,
-                listOf(Pair(30, listOf(t3.rootFpr, t3.b0Fpr, t3.b1Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr)),
-                        Pair(30, listOf(t3.rootFpr, t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c0Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr)),
-                        Pair(60, listOf(t3.rootFpr, t3.a0Fpr, t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c0Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr))),
-                null)
+        sp(
+            q5,
+            t3.targetFpr,
+            t3.targetUid,
+            listOf(
+                Pair(
+                    30,
+                    listOf(
+                        t3.rootFpr,
+                        t3.b0Fpr,
+                        t3.b1Fpr,
+                        t3.c1Fpr,
+                        t3.d0Fpr,
+                        t3.d1Fpr,
+                        t3.e0Fpr,
+                        t3.f0Fpr,
+                        t3.targetFpr)),
+                Pair(
+                    30,
+                    listOf(
+                        t3.rootFpr,
+                        t3.a1Fpr,
+                        t3.b0Fpr,
+                        t3.b1Fpr,
+                        t3.c0Fpr,
+                        t3.c1Fpr,
+                        t3.d0Fpr,
+                        t3.d1Fpr,
+                        t3.e0Fpr,
+                        t3.f0Fpr,
+                        t3.targetFpr)),
+                Pair(
+                    60,
+                    listOf(
+                        t3.rootFpr,
+                        t3.a0Fpr,
+                        t3.a1Fpr,
+                        t3.b0Fpr,
+                        t3.b1Fpr,
+                        t3.c0Fpr,
+                        t3.c1Fpr,
+                        t3.d0Fpr,
+                        t3.d1Fpr,
+                        t3.e0Fpr,
+                        t3.f0Fpr,
+                        t3.targetFpr))),
+            null)
 
         val q6 = Query(n3, t3.a1Fpr)
 
-        sp(q6, t3.targetFpr, t3.targetUid,
-                listOf(Pair(30, listOf(t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr)),
-                        Pair(90, listOf(t3.a1Fpr, t3.b0Fpr, t3.b1Fpr, t3.c0Fpr, t3.c1Fpr, t3.d0Fpr, t3.d1Fpr, t3.e0Fpr, t3.f0Fpr, t3.targetFpr))),
-                null)
+        sp(
+            q6,
+            t3.targetFpr,
+            t3.targetUid,
+            listOf(
+                Pair(
+                    30,
+                    listOf(
+                        t3.a1Fpr,
+                        t3.b0Fpr,
+                        t3.b1Fpr,
+                        t3.c1Fpr,
+                        t3.d0Fpr,
+                        t3.d1Fpr,
+                        t3.e0Fpr,
+                        t3.f0Fpr,
+                        t3.targetFpr)),
+                Pair(
+                    90,
+                    listOf(
+                        t3.a1Fpr,
+                        t3.b0Fpr,
+                        t3.b1Fpr,
+                        t3.c0Fpr,
+                        t3.c1Fpr,
+                        t3.d0Fpr,
+                        t3.d1Fpr,
+                        t3.e0Fpr,
+                        t3.f0Fpr,
+                        t3.targetFpr))),
+            null)
     }
 
     @Test
@@ -217,44 +448,96 @@ class AuthenticateTest {
 
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(120, listOf(t.aliceFpr))), null)
 
-        sp(q1, t.bobFpr, t.bobUid,
-                listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr)),
-                        Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr, t.bobFpr))
-                ),
-                null)
+        sp(
+            q1,
+            t.bobFpr,
+            t.bobUid,
+            listOf(
+                Pair(60, listOf(t.aliceFpr, t.bobFpr)),
+                Pair(
+                    120,
+                    listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr, t.bobFpr))),
+            null)
 
         sp(q1, t.carolFpr, t.carolUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr))), null)
 
-        sp(q1, t.daveFpr, t.daveUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q1,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))),
+            null)
 
-        sp(q1, t.elmarFpr, t.elmarUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr))), null)
+        sp(
+            q1,
+            t.elmarFpr,
+            t.elmarUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr))),
+            null)
 
-        sp(q1, t.frankFpr, t.frankUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr))), null)
+        sp(
+            q1,
+            t.frankFpr,
+            t.frankUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr))),
+            null)
 
-        sp(q1, t.georgeFpr, t.georgeUid,
-                listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr)),
-                        Pair(60, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr,
-                                t.frankFpr, t.bobFpr, t.georgeFpr))),
-                null)
+        sp(
+            q1,
+            t.georgeFpr,
+            t.georgeUid,
+            listOf(
+                Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr)),
+                Pair(
+                    60,
+                    listOf(
+                        t.aliceFpr,
+                        t.carolFpr,
+                        t.daveFpr,
+                        t.elmarFpr,
+                        t.frankFpr,
+                        t.bobFpr,
+                        t.georgeFpr))),
+            null)
 
-        sp(q1, t.henryFpr, t.henryUid,
-                listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr)),
-                        Pair(60, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr,
-                                t.frankFpr, t.bobFpr, t.georgeFpr, t.henryFpr))),
-                null)
+        sp(
+            q1,
+            t.henryFpr,
+            t.henryUid,
+            listOf(
+                Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr)),
+                Pair(
+                    60,
+                    listOf(
+                        t.aliceFpr,
+                        t.carolFpr,
+                        t.daveFpr,
+                        t.elmarFpr,
+                        t.frankFpr,
+                        t.bobFpr,
+                        t.georgeFpr,
+                        t.henryFpr))),
+            null)
 
-        sp(q1, t.isaacFpr, t.isaacUid,
-                listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr, t.isaacFpr))),
-                null)
+        sp(
+            q1,
+            t.isaacFpr,
+            t.isaacUid,
+            listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr, t.isaacFpr))),
+            null)
 
         sp(q1, t.jennyFpr, t.jennyUid, listOf(), null)
-
 
         val q2 = Query(n, t.jennyFpr)
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(), null)
 
-        sp(q2, t.bobFpr, t.bobUid, listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr))), null)
+        sp(
+            q2,
+            t.bobFpr,
+            t.bobUid,
+            listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr))),
+            null)
 
         sp(q2, t.carolFpr, t.carolUid, listOf(), null)
 
@@ -262,22 +545,36 @@ class AuthenticateTest {
 
         sp(q2, t.elmarFpr, t.elmarUid, listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr))), null)
 
-        sp(q2, t.frankFpr, t.frankUid, listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr))), null)
+        sp(
+            q2,
+            t.frankFpr,
+            t.frankUid,
+            listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr))),
+            null)
 
-        sp(q2, t.georgeFpr, t.georgeUid,
-                listOf(Pair(100, listOf(t.jennyFpr, t.georgeFpr)),
-                        Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr))
-                ), null)
+        sp(
+            q2,
+            t.georgeFpr,
+            t.georgeUid,
+            listOf(
+                Pair(100, listOf(t.jennyFpr, t.georgeFpr)),
+                Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr))),
+            null)
 
-        sp(q2, t.henryFpr, t.henryUid,
-                listOf(Pair(100, listOf(t.jennyFpr, t.georgeFpr, t.henryFpr)),
-                        Pair(20, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr, t.henryFpr))
-                ), null)
+        sp(
+            q2,
+            t.henryFpr,
+            t.henryUid,
+            listOf(
+                Pair(100, listOf(t.jennyFpr, t.georgeFpr, t.henryFpr)),
+                Pair(
+                    20,
+                    listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr, t.henryFpr))),
+            null)
 
         sp(q2, t.isaacFpr, t.isaacUid, listOf(), null)
 
         sp(q2, t.jennyFpr, t.jennyUid, listOf(Pair(120, listOf(t.jennyFpr))), null)
-
 
         val q3 = Query(n, t.aliceFpr, t.jennyFpr)
 
@@ -301,27 +598,51 @@ class AuthenticateTest {
         // Finally, we call backwards a third time and find:
         //
         //   A -> C -> D -> E -> F -> B (120 -> 20)
-        sp(q3, t.bobFpr, t.bobUid,
-                listOf(Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr)),
-                        Pair(60, listOf(t.aliceFpr, t.bobFpr)),
-                        Pair(20, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr, t.bobFpr))
-                ), 240)
+        sp(
+            q3,
+            t.bobFpr,
+            t.bobUid,
+            listOf(
+                Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr)),
+                Pair(60, listOf(t.aliceFpr, t.bobFpr)),
+                Pair(
+                    20,
+                    listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr, t.bobFpr))),
+            240)
 
         sp(q3, t.carolFpr, t.carolUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr))), null)
 
-        sp(q3, t.daveFpr, t.daveUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q3,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))),
+            null)
 
-        sp(q3, t.elmarFpr, t.elmarUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr))), null)
+        sp(
+            q3,
+            t.elmarFpr,
+            t.elmarUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr))),
+            null)
 
-        sp(q3, t.frankFpr, t.frankUid, listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr))), 240);
+        sp(
+            q3,
+            t.frankFpr,
+            t.frankUid,
+            listOf(Pair(120, listOf(t.aliceFpr, t.carolFpr, t.daveFpr, t.elmarFpr, t.frankFpr))),
+            240)
 
-        sp(q3, t.georgeFpr, t.georgeUid,
-                listOf(
-                        Pair(100, listOf(t.jennyFpr, t.georgeFpr)),
-                        Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr)),
-                        Pair(20, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr)),
-                ), 240)
-
+        sp(
+            q3,
+            t.georgeFpr,
+            t.georgeUid,
+            listOf(
+                Pair(100, listOf(t.jennyFpr, t.georgeFpr)),
+                Pair(100, listOf(t.jennyFpr, t.elmarFpr, t.frankFpr, t.bobFpr, t.georgeFpr)),
+                Pair(20, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr)),
+            ),
+            240)
 
         // NOTE: original expectation from sequoia-wot:
         //        sp(q3, t.henryFpr, t.henryUid,
@@ -331,19 +652,32 @@ class AuthenticateTest {
 
         // NOTE: Adjusted expectation for pgpainless.
         // sequoia-wot searches for paths in a very specific way:
-        // backward_propagate() gets called twice in succession, from `authenticate()`, with two different search
-        // modes. The results get merged in a very specific way. In this test, that approach leads to a different
-        // distribution of trust amounts found for the two paths, which also happens to switch the ordering of the
+        // backward_propagate() gets called twice in succession, from `authenticate()`, with two
+        // different search
+        // modes. The results get merged in a very specific way. In this test, that approach leads
+        // to a different
+        // distribution of trust amounts found for the two paths, which also happens to switch the
+        // ordering of the
         // two paths.
-        // Note that the authentication result (the trust amount) remains unchanged, the total flow of 120 remains,
-        // it's just distributed differently between the two available paths. Both results are correct.
-        sp(q3, t.henryFpr, t.henryUid,
-                listOf(Pair(100, listOf(t.jennyFpr, t.georgeFpr, t.henryFpr)),
-                        Pair(20, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr))
-                ), null)
+        // Note that the authentication result (the trust amount) remains unchanged, the total flow
+        // of 120 remains,
+        // it's just distributed differently between the two available paths. Both results are
+        // correct.
+        sp(
+            q3,
+            t.henryFpr,
+            t.henryUid,
+            listOf(
+                Pair(100, listOf(t.jennyFpr, t.georgeFpr, t.henryFpr)),
+                Pair(20, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr))),
+            null)
 
-
-        sp(q3, t.isaacFpr, t.isaacUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr, t.isaacFpr))), null)
+        sp(
+            q3,
+            t.isaacFpr,
+            t.isaacUid,
+            listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.georgeFpr, t.henryFpr, t.isaacFpr))),
+            null)
 
         sp(q3, t.jennyFpr, t.jennyUid, listOf(Pair(120, listOf(t.jennyFpr))), null)
     }
@@ -360,30 +694,56 @@ class AuthenticateTest {
 
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr))), null)
 
-        sp(q1, t.carolFpr, t.carolUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+        sp(
+            q1,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
 
-        sp(q1, t.daveFpr, t.daveUid, listOf(Pair(50, listOf(t.aliceFpr, t.bobFpr, t.daveFpr))), null)
+        sp(
+            q1,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(50, listOf(t.aliceFpr, t.bobFpr, t.daveFpr))),
+            null)
 
-        sp(q1, t.ellenFpr, t.ellenUid,
-                listOf(
-                        Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr)),
-                        Pair(20, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr)),
-                ), null)
+        sp(
+            q1,
+            t.ellenFpr,
+            t.ellenUid,
+            listOf(
+                Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr)),
+                Pair(20, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr)),
+            ),
+            null)
 
-        sp(q1, t.francisFpr, t.francisUid,
-                listOf(
-                        Pair(75, listOf(t.aliceFpr, t.bobFpr, t.francisFpr)),
-                        Pair(45, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr, t.francisFpr)),
-                ), null)
+        sp(
+            q1,
+            t.francisFpr,
+            t.francisUid,
+            listOf(
+                Pair(75, listOf(t.aliceFpr, t.bobFpr, t.francisFpr)),
+                Pair(45, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr, t.francisFpr)),
+            ),
+            null)
 
-        sp(q1, t.georginaFpr, t.georginaUid, listOf(Pair(30, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr, t.georginaFpr))), null)
+        sp(
+            q1,
+            t.georginaFpr,
+            t.georginaUid,
+            listOf(Pair(30, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr, t.georginaFpr))),
+            null)
 
-        sp(q1, t.henryFpr, t.henryUid,
-                listOf(
-                        Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr, t.henryFpr)),
-                        Pair(20, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr, t.henryFpr)),
-                ), null)
-
+        sp(
+            q1,
+            t.henryFpr,
+            t.henryUid,
+            listOf(
+                Pair(100, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.ellenFpr, t.henryFpr)),
+                Pair(20, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.ellenFpr, t.henryFpr)),
+            ),
+            null)
 
         val q2 = Query(n, t.bobFpr)
 
@@ -395,18 +755,26 @@ class AuthenticateTest {
 
         sp(q2, t.daveFpr, t.daveUid, listOf(Pair(50, listOf(t.bobFpr, t.daveFpr))), null)
 
-        sp(q2, t.ellenFpr, t.ellenUid,
-                listOf(
-                        Pair(100, listOf(t.bobFpr, t.carolFpr, t.ellenFpr)),
-                        Pair(50, listOf(t.bobFpr, t.daveFpr, t.ellenFpr)),
-                ), null)
+        sp(
+            q2,
+            t.ellenFpr,
+            t.ellenUid,
+            listOf(
+                Pair(100, listOf(t.bobFpr, t.carolFpr, t.ellenFpr)),
+                Pair(50, listOf(t.bobFpr, t.daveFpr, t.ellenFpr)),
+            ),
+            null)
 
-        sp(q2, t.francisFpr, t.francisUid,
-                listOf(
-                        Pair(75, listOf(t.bobFpr, t.francisFpr)),
-                        Pair(100, listOf(t.bobFpr, t.carolFpr, t.ellenFpr, t.francisFpr)),
-                        Pair(20, listOf(t.bobFpr, t.daveFpr, t.ellenFpr, t.francisFpr)),
-                ), 240)
+        sp(
+            q2,
+            t.francisFpr,
+            t.francisUid,
+            listOf(
+                Pair(75, listOf(t.bobFpr, t.francisFpr)),
+                Pair(100, listOf(t.bobFpr, t.carolFpr, t.ellenFpr, t.francisFpr)),
+                Pair(20, listOf(t.bobFpr, t.daveFpr, t.ellenFpr, t.francisFpr)),
+            ),
+            240)
     }
 
     @Test
@@ -417,11 +785,15 @@ class AuthenticateTest {
 
         val q1 = Query(n, t.aliceFpr)
 
-        sp(q1, t.frankFpr, t.frankUid,
-                listOf(
-                        Pair(20, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.frankFpr)),
-                        Pair(10, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.edFpr, t.frankFpr)),
-                ), null)
+        sp(
+            q1,
+            t.frankFpr,
+            t.frankUid,
+            listOf(
+                Pair(20, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.frankFpr)),
+                Pair(10, listOf(t.aliceFpr, t.bobFpr, t.daveFpr, t.edFpr, t.frankFpr)),
+            ),
+            null)
     }
 
     @Test
@@ -430,21 +802,27 @@ class AuthenticateTest {
 
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
 
             val q = Query(n, t.aliceFpr, false, date)
 
-            val amount = when (i + 1) {
-                1 -> 60
-                2 -> 120
-                3 -> 60
-                else -> throw RuntimeException("")
-            }
+            val amount =
+                when (i + 1) {
+                    1 -> 60
+                    2 -> 120
+                    3 -> 60
+                    else -> throw RuntimeException("")
+                }
 
-            sp(q, t.carolFpr, t.carolUid, listOf(Pair(amount, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+            sp(
+                q,
+                t.carolFpr,
+                t.carolUid,
+                listOf(Pair(amount, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                null)
         }
     }
 
@@ -455,14 +833,16 @@ class AuthenticateTest {
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             // At t1, soft revocations are in the future, so certifications are still valid.
             //
-            // At t2, B is soft-revoked, so existing certifications are still valid, but we can no longer
+            // At t2, B is soft-revoked, so existing certifications are still valid, but we can no
+            // longer
             // authenticate B.
             //
-            // At t3, A re-certifies B and B re-certifies D. These certifications should be ignored as they are made
+            // At t3, A re-certifies B and B re-certifies D. These certifications should be ignored
+            // as they are made
             // after B was revoked.
 
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -472,7 +852,6 @@ class AuthenticateTest {
             // Covers scenarios #1 at t1, #3 at t2 and t3
             val q1 = Query(n, t.bobFpr, false, date)
             sp(q1, t.daveFpr, t.daveUid, listOf(Pair(60, listOf(t.bobFpr, t.daveFpr))), null)
-
 
             val q2 = Query(n, t.aliceFpr, false, date)
 
@@ -488,13 +867,16 @@ class AuthenticateTest {
             // Consider the code path where B is both an issuer and a target.
             //
             // Covers scenarios #1 & #2 at t1, #3 & #4 at t2 and t3.
-            sp(q2, t.daveFpr, t.daveUid,
-                    listOf(
-                            Pair(60, listOf(t.aliceFpr, t.bobFpr, t.daveFpr)),
-                            Pair(30, listOf(t.aliceFpr, t.carolFpr, t.daveFpr)),
-                    ), null)
+            sp(
+                q2,
+                t.daveFpr,
+                t.daveUid,
+                listOf(
+                    Pair(60, listOf(t.aliceFpr, t.bobFpr, t.daveFpr)),
+                    Pair(30, listOf(t.aliceFpr, t.carolFpr, t.daveFpr)),
+                ),
+                null)
         }
-
     }
 
     @Test
@@ -505,10 +887,11 @@ class AuthenticateTest {
         //
         // At t2, B is hard revoked so all certifications are invalid.
         //
-        // At t3, A re-certifies B and B re-certifies D. These certifications should also be ignored.
+        // At t3, A re-certifies B and B re-certifies D. These certifications should also be
+        // ignored.
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -529,7 +912,12 @@ class AuthenticateTest {
             // Consider the code path where B is both an issuer and a target.
             //
             // Covers scenarios #5 & #6 at t1, #7 & #8 at t2 and t3.
-            sp(q2, t.daveFpr, t.daveUid, listOf(Pair(30, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))), null)
+            sp(
+                q2,
+                t.daveFpr,
+                t.daveUid,
+                listOf(Pair(30, listOf(t.aliceFpr, t.carolFpr, t.daveFpr))),
+                null)
         }
     }
 
@@ -539,7 +927,7 @@ class AuthenticateTest {
 
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -547,7 +935,8 @@ class AuthenticateTest {
             val q1 = Query(n, t.aliceFpr, false, date)
 
             // Bob as target.
-            // (Once Bob has expired, it can be used as a trusted introducer for prior certifications, but
+            // (Once Bob has expired, it can be used as a trusted introducer for prior
+            // certifications, but
             // bindings cannot be authenticated.)
             if (i + 1 == 1) {
                 sp(q1, t.bobFpr, t.bobUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr))), null)
@@ -556,7 +945,12 @@ class AuthenticateTest {
             }
 
             // Bob in the middle.
-            sp(q1, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+            sp(
+                q1,
+                t.carolFpr,
+                t.carolUid,
+                listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                null)
 
             // Bob as root.
             val q2 = Query(n, t.bobFpr, false, date)
@@ -578,7 +972,7 @@ class AuthenticateTest {
         // At t2, B is soft-revoked so all future certifications are invalid.
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -601,11 +995,22 @@ class AuthenticateTest {
                 sp(q2, t.bobFpr, t.bobUid, listOf(), null)
             }
 
-            // Can use a delegation even if the certification that it is a part of has had its User ID revoked.
+            // Can use a delegation even if the certification that it is a part of has had its User
+            // ID revoked.
             if (i + 1 < 3) {
-                sp(q2, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+                sp(
+                    q2,
+                    t.carolFpr,
+                    t.carolUid,
+                    listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                    null)
             } else {
-                sp(q2, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+                sp(
+                    q2,
+                    t.carolFpr,
+                    t.carolUid,
+                    listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                    null)
             }
         }
     }
@@ -616,7 +1021,7 @@ class AuthenticateTest {
 
         for ((i, time) in listOf<Long>(1580598000, 1583103600, 1585778400).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -629,23 +1034,36 @@ class AuthenticateTest {
             when (i + 1) {
                 1 -> {
                     sp(q1, t.bobFpr, t.bobUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr))), null)
-                    sp(q1, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+                    sp(
+                        q1,
+                        t.carolFpr,
+                        t.carolUid,
+                        listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                        null)
                 }
-
                 2 -> {
                     sp(q1, t.bobFpr, t.bobUid, listOf(), null)
                     sp(q1, t.carolFpr, t.carolUid, listOf(), null)
                 }
-
                 3 -> {
-                    sp(q1, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr))), null)
-                    sp(q1, t.carolFpr, t.carolUid, listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+                    sp(
+                        q1,
+                        t.bobFpr,
+                        t.bobUid,
+                        listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr))),
+                        null)
+                    sp(
+                        q1,
+                        t.carolFpr,
+                        t.carolUid,
+                        listOf(Pair(120, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                        null)
                 }
-
                 else -> throw RuntimeException() // unreachable
             }
 
-            // Alice, not Bob, revokes Bob's user id. So when Bob is the root, the self-signature should still be good.
+            // Alice, not Bob, revokes Bob's user id. So when Bob is the root, the self-signature
+            // should still be good.
             val q2 = Query(n, t.bobFpr, false, date)
             sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
         }
@@ -673,7 +1091,7 @@ class AuthenticateTest {
         // At t2, B is certified with a trust amount of 0. This should eliminate the path.
         for ((i, time) in listOf<Long>(1580598000, 1583103600).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)
@@ -681,12 +1099,18 @@ class AuthenticateTest {
             val q1 = Query(n, t.aliceFpr, false, date)
 
             if (i + 1 == 1) {
-                sp(q1, t.carolFpr, t.carolUid, listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+                sp(
+                    q1,
+                    t.carolFpr,
+                    t.carolUid,
+                    listOf(Pair(60, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+                    null)
             } else {
                 sp(q1, t.carolFpr, t.carolUid, listOf(), null)
             }
 
-            // Start with bob and make sure that a certification by a root with a 0 trust amount is also respected.
+            // Start with bob and make sure that a certification by a root with a 0 trust amount is
+            // also respected.
             val q2 = Query(n, t.bobFpr, false, date)
 
             if (i + 1 == 1) {
@@ -706,16 +1130,28 @@ class AuthenticateTest {
         val q1 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 90)), false, Date())
         sp(q1, t.aliceFpr, t.aliceUid, listOf(Pair(90, listOf(t.aliceFpr))), null)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr))), null)
-        sp(q1, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
-        sp(q1, t.daveFpr, t.daveUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q1,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
+        sp(
+            q1,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr, t.daveFpr))),
+            null)
         sp(q1, t.ellenFpr, t.ellenUid, listOf(), null)
         sp(q1, t.frankFpr, t.frankUid, listOf(), null)
 
         // No one authenticated Bob's User ID on Carol's key.
         sp(q1, t.carolFpr, t.bobUid, listOf(), null)
 
-        // Multiple partially trusted roots. Check that together they can fully certify a self-signature.
-        val q2 = Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 90), TrustRoot(t.bobFpr, 90)), false, Date())
+        // Multiple partially trusted roots. Check that together they can fully certify a
+        // self-signature.
+        val q2 =
+            Dijkstra(n, setOf(TrustRoot(t.aliceFpr, 90), TrustRoot(t.bobFpr, 90)), false, Date())
 
         sp(q2, t.aliceFpr, t.aliceUid, listOf(Pair(90, listOf(t.aliceFpr))), null)
 
@@ -724,13 +1160,16 @@ class AuthenticateTest {
         //                listOf(Pair(90, listOf(t.bobFpr)),
         //                        Pair(90, listOf(t.aliceFpr, t.bobFpr))), null)
 
-        // Our changed expectation: the order has changed because we return self-signed roots including the
+        // Our changed expectation: the order has changed because we return self-signed roots
+        // including the
         // self-certification edge.
         // This also happens to result in different ordering of the two paths, in this case.
-        sp(q2, t.bobFpr, t.bobUid,
-                listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr)),
-                        Pair(90, listOf(t.bobFpr))
-                ), null)
+        sp(
+            q2,
+            t.bobFpr,
+            t.bobUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr)), Pair(90, listOf(t.bobFpr))),
+            null)
     }
 
     @Test
@@ -741,15 +1180,30 @@ class AuthenticateTest {
 
         val q1 = Query(n, t.aliceFpr)
         sp(q1, t.bobFpr, t.bobUid, listOf(Pair(100, listOf(t.aliceFpr, t.bobFpr))), null)
-        sp(q1, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))), null)
+        sp(
+            q1,
+            t.carolFpr,
+            t.carolUid,
+            listOf(Pair(90, listOf(t.aliceFpr, t.bobFpr, t.carolFpr))),
+            null)
         sp(q1, t.carolFpr, t.carolOtherOrgUid, listOf(), null)
         sp(q1, t.daveFpr, t.daveUid, listOf(), null)
 
         val q2 = Query(n, t.bobFpr)
         sp(q2, t.bobFpr, t.bobUid, listOf(Pair(120, listOf(t.bobFpr))), null)
         sp(q2, t.carolFpr, t.carolUid, listOf(Pair(90, listOf(t.bobFpr, t.carolFpr))), null)
-        sp(q2, t.carolFpr, t.carolOtherOrgUid, listOf(Pair(90, listOf(t.bobFpr, t.carolFpr, t.carolFpr))), null)
-        sp(q2, t.daveFpr, t.daveUid, listOf(Pair(90, listOf(t.bobFpr, t.carolFpr, t.daveFpr))), null)
+        sp(
+            q2,
+            t.carolFpr,
+            t.carolOtherOrgUid,
+            listOf(Pair(90, listOf(t.bobFpr, t.carolFpr, t.carolFpr))),
+            null)
+        sp(
+            q2,
+            t.daveFpr,
+            t.daveUid,
+            listOf(Pair(90, listOf(t.bobFpr, t.carolFpr, t.daveFpr))),
+            null)
     }
 
     @Test
@@ -758,7 +1212,7 @@ class AuthenticateTest {
 
         for ((i, time) in listOf<Long>(1577919600, 1580598000).withIndex()) {
             val date = Date(Instant.ofEpochSecond(time).toEpochMilli())
-            println("Trying at #$i $date");
+            println("Trying at #$i $date")
 
             val n = t.getNetworkAt(date)
             printNetwork(n)

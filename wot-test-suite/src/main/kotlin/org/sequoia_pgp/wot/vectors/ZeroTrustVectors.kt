@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,11 +8,10 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * If the most recent certification has a trust amount of 0, then that
- * edge should not be considered.
+ * If the most recent certification has a trust amount of 0, then that edge should not be
+ * considered.
  *
  * To test this, we use the following network:
- *
  * ```
  *   A
  *   | 1/120
@@ -22,10 +22,10 @@ import org.pgpainless.wot.network.Identifier
  *   C
  * ```
  *
- * At t1, there is a path from A to C.  At t2, there should be no path
- * (not even one with a trust amount of 0!).
+ * At t1, there is a path from A to C. At t2, there should be no path (not even one with a trust
+ * amount of 0!).
  */
-class ZeroTrustVectors: ArtifactVectors {
+class ZeroTrustVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("931E51F99B89649783A1DFF265266E28246040C2")
     val aliceUid = "<alice@example.org>"

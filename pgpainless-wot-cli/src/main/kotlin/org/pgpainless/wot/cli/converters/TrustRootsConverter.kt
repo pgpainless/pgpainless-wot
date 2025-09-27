@@ -8,9 +8,9 @@ import org.pgpainless.wot.network.Identifier
 import org.pgpainless.wot.network.TrustRoot
 import picocli.CommandLine.ITypeConverter
 
-class TrustRootsConverter: ITypeConverter<TrustRoot> {
+class TrustRootsConverter : ITypeConverter<TrustRoot> {
     override fun convert(value: String?): TrustRoot? {
-        return when(value) {
+        return when (value) {
             null -> null
             else -> TrustRoot(Identifier(value))
         }

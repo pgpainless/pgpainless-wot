@@ -1,13 +1,13 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
 package org.sequoia_pgp.wot.vectors
 
 /**
- * This is a simple network where a User ID contains an email address
- * that would be normalized by puny code.
- *
+ * This is a simple network where a User ID contains an email address that would be normalized by
+ * puny code.
  *
  * ```text
  *            o alice
@@ -19,7 +19,7 @@ package org.sequoia_pgp.wot.vectors
  *            o carol
  * ```
  */
-class PunyCodeVectors: ArtifactVectors {
+class PunyCodeVectors : ArtifactVectors {
 
     // TODO: Extract fingerprints and UIDs
 

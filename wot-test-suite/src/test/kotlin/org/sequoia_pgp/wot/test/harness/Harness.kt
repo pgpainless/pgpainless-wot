@@ -8,12 +8,14 @@ import org.sequoia_pgp.wot.test.ExecutionCallback
 import org.sequoia_pgp.wot.test.SimpleTestCase
 
 /**
- * Abstract class to produce [SimpleTestCase.ExecutionCallback] instances for WOT CLI implementations.
+ * Abstract class to produce [SimpleTestCase.ExecutionCallback] instances for WOT CLI
+ * implementations.
  */
 abstract class Harness {
 
     /**
-     * Return a [SimpleTestCase.ExecutionCallback] which executes a [SimpleTestCase] using a custom WOT implementation.
+     * Return a [SimpleTestCase.ExecutionCallback] which executes a [SimpleTestCase] using a custom
+     * WOT implementation.
      */
     abstract fun runner(): ExecutionCallback
 }

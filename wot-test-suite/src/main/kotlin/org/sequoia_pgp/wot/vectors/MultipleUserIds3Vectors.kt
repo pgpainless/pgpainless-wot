@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -19,14 +20,12 @@ import org.pgpainless.wot.network.Identifier
  *                f
  * ```
  *
- * The first time back propagation is run, the algorithm will find the
- * path a - b - c - f (b prefers c - f to d - e - f, because the former
- * is shorter).  The second time it is run, it will find a - b - d - e -
- * f.  The path's trust amount will be 10, because we suppress 20 between
- * a and b, and we can't use the bob@some.org certification as it doesn't
- * not have enough depth.
+ * The first time back propagation is run, the algorithm will find the path a - b - c - f (b prefers
+ * c - f to d - e - f, because the former is shorter). The second time it is run, it will find a -
+ * b - d - e - f. The path's trust amount will be 10, because we suppress 20 between a and b, and we
+ * can't use the bob@some.org certification as it doesn't not have enough depth.
  */
-class MultipleUserIds3Vectors: ArtifactVectors {
+class MultipleUserIds3Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("DA3CFC60BD4B8835702A66782C7A431946C12DF7")
     val aliceUid = "<alice@example.org>"

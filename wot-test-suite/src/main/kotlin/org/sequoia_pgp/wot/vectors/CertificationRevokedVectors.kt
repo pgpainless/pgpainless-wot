@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,16 +8,14 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * Alice may realize that she made a certification in error, e.g., she
- * realizes that she was tricked into certifying an incorrect identity by
- * Mallory.  Or, circumstances may change.  A person may leave an
- * organization, so the CA admin needs to invalidate the certification of
- * their organizational identity.
+ * Alice may realize that she made a certification in error, e.g., she realizes that she was tricked
+ * into certifying an incorrect identity by Mallory. Or, circumstances may change. A person may
+ * leave an organization, so the CA admin needs to invalidate the certification of their
+ * organizational identity.
  *
  * Consider the following timeline:
  *
- *   t0: A, B, and C are created
- *   t1: A certifies B and B certifies C.
+ * t0: A, B, and C are created t1: A certifies B and B certifies C.
  *
  * ```
  *   A
@@ -26,11 +25,11 @@ import org.pgpainless.wot.network.Identifier
  *   C
  * ```
  *
- *   t2: A revokes their certification of B
+ * t2: A revokes their certification of B
  *
  *       A should now no longer be able to authenticate B or C.
  *
- *   t3: A recertifies B
+ * t3: A recertifies B
  *
  * ```
  *   A
@@ -40,9 +39,9 @@ import org.pgpainless.wot.network.Identifier
  *   C
  * ```
  *
- *       A should be able to authenticate B and C.
+ * A should be able to authenticate B and C.
  */
-class CertificationRevokedVectors: ArtifactVectors {
+class CertificationRevokedVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("817C2BE18D9FF48FFE58FF39B699FC21AD92EFDC")
     val aliceUid = "<alice@example.org>"
@@ -56,25 +55,18 @@ class CertificationRevokedVectors: ArtifactVectors {
     val carolUid = "<carol@example.org>"
     // Certified by: 4258ACF6C3C8FCE130D6EBAB0CC5158AEA25F24A
 
-    /**
-     * A, B, C are created.
-     */
+    /** A, B, C are created. */
     val t0 = parseReferenceTime("2020-01-01 00:00:00 UTC")
 
-    /**
-     * A certifies B, B certifies C.
-     */
+    /** A certifies B, B certifies C. */
     val t1 = parseReferenceTime("2020-02-01 00:00:00 UTC")
 
     /**
-     * A revokes their certification of B.
-     * A should now no longer be able to authenticate B or C.
+     * A revokes their certification of B. A should now no longer be able to authenticate B or C.
      */
     val t2 = parseReferenceTime("2020-03-01 00:00:00 UTC")
 
-    /**
-     * A re-certifies B.
-     */
+    /** A re-certifies B. */
     val t3 = parseReferenceTime("2020-04-01 00:00:00 UTC")
 
     override val tempFilePrefix: String

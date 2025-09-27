@@ -4,6 +4,7 @@
 
 package org.pgpainless.wot
 
+import java.io.InputStream
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
 import org.pgpainless.PGPainless
 import org.pgpainless.certificate_store.CertificateFactory
@@ -12,20 +13,22 @@ import pgp.certificate_store.PGPCertificateStore
 import pgp.certificate_store.certificate.Certificate
 import pgp.certificate_store.certificate.KeyMaterialMerger
 import pgp.certificate_store.exception.BadNameException
-import java.io.InputStream
 
 /**
- * Implementation of [PGPCertificateStore] which is based on one or more [PGPPublicKeyRingCollection].
- * During initialization, all items in the [PGPPublicKeyRingCollection]s are converted into [Certificates][Certificate]
- * and stored in a map keyed by their fingerprints.
+ * Implementation of [PGPCertificateStore] which is based on one or more
+ * [PGPPublicKeyRingCollection]. During initialization, all items in the
+ * [PGPPublicKeyRingCollection]s are converted into [Certificates][Certificate] and stored in a map
+ * keyed by their fingerprints.
  *
- * In case of fingerprint collisions across certificates from different collections, [Certificate] objects
- * from a [PGPPublicKeyRingCollection] instance with a higher list index take precedence.
+ * In case of fingerprint collisions across certificates from different collections, [Certificate]
+ * objects from a [PGPPublicKeyRingCollection] instance with a higher list index take precedence.
  *
- * [Certificates][Certificate] being inserted using [insertCertificate] or [insertCertificateBySpecialName] are also
- * stored in that map, but are not being written into the [PGPPublicKeyRingCollection].
+ * [Certificates][Certificate] being inserted using [insertCertificate] or
+ * [insertCertificateBySpecialName] are also stored in that map, but are not being written into the
+ * [PGPPublicKeyRingCollection].
  */
-class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) : PGPCertificateStore {
+class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) :
+    PGPCertificateStore {
 
     // Keep certificates inserted only in memory
     private val certificates = mutableMapOf<String, Certificate>()
@@ -40,7 +43,7 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) : 
         }
     }
 
-    constructor(baseKeyRing: PGPPublicKeyRingCollection): this(listOf(baseKeyRing))
+    constructor(baseKeyRing: PGPPublicKeyRingCollection) : this(listOf(baseKeyRing))
 
     override fun getCertificate(identifier: String?): Certificate {
         if (identifier == null) {
@@ -57,24 +60,27 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) : 
     }
 
     override fun getCertificatesBySubkeyId(subkeyId: Long): MutableIterator<Certificate> {
-        return certificates.values.filter {
-            it.subkeyIds.contains(subkeyId)
-        }.toMutableList().listIterator()
+        return certificates.values
+            .filter { it.subkeyIds.contains(subkeyId) }
+            .toMutableList()
+            .listIterator()
     }
 
     override fun insertCertificate(data: InputStream?, merge: KeyMaterialMerger?): Certificate {
         val publicKeys = PGPainless.readKeyRing().publicKeyRing(data!!)
         val certificate = CertificateFactory.certificateFromPublicKeyRing(publicKeys!!, null)
-        var insert: Certificate? = if (merge != null) {
-            val existing = try {
-                getCertificate(certificate.fingerprint)
-            } catch (e: NoSuchElementException) {
-                null
+        var insert: Certificate? =
+            if (merge != null) {
+                val existing =
+                    try {
+                        getCertificate(certificate.fingerprint)
+                    } catch (e: NoSuchElementException) {
+                        null
+                    }
+                merge.merge(certificate, existing).asCertificate()
+            } else {
+                certificate
             }
-            merge.merge(certificate, existing).asCertificate()
-        } else {
-            certificate
-        }
 
         if (insert == null) {
             return certificate
@@ -84,20 +90,26 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) : 
         return insert
     }
 
-    override fun insertCertificateBySpecialName(specialName: String?, data: InputStream?, merge: KeyMaterialMerger?): Certificate {
+    override fun insertCertificateBySpecialName(
+        specialName: String?,
+        data: InputStream?,
+        merge: KeyMaterialMerger?
+    ): Certificate {
         val publicKeys = PGPainless.readKeyRing().publicKeyRing(data!!)
         val certificate = CertificateFactory.certificateFromPublicKeyRing(publicKeys!!, null)
 
-        var insert: Certificate? = if (merge != null) {
-            val existing = try {
-                getCertificate(specialName!!)
-            } catch (e: NoSuchElementException) {
-                null
+        var insert: Certificate? =
+            if (merge != null) {
+                val existing =
+                    try {
+                        getCertificate(specialName!!)
+                    } catch (e: NoSuchElementException) {
+                        null
+                    }
+                merge.merge(certificate, existing).asCertificate()
+            } else {
+                certificate
             }
-            merge.merge(certificate, existing).asCertificate()
-        } else {
-            certificate
-        }
 
         if (insert == null) {
             return certificate
@@ -114,5 +126,4 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) : 
     override fun getFingerprints(): MutableIterator<String> {
         return certificates.values.map { it.fingerprint }.toMutableList().listIterator()
     }
-
 }

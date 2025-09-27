@@ -11,7 +11,15 @@ class BestViaRootTest : SimpleTestCase(BestViaRootVectors()) {
 
     override fun arguments(): Array<String> {
         val v = vectors as BestViaRootVectors
-        return arrayOf("--keyring", keyRingPath(), "-r", v.aliceFpr.toString(), "--full", "authenticate", v.targetFpr.toString(), v.targetUid)
+        return arrayOf(
+            "--keyring",
+            keyRingPath(),
+            "-r",
+            v.aliceFpr.toString(),
+            "--full",
+            "authenticate",
+            v.targetFpr.toString(),
+            v.targetUid)
     }
 
     override fun expectedOutput(): Pair<String, Int> {
@@ -24,6 +32,7 @@ class BestViaRootTest : SimpleTestCase(BestViaRootVectors()) {
   │   certified the following binding on 2021-09-27 (expiry: 2026-09-27) as a fully trusted meta-introducer (depth: 10)
   └ 2AB08C06FC795AC26673B23CAD561ABDCBEBFDF0 "<target@example.org>"
 
-""" to 0
+""" to
+            0
     }
 }

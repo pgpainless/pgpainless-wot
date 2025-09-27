@@ -6,14 +6,15 @@ package org.pgpainless.wot.network
 
 import java.lang.IllegalArgumentException
 
-class TrustDepth: Comparable<Int> {
+class TrustDepth : Comparable<Int> {
     val value: Int
 
     private constructor(value: Int) {
-        this.value = when (value) {
-            in validRange -> value
-            else -> throw IllegalArgumentException("Trust Depth MUST be a value from 0 to 255.")
-        }
+        this.value =
+            when (value) {
+                in validRange -> value
+                else -> throw IllegalArgumentException("Trust Depth MUST be a value from 0 to 255.")
+            }
     }
 
     fun isUnlimited(): Boolean {
@@ -33,16 +34,12 @@ class TrustDepth: Comparable<Int> {
             Pair(true, true) -> this
             Pair(true, false) -> other
             Pair(false, true) -> this
-            else -> if (compareTo(other.value) < 1)
-                this
-            else
-                other
+            else -> if (compareTo(other.value) < 1) this else other
         }
     }
 
     companion object {
-        @JvmStatic
-        private val validRange = 0..255
+        @JvmStatic private val validRange = 0..255
 
         @JvmStatic
         fun unlimited(): TrustDepth {

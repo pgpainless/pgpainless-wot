@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,13 +8,11 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * Check that an expired certificate can't be authenticated and can't be
- * used to authenticate other certificates.
+ * Check that an expired certificate can't be authenticated and can't be used to authenticate other
+ * certificates.
  *
- *  t0: Create A, B, C
- *  t1: Create certifications (amount = 60)
- *  t2: B expires.
- *  t3: Create certifications (amount = 120)
+ * t0: Create A, B, C t1: Create certifications (amount = 60) t2: B expires. t3: Create
+ * certifications (amount = 120)
  *
  * ```
  *   A
@@ -23,14 +22,12 @@ import org.pgpainless.wot.network.Identifier
  *   C
  * ```
  *
- * At t3, the new certifications are ignored, because they were created
- * after B expired.
+ * At t3, the new certifications are ignored, because they were created after B expired.
  *
- * At t3, B can still be used as a trusted introducer for C, because the
- * initial certifications were created before it expired, but it is no
- * longer possible to authenticate B.
+ * At t3, B can still be used as a trusted introducer for C, because the initial certifications were
+ * created before it expired, but it is no longer possible to authenticate B.
  */
-class CertExpiredVectors: ArtifactVectors {
+class CertExpiredVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("1FA62523FB7C06E71EEFB82BB5159F3FC3EB3AC9")
     val aliceUid = "<alice@example.org>"
@@ -43,24 +40,16 @@ class CertExpiredVectors: ArtifactVectors {
     val carolUid = "<carol@example.org>"
     // Certified by: B166B31AE5F95600B3F7184FE74C6CE62821686F
 
-    /**
-     * Create A, B, C.
-     */
+    /** Create A, B, C. */
     val t0 = parseReferenceTime("2020-01-01 00:00:00 UTC")
 
-    /**
-     * Create certifications (amount = 60).
-     */
+    /** Create certifications (amount = 60). */
     val t1 = parseReferenceTime("2020-02-01 00:00:00 UTC")
 
-    /**
-     * B expires.
-     */
+    /** B expires. */
     val t2 = parseReferenceTime("2020-02-15 00:00:00 UTC")
 
-    /**
-     * Create certifications (amount = 120).
-     */
+    /** Create certifications (amount = 120). */
     val t3 = parseReferenceTime("2020-04-01 00:00:00 UTC")
     override val tempFilePrefix: String
         get() = "cert-expired"

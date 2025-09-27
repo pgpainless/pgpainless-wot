@@ -4,13 +4,11 @@
 
 package org.pgpainless.wot.query
 
+import java.util.*
 import org.pgpainless.wot.network.Network
 import org.pgpainless.wot.network.TrustRoot
-import java.util.*
 
-/**
- * Factory for instantiating instances of [ShortestPathAlgorithm] implementations.
- */
+/** Factory for instantiating instances of [ShortestPathAlgorithm] implementations. */
 abstract class ShortestPathAlgorithmFactory {
 
     /**
@@ -19,12 +17,13 @@ abstract class ShortestPathAlgorithmFactory {
      * @param network flow network
      * @param trustRoots set of trust roots
      * @param isCertificationNetwork if true, the network is interpreted as a certification-network,
-     * otherwise as an authentication-network.
+     *   otherwise as an authentication-network.
      * @param referenceTime reference time for certificate validity
      */
     abstract fun createInstance(
-            network: Network,
-            trustRoots: Set<TrustRoot>,
-            isCertificationNetwork: Boolean,
-            referenceTime: Date): ShortestPathAlgorithm
+        network: Network,
+        trustRoots: Set<TrustRoot>,
+        isCertificationNetwork: Boolean,
+        referenceTime: Date
+    ): ShortestPathAlgorithm
 }

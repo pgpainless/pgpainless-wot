@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,7 +9,6 @@ import org.pgpainless.wot.network.Identifier
 
 /**
  * Here we have multiple regular expressions on a single delegation.
- *
  *
  * ```
  *                            alice@some.org
@@ -20,7 +20,7 @@ import org.pgpainless.wot.network.Identifier
  *         ed@example.org     frank@other.org     george@their.org
  * ```
  */
-class Regex3Vectors: ArtifactVectors {
+class Regex3Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("D8CFEBBA006E2ED57CF45CC413F0BAE09D94FE4E")
     val aliceUid = "<alice@some.org>"

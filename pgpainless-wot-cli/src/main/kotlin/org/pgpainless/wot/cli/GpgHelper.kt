@@ -14,35 +14,35 @@ class GpgHelper(val executable: String) {
 
     fun readGpgKeyRing(): PGPCertificateStore {
         return KeyRingCertificateStore(
-            PGPainless.readKeyRing().publicKeyRingCollection(
-                Runtime.getRuntime().exec("$executable --export").inputStream
-            )
-        )
+            PGPainless.readKeyRing()
+                .publicKeyRingCollection(
+                    Runtime.getRuntime().exec("$executable --export").inputStream))
     }
 
-    fun readGpgOwnertrust(): List<TrustRoot> = Runtime.getRuntime()
-        .exec("$executable --export-ownertrust")
-        .inputStream
-        .bufferedReader()
-        .readLines()
-        .asSequence()
-        .filterNot { it.startsWith("#") }
-        .filterNot { it.isBlank() }
-        .map {
-            Identifier(it.substring(0, it.indexOf(':'))) to it.elementAt(it.indexOf(':') + 1) }
-        .map {
-            it.first to when (it.second.digitToInt()) {
-                2 -> null   // unknown
-                3 -> 0      // not trust
-                4 -> 40     // marginally trusted
-                5 -> 120    // fully trusted
-                6 -> Int.MAX_VALUE    // ultimately trusted
-                else -> null
+    fun readGpgOwnertrust(): List<TrustRoot> =
+        Runtime.getRuntime()
+            .exec("$executable --export-ownertrust")
+            .inputStream
+            .bufferedReader()
+            .readLines()
+            .asSequence()
+            .filterNot { it.startsWith("#") }
+            .filterNot { it.isBlank() }
+            .map {
+                Identifier(it.substring(0, it.indexOf(':'))) to it.elementAt(it.indexOf(':') + 1)
             }
-        }
-        .filterNot { it.second == null }
-        .map {
-            TrustRoot(it.first, it.second!!)
-        }
-        .toList()
+            .map {
+                it.first to
+                    when (it.second.digitToInt()) {
+                        2 -> null // unknown
+                        3 -> 0 // not trust
+                        4 -> 40 // marginally trusted
+                        5 -> 120 // fully trusted
+                        6 -> Int.MAX_VALUE // ultimately trusted
+                        else -> null
+                    }
+            }
+            .filterNot { it.second == null }
+            .map { TrustRoot(it.first, it.second!!) }
+            .toList()
 }

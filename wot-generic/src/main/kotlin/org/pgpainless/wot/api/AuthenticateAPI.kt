@@ -6,10 +6,7 @@ package org.pgpainless.wot.api
 
 import org.pgpainless.wot.network.Identifier
 
-/**
- * Authenticate a binding.
- * A binding is a pair consisting of a certificate and a User ID.
- */
+/** Authenticate a binding. A binding is a pair consisting of a certificate and a User ID. */
 interface AuthenticateAPI {
 
     /**
@@ -21,6 +18,7 @@ interface AuthenticateAPI {
 
     /**
      * Authentication result.
+     *
      * @param targetAmount the targeted trust amount required to achieve full authentication
      * @param paths the number of paths
      */
@@ -31,5 +29,4 @@ interface AuthenticateAPI {
         val acceptable: Boolean
             get() = binding.paths.amount >= targetAmount
     }
-
 }

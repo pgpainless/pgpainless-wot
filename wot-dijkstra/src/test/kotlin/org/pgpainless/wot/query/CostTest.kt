@@ -22,8 +22,10 @@ class CostTest {
         assert(cost2 < cost3)
         assert(cost3 > cost4)
 
-        assert(cost1 < cost4) // cost1 is "cheaper": even though it constrains the amount more, it costs fewer hops
+        assert(
+            cost1 <
+                cost4) // cost1 is "cheaper": even though it constrains the amount more, it costs
+        // fewer hops
         assert(cost2 < cost4)
     }
-
 }

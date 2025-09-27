@@ -4,12 +4,12 @@
 
 package org.pgpainless.wot.network
 
-import org.junit.jupiter.api.Test
-import org.pgpainless.wot.dsl.NetworkDSL
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import org.pgpainless.wot.dsl.NetworkDSL
 
-class NetworkTest: NetworkDSL {
+class NetworkTest : NetworkDSL {
 
     @Test
     fun testEmptyNetworkIsEmpty() {
@@ -41,10 +41,11 @@ class NetworkTest: NetworkDSL {
             buildEdge("A", "C", "Charlie <charlie@example.org>")
         }
 
-        assertEquals("Network with 3 nodes, 2 edges:\n" +
+        assertEquals(
+            "Network with 3 nodes, 2 edges:\n" +
                 "A certifies binding: null <-> B [120]\n" +
                 "A certifies binding: Charlie <charlie@example.org> <-> C [120]\n",
-                network.toString())
+            network.toString())
     }
 
     @Test

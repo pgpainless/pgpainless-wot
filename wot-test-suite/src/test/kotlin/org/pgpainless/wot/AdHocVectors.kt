@@ -20,14 +20,12 @@ import pgp.certificate_store.PGPCertificateStore
 interface AdHocVectors {
 
     /**
-     * When doing backwards propagation, we find paths from all nodes to the
-     * target.  Since we don't stop when we reach a root, the returned path
-     * should still be optimal.  Consider:
+     * When doing backwards propagation, we find paths from all nodes to the target. Since we don't
+     * stop when we reach a root, the returned path should still be optimal. Consider:
      *
-     * A --- 120/10 ---> B --- 120/10 ---> C --- 120/10 ---> Target
-     *  \                                                      /
-     *   `--- 50/10 ---> Y --- 50/10 ---> Z --- 50/10 --------'
-     * When the root is B, then the path that we find for A should be A -> B -> C -> Target, not A -> Y -> Z -> Target.
+     * A --- 120/10 ---> B --- 120/10 ---> C --- 120/10 ---> Target \ / `--- 50/10 ---> Y --- 50/10
+     * ---> Z --- 50/10 --------' When the root is B, then the path that we find for A should be A
+     * -> B -> C -> Target, not A -> Y -> Z -> Target.
      */
     class BestViaRoot : AdHocVectors {
         val aliceUID: String = "Alice <alice@pgpainless.org>"
@@ -36,7 +34,8 @@ interface AdHocVectors {
         val aliceFingerprint = Fingerprint(aliceKey)
 
         val bobUID = "Bob <bob@pgpainless.org>"
-        val bobKey: PGPSecretKeyRing = PGPainless.generateKeyRing().simpleRsaKeyRing(bobUID, RsaLength._3072)
+        val bobKey: PGPSecretKeyRing =
+            PGPainless.generateKeyRing().simpleRsaKeyRing(bobUID, RsaLength._3072)
         val bobCert = PGPPublicKeyRing(bobKey)
         val bobFingerprint = Fingerprint(bobKey)
 
@@ -63,32 +62,35 @@ interface AdHocVectors {
         override val publicKeyRingCollection: PGPPublicKeyRingCollection
 
         init {
-            publicKeyRingCollection = listOf(
-                targetCert.let {
-                    // C ---120/10--> Target
-                    certify(issuer = carolKey, target = it, amount = 120, depth = 10)
-                }.let {
-                    // Z ---50/10---> Target
-                    certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
-                },
-                carolCert.let {
-                    // B ---120/10--> C
-                    certify(issuer = bobKey, target = it, amount = 120, depth = 10)
-                },
-                bobCert.let {
-                    // A ---120/10--> B
-                    certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
-                },
-                aliceCert,
-                zebraCert.let {
-                    // Y ---50/10--> Z
-                    certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
-                },
-                yellowCert.let {
-                    // A ---50/10--> Y
-                    certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
-                }
-            ).let { PGPPublicKeyRingCollection(it) }
+            publicKeyRingCollection =
+                listOf(
+                        targetCert
+                            .let {
+                                // C ---120/10--> Target
+                                certify(issuer = carolKey, target = it, amount = 120, depth = 10)
+                            }
+                            .let {
+                                // Z ---50/10---> Target
+                                certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
+                            },
+                        carolCert.let {
+                            // B ---120/10--> C
+                            certify(issuer = bobKey, target = it, amount = 120, depth = 10)
+                        },
+                        bobCert.let {
+                            // A ---120/10--> B
+                            certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
+                        },
+                        aliceCert,
+                        zebraCert.let {
+                            // Y ---50/10--> Z
+                            certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
+                        },
+                        yellowCert.let {
+                            // A ---50/10--> Y
+                            certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
+                        })
+                    .let { PGPPublicKeyRingCollection(it) }
         }
     }
 
@@ -97,22 +99,29 @@ interface AdHocVectors {
     val pgpCertificateStore: PGPCertificateStore
         get() = KeyRingCertificateStore(publicKeyRingCollection)
 
-    fun certify(issuer: PGPSecretKeyRing,
-                target: PGPPublicKeyRing,
-                userId: String = target.publicKey.userIDs.next()!!,
-                amount: Int,
-                depth: Int): PGPPublicKeyRing = PGPainless.certify()
+    fun certify(
+        issuer: PGPSecretKeyRing,
+        target: PGPPublicKeyRing,
+        userId: String = target.publicKey.userIDs.next()!!,
+        amount: Int,
+        depth: Int
+    ): PGPPublicKeyRing =
+        PGPainless.certify()
             .userIdOnCertificate(userId, target)
             .withKey(issuer, SecretKeyRingProtector.unprotectedKeys())
-            .buildWithSubpackets(object : Callback {
-                override fun modifyHashedSubpackets(hashedSubpackets: CertificationSubpackets?) {
-                    hashedSubpackets!!.setTrust(depth, amount)
-                }
-            }).certifiedCertificate
+            .buildWithSubpackets(
+                object : Callback {
+                    override fun modifyHashedSubpackets(
+                        hashedSubpackets: CertificationSubpackets?
+                    ) {
+                        hashedSubpackets!!.setTrust(depth, amount)
+                    }
+                })
+            .certifiedCertificate
 
     fun PGPPublicKeyRing(secretKey: PGPSecretKeyRing): PGPPublicKeyRing =
-            PGPainless.extractCertificate(secretKey)
+        PGPainless.extractCertificate(secretKey)
 
     fun Fingerprint(keyRing: PGPKeyRing): Identifier =
-            Identifier(OpenPgpFingerprint.of(keyRing).toString())
+        Identifier(OpenPgpFingerprint.of(keyRing).toString())
 }

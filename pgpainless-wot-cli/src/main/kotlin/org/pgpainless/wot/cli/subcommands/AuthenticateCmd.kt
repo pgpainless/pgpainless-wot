@@ -4,45 +4,43 @@
 
 package org.pgpainless.wot.cli.subcommands
 
+import java.util.concurrent.Callable
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.pgpainless.wot.cli.converters.FingerprintConverter
 import org.pgpainless.wot.network.Identifier
 import picocli.CommandLine
 import picocli.CommandLine.*
-import java.util.concurrent.Callable
 
-/**
- * Authenticate a binding between a certification and one of its user-ids.
- */
-@Command(name = "authenticate", description = ["Authenticate the binding between a certificate and user ID."])
-class AuthenticateCmd: Callable<Int> {
+/** Authenticate a binding between a certification and one of its user-ids. */
+@Command(
+    name = "authenticate",
+    description = ["Authenticate the binding between a certificate and user ID."])
+class AuthenticateCmd : Callable<Int> {
 
-    /**
-     * Parent command to acquire global options from.
-     */
-    @ParentCommand
-    lateinit var parent: WebOfTrustCLI
+    /** Parent command to acquire global options from. */
+    @ParentCommand lateinit var parent: WebOfTrustCLI
 
-    /**
-     * Fingerprint of the certificate.
-     */
-    @Parameters(index = "0", description = ["Fingerprint of the certificate"], converter = [FingerprintConverter::class], paramLabel = "FINGERPRINT")
+    /** Fingerprint of the certificate. */
+    @Parameters(
+        index = "0",
+        description = ["Fingerprint of the certificate"],
+        converter = [FingerprintConverter::class],
+        paramLabel = "FINGERPRINT")
     lateinit var fingerprint: Identifier
 
-    /**
-     * User-ID to authenticate.
-     */
+    /** User-ID to authenticate. */
     @Parameters(index = "1", description = ["UserID"], paramLabel = "USERID")
     lateinit var userId: String
 
-    /**
-     * Handle the User-ID as an email address.
-     */
-    @CommandLine.Option(names = ["--email"], description = ["Consider all user-IDs that contain the given email address."])
+    /** Handle the User-ID as an email address. */
+    @CommandLine.Option(
+        names = ["--email"],
+        description = ["Consider all user-IDs that contain the given email address."])
     var email = false
 
     /**
      * Execute the command.
+     *
      * @return exit code
      */
     override fun call(): Int {

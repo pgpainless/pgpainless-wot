@@ -16,17 +16,19 @@ import org.pgpainless.wot.network.RevocationState
 interface PGPDSL {
 
     fun Node(certificate: PGPPublicKeyRing): Node {
-        return Node(Fingerprint(certificate), )
+        return Node(
+            Fingerprint(certificate),
+        )
     }
 
     fun Node(validatedCert: KeyRingInfo): Node {
         return Node(
-                Fingerprint(validatedCert.fingerprint),
-                validatedCert.primaryKeyExpirationDate,
-                RevocationState(validatedCert.revocationState),
-                validatedCert.userIds.associateWith{
-                    RevocationState(validatedCert.getUserIdRevocation(it))
-                })
+            Fingerprint(validatedCert.fingerprint),
+            validatedCert.primaryKeyExpirationDate,
+            RevocationState(validatedCert.revocationState),
+            validatedCert.userIds.associateWith {
+                RevocationState(validatedCert.getUserIdRevocation(it))
+            })
     }
 
     fun Fingerprint(certificate: PGPPublicKeyRing): Identifier {
@@ -41,8 +43,10 @@ interface PGPDSL {
         return PGPNetworkParser.RevocationState(signature)
     }
 
-    fun RevocationState(pgpRevocationState: org.pgpainless.algorithm.RevocationState): RevocationState {
-        return when(pgpRevocationState.type) {
+    fun RevocationState(
+        pgpRevocationState: org.pgpainless.algorithm.RevocationState
+    ): RevocationState {
+        return when (pgpRevocationState.type) {
             RevocationStateType.hardRevoked -> RevocationState.hardRevoked()
             RevocationStateType.notRevoked -> RevocationState.notRevoked()
             else -> RevocationState.softRevoked(pgpRevocationState.date)

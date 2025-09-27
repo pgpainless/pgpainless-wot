@@ -4,21 +4,22 @@
 
 package org.sequoia_pgp.wot.test.harness
 
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import org.pgpainless.wot.cli.WebOfTrustCLI
 import org.sequoia_pgp.wot.test.ExecutionCallback
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
-/**
- * Harness for the [WebOfTrustCLI] class.
- */
-class WotCLIHarness: Harness() {
+/** Harness for the [WebOfTrustCLI] class. */
+class WotCLIHarness : Harness() {
 
     override fun runner(): ExecutionCallback {
-        return object: ExecutionCallback {
+        return object : ExecutionCallback {
 
-            override fun execute(vectors: ArtifactVectors, arguments: Array<String>): Pair<String, Int> {
+            override fun execute(
+                vectors: ArtifactVectors,
+                arguments: Array<String>
+            ): Pair<String, Int> {
                 val origStdout = System.out
                 val origStderr = System.err
 
@@ -32,7 +33,6 @@ class WotCLIHarness: Harness() {
                 System.setErr(origStderr)
                 return bOut.toString() to exitCode
             }
-
         }
     }
 }

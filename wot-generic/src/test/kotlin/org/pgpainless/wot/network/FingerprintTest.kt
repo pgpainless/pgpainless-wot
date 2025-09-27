@@ -4,9 +4,9 @@
 
 package org.pgpainless.wot.network
 
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import org.junit.jupiter.api.Test
 
 class FingerprintTest {
 
@@ -15,7 +15,6 @@ class FingerprintTest {
         val fromLowerCase = Identifier("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         assertEquals("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", fromLowerCase.fingerprint)
     }
-
 
     @Test
     fun `verify that objects constructed from the lower- and uppercase representation do equal`() {
@@ -42,8 +41,6 @@ class FingerprintTest {
         val list = mutableListOf(Identifier("A"), Identifier("C"), Identifier("B"))
         list.sort()
 
-        assertEquals(
-                listOf(Identifier("A"), Identifier("B"), Identifier("C")),
-                list)
+        assertEquals(listOf(Identifier("A"), Identifier("B"), Identifier("C")), list)
     }
 }

@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,22 +8,18 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * Creates 4 10 element cliques.  To authenticate the target, the path
- * finder must find it's way through them.  If the algorithm is NP
- * complete, then it will take a long time to do this.
+ * Creates 4 10 element cliques. To authenticate the target, the path finder must find it's way
+ * through them. If the algorithm is NP complete, then it will take a long time to do this.
  *
- * The cliques-local-optima variant includes an additional certification
- * from the target to a-0, which will trip up simple heuristics.
+ * The cliques-local-optima variant includes an additional certification from the target to a-0,
+ * which will trip up simple heuristics.
  *
- * For added fun, we also add a local optimum in the -local-optimum
- * variant:
- *
- *   - root -- 200/30 --> a1
- *   - root -- 255/30 --> b0
+ * For added fun, we also add a local optimum in the -local-optimum variant:
+ * - root -- 200/30 --> a1
+ * - root -- 255/30 --> b0
  *
  * And a second local optimum in the -local-optimum-2 variant:
- *
- *   - b1 -- 255/30 --> c1
+ * - b1 -- 255/30 --> c1
  *
  * ```
  *           root ----------------------+-.
@@ -67,7 +64,7 @@ import org.pgpainless.wot.network.Identifier
  *          target
  * ```
  */
-open class CliquesVectors: ArtifactVectors {
+open class CliquesVectors : ArtifactVectors {
 
     val rootFpr = Identifier("D2B0C3835C01B0C120BC540DA4AA8F880BA512B5")
     val rootUid = "<root@example.org>"
@@ -105,9 +102,7 @@ open class CliquesVectors: ArtifactVectors {
     val targetFpr = Identifier("CE22ECD282F219AA99598BA3B58A7DA61CA97F55")
     val targetUid = "<target@example.org>"
 
-    /**
-     * A few minutes after the network is fully generated.
-     */
+    /** A few minutes after the network is fully generated. */
     val t0 = parseReferenceTime("2021-02-14 00:00:00 UTC")
 
     override val tempFilePrefix: String

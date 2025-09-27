@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,24 +8,19 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * In this test Alice has certified two different User IDs for Bob.
- * First, we check that at most one of those certifications is used.
- * Then we check that both are considered.  Because neither certification
- * is better than the other (one has a larger trust amount; the other has
- * more depth), different scenarios will result in different
- * certifications being selected.
+ * In this test Alice has certified two different User IDs for Bob. First, we check that at most one
+ * of those certifications is used. Then we check that both are considered. Because neither
+ * certification is better than the other (one has a larger trust amount; the other has more depth),
+ * different scenarios will result in different certifications being selected.
  *
+ * Alice has certified two of Bob's User IDs. One with a trust amount of 50 and depth 2 and the
+ * other with a trust amount of 70 and depth 1.
  *
- * Alice has certified two of Bob's User IDs.  One with a trust amount of
- * 50 and depth 2 and the other with a trust amount of 70 and depth 1.
+ * Using Alice as a root and authenticating Carol, we can get a trust amount of 70. Although Bob -
+ * Carol has a capacity of 120, we only use one User ID per key.
  *
- * Using Alice as a root and authenticating Carol, we can get a trust
- * amount of 70.  Although Bob - Carol has a capacity of 120, we only use
- * one User ID per key.
- *
- * When authenticating Dave, we get a trust amount of 50.  This is
- * because the delegation with a trust amount of 70 does not have enough
- * depth to reach dave so we use the other certification.
+ * When authenticating Dave, we get a trust amount of 50. This is because the delegation with a
+ * trust amount of 70 does not have enough depth to reach dave so we use the other certification.
  *
  * ```
  *                 alice
@@ -36,7 +32,7 @@ import org.pgpainless.wot.network.Identifier
  *                 dave
  * ```
  */
-class MultipleUserIds1Vectors: ArtifactVectors {
+class MultipleUserIds1Vectors : ArtifactVectors {
 
     val aliceFpr = Identifier("2A2A4A23A7EEC119BC0B46642B3825DC02A05FEA")
     val aliceUid = "<alice@example.org>"

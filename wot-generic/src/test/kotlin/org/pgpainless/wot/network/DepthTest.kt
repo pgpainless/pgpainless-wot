@@ -4,15 +4,15 @@
 
 package org.pgpainless.wot.network
 
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.pgpainless.wot.network.TrustDepth.Companion.auto
 import org.pgpainless.wot.network.TrustDepth.Companion.limited
 import org.pgpainless.wot.network.TrustDepth.Companion.unlimited
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class DepthTest {
 

@@ -4,18 +4,19 @@
 
 package org.sequoia_pgp.wot.test
 
+import java.io.File
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Named
 import org.junit.jupiter.params.provider.Arguments
 import org.sequoia_pgp.wot.test.harness.ExecutableHarness
 import org.sequoia_pgp.wot.test.harness.WotCLIHarness
 import org.sequoia_pgp.wot.vectors.ArtifactVectors
-import java.io.File
-import kotlin.test.assertEquals
 
 /**
  * Test case which allows to query the given [ArtifactVectors] using different WOT implementations.
  *
- * To implement a concrete test case, extend this class and add one or more methods with the following signature:
+ * To implement a concrete test case, extend this class and add one or more methods with the
+ * following signature:
  * ```
  * @ParameterizedTest
  * @MethodSource("instances")
@@ -29,14 +30,14 @@ import kotlin.test.assertEquals
  */
 open class TestCase(val vectors: ArtifactVectors) {
 
-    internal fun keyRingPath(): String =
-            vectors.tempKeyRingFile.absolutePath
+    internal fun keyRingPath(): String = vectors.tempKeyRingFile.absolutePath
 
     fun assertResultEquals(
         callback: ExecutionCallback,
         arguments: Array<String>,
         expectedOutput: String,
-        expectedExitCode: Int) {
+        expectedExitCode: Int
+    ) {
         val result = callback.execute(vectors, arguments)
 
         assertEquals(expectedOutput, result.first)
@@ -53,7 +54,9 @@ open class TestCase(val vectors: ArtifactVectors) {
                 // sq-wot, if environment variable "SQ_WOT" points to sq-wot executable
                 val sqWotExe = System.getenv("SQ_WOT")
                 if (sqWotExe != null && File(sqWotExe).let { it.exists() && it.isFile }) {
-                    add(Arguments.of(Named.of("sq-wot", ExecutableHarness(sqWotExe, arrayOf()).runner())))
+                    add(
+                        Arguments.of(
+                            Named.of("sq-wot", ExecutableHarness(sqWotExe, arrayOf()).runner())))
                 }
             }
         }

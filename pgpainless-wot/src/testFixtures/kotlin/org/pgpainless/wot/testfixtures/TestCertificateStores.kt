@@ -4,18 +4,20 @@
 
 package org.pgpainless.wot.testfixtures
 
+import java.io.InputStream
 import org.opentest4j.TestAbortedException
 import org.pgpainless.certificate_store.KeyMaterialReader
 import pgp.cert_d.PGPCertificateDirectory
 import pgp.cert_d.backend.InMemoryCertificateDirectoryBackend
 import pgp.cert_d.subkey_lookup.InMemorySubkeyLookup
 import pgp.certificate_store.certificate.KeyMaterialMerger
-import java.io.InputStream
 
 class TestCertificateStores {
     companion object {
         @JvmStatic
-        private val merger: KeyMaterialMerger = KeyMaterialMerger { data, _ -> data }  // Always use newer material
+        private val merger: KeyMaterialMerger = KeyMaterialMerger { data, _ ->
+            data
+        } // Always use newer material
 
         @JvmStatic
         fun disconnectedGraph(): PGPCertificateDirectory {
@@ -28,8 +30,7 @@ class TestCertificateStores {
             }
         }
 
-        @JvmStatic
-        fun emptyGraph() = createInMemoryCertificateDirectory()
+        @JvmStatic fun emptyGraph() = createInMemoryCertificateDirectory()
 
         @JvmStatic
         fun oneDelegationGraph(): PGPCertificateDirectory {
@@ -49,8 +50,7 @@ class TestCertificateStores {
         @JvmStatic
         private fun createInMemoryCertificateDirectory(): PGPCertificateDirectory {
             return PGPCertificateDirectory(
-                InMemoryCertificateDirectoryBackend(KeyMaterialReader()),
-                InMemorySubkeyLookup())
+                InMemoryCertificateDirectoryBackend(KeyMaterialReader()), InMemorySubkeyLookup())
         }
 
         @JvmStatic
@@ -61,7 +61,8 @@ class TestCertificateStores {
         @JvmStatic
         private fun requireResource(resourceName: String): InputStream {
             return TestCertificateStores::class.java.classLoader.getResourceAsStream(resourceName)
-                ?: throw TestAbortedException("Cannot read resource $resourceName: InputStream is null.")
+                ?: throw TestAbortedException(
+                    "Cannot read resource $resourceName: InputStream is null.")
         }
     }
 }

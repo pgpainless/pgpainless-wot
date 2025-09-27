@@ -4,6 +4,12 @@
 
 package org.pgpainless.wot
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.bouncycastle.openpgp.PGPPublicKeyRing
 import org.bouncycastle.util.io.Streams
 import org.junit.jupiter.api.Test
@@ -15,24 +21,25 @@ import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.key.OpenPgpV4Fingerprint
 import org.pgpainless.wot.network.Identifier
 import org.pgpainless.wot.network.TrustRoot
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class CertificateAuthorityImplTest {
 
     val v = AdHocVectors.BestViaRoot()
     val store = KeyRingCertificateStore(v.publicKeyRingCollection)
     val trustRoots = setOf(TrustRoot(v.aliceFingerprint))
-    val certAuthority = CertificateAuthorityImpl.webOfTrustFromCertificateStore(
+    val certAuthority =
+        CertificateAuthorityImpl.webOfTrustFromCertificateStore(
             store, trustRoots, Date(), DijkstraAlgorithmFactory())
 
     @Test
     fun testSuccessfulAuthentication() {
-        val authenticity = certAuthority.authenticateBinding(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), v.targetUID, false, Date(), 120)
+        val authenticity =
+            certAuthority.authenticateBinding(
+                OpenPgpV4Fingerprint(v.targetFingerprint.toString()),
+                v.targetUID,
+                false,
+                Date(),
+                120)
         assertTrue { authenticity.isAuthenticated }
         assertEquals(v.targetFingerprint, Fingerprint(authenticity.certificate))
         assertEquals(
@@ -44,16 +51,26 @@ class CertificateAuthorityImplTest {
 
     @Test
     fun testUnsuccessfulAuthentication() {
-        val authenticity = certAuthority.authenticateBinding(OpenPgpV4Fingerprint(v.targetFingerprint.toString()), "Imposter <imposter@example.org>", false, Date() , 120)
+        val authenticity =
+            certAuthority.authenticateBinding(
+                OpenPgpV4Fingerprint(v.targetFingerprint.toString()),
+                "Imposter <imposter@example.org>",
+                false,
+                Date(),
+                120)
         assertFalse { authenticity.isAuthenticated }
     }
 
     @Test
     fun encryptToAuthenticatableRecipients() {
         val output = ByteArrayOutputStream()
-        val encryptionStream = PGPainless.encryptAndOrSign().onOutputStream(output).withOptions(
-            ProducerOptions.encrypt(EncryptionOptions.encryptCommunications()
-                .addAuthenticatableRecipients(v.targetUID, false, certAuthority, 120)))
+        val encryptionStream =
+            PGPainless.encryptAndOrSign()
+                .onOutputStream(output)
+                .withOptions(
+                    ProducerOptions.encrypt(
+                        EncryptionOptions.encryptCommunications()
+                            .addAuthenticatableRecipients(v.targetUID, false, certAuthority, 120)))
         val msg = "Hello, World!\n"
         encryptionStream.write(msg.toByteArray())
         encryptionStream.close()
@@ -67,10 +84,10 @@ class CertificateAuthorityImplTest {
         assertFalse { encResult.isEncryptedFor(v.zebraCert) }
 
         val input = ByteArrayInputStream(output.toByteArray())
-        val decryptionStream = PGPainless.decryptAndOrVerify()
-            .onInputStream(input)
-            .withOptions(ConsumerOptions.get()
-                .addDecryptionKey(v.targetKey))
+        val decryptionStream =
+            PGPainless.decryptAndOrVerify()
+                .onInputStream(input)
+                .withOptions(ConsumerOptions.get().addDecryptionKey(v.targetKey))
         val plaintext = ByteArrayOutputStream()
         Streams.pipeAll(decryptionStream, plaintext)
         decryptionStream.close()

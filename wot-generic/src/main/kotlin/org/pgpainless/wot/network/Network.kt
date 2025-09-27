@@ -11,10 +11,11 @@ package org.pgpainless.wot.network
  * @param edges map of issuer/target pairs to edges
  */
 class Network(
-        val nodes: Map<Identifier, Node>,
-        val edges: Map<Pair<Identifier, Identifier>, Edge>) {
+    val nodes: Map<Identifier, Node>,
+    val edges: Map<Pair<Identifier, Identifier>, Edge>
+) {
 
-    constructor(): this(mapOf(), mapOf())
+    constructor() : this(mapOf(), mapOf())
 
     /**
      * Return all edges issued by the node with the given identifier.
@@ -34,34 +35,25 @@ class Network(
         return edges.filter { it.key.second == target }.map { it.value }
     }
 
-    /**
-     * The total number of edges in the network.
-     */
+    /** The total number of edges in the network. */
     val numberOfEdges: Int
         get() = edges.size
 
-    /**
-     * The total number of edge-components (signatures) that make up the network.
-     */
+    /** The total number of edge-components (signatures) that make up the network. */
     val numberOfSignatures: Int
-        get() = edges.values.sumOf { edge ->
-            edge.components().values.sumOf { it.size }
-        }
+        get() = edges.values.sumOf { edge -> edge.components().values.sumOf { it.size } }
 
     override fun toString(): String {
         return buildString {
             appendLine("Network with ${nodes.size} nodes, $numberOfEdges edges:")
-            for(component in edges.values) append(component)
+            for (component in edges.values) append(component)
         }
     }
 
     companion object {
 
-        /**
-         * Return a [Builder] for the Network.
-         */
-        @JvmStatic
-        fun builder(): Builder = Builder()
+        /** Return a [Builder] for the Network. */
+        @JvmStatic fun builder(): Builder = Builder()
     }
 
     class Builder internal constructor() {
@@ -74,9 +66,11 @@ class Network(
         }
 
         fun addEdge(edge: Edge.Component): Builder {
-            protoEdges.getOrPut(Pair(edge.issuer.fingerprint, edge.target.fingerprint)) {
-                Edge(edge.issuer, edge.target)
-            }.addComponent(edge)
+            protoEdges
+                .getOrPut(Pair(edge.issuer.fingerprint, edge.target.fingerprint)) {
+                    Edge(edge.issuer, edge.target)
+                }
+                .addComponent(edge)
             return this
         }
 

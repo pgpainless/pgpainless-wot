@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,9 +8,9 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * B tsigns <C, c1> and we want to authenticate c1.  This should work
- * when B is a root as C is considered a trusted introducer.  But it
- * should not work when A is considered a root a C can't introduce c2.
+ * B tsigns <C, c1> and we want to authenticate c1. This should work when B is a root as C is
+ * considered a trusted introducer. But it should not work when A is considered a root a C can't
+ * introduce c2.
  *
  * ```
  *            A
@@ -22,7 +23,7 @@ import org.pgpainless.wot.network.Identifier
  *            D
  * ```
  */
-class SelfSignedVectors: ArtifactVectors {
+class SelfSignedVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("838454E0D61D046300B408A908A4FDB4F368ECB9")
     val aliceUid = "<alice@example.org>"

@@ -4,13 +4,13 @@
 
 package org.pgpainless.wot
 
+import java.util.*
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.pgpainless.wot.api.WebOfTrustAPI
 import org.pgpainless.wot.network.TrustRoot
-import java.util.*
-import kotlin.test.assertTrue
 
-class AdHocTest: PGPDSL {
+class AdHocTest : PGPDSL {
 
     @Test
     fun test() {
@@ -18,9 +18,17 @@ class AdHocTest: PGPDSL {
         val store = vectors.pgpCertificateStore
         val network = PGPNetworkParser(store).buildNetwork()
 
-        val api = WebOfTrustAPI(network, setOf(TrustRoot(vectors.aliceFingerprint)),
-                false, false, 120, Date(),
+        val api =
+            WebOfTrustAPI(
+                network,
+                setOf(TrustRoot(vectors.aliceFingerprint)),
+                false,
+                false,
+                120,
+                Date(),
                 DijkstraAlgorithmFactory())
-        assertTrue { api.authenticate(vectors.targetFingerprint, vectors.targetUID, false).acceptable }
+        assertTrue {
+            api.authenticate(vectors.targetFingerprint, vectors.targetUID, false).acceptable
+        }
     }
 }

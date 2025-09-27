@@ -4,6 +4,4 @@
 
 package org.pgpainless.wot.network
 
-class TrustRoot(val fingerprint: Identifier,
-                val trustAmount: Int = 120) {
-}
+class TrustRoot(val fingerprint: Identifier, val trustAmount: Int = 120) {}

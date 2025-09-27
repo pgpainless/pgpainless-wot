@@ -4,13 +4,10 @@
 
 package org.pgpainless.wot.api
 
-/**
- * Enum listing possible output formats.
- */
+/** Enum listing possible output formats. */
 enum class Format(private val displayName: String) {
     humanReadable("human-readable"),
-    dot("dot")
-    ;
+    dot("dot");
 
     override fun toString(): String = displayName
 

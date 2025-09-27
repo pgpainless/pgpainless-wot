@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -6,7 +7,7 @@ package org.sequoia_pgp.wot.vectors
 
 import org.pgpainless.wot.network.Identifier
 
-class InfinityAndBeyondVectors: ArtifactVectors {
+class InfinityAndBeyondVectors : ArtifactVectors {
 
     val u1Fpr = Identifier("B557862780A97676CC32F4BB1491A9C2BDE6F1DC")
     val u1Uid = "<u1@example.org>"
@@ -17,7 +18,8 @@ class InfinityAndBeyondVectors: ArtifactVectors {
     val u254Fpr = Identifier("AF097DA4DB5C0E2116EF583B25A6B381B621C082")
     val u254Uid = "<u254@example.org>"
 
-    val fprs = listOf(
+    val fprs =
+        listOf(
             Identifier("B557862780A97676CC32F4BB1491A9C2BDE6F1DC"),
             Identifier("0618F850B6D0C48DBF406BBFAB3DAED809A35F78"),
             Identifier("70B0C5FEFFE6B55F2CEE85455621246D16D6785E"),
@@ -278,11 +280,9 @@ class InfinityAndBeyondVectors: ArtifactVectors {
             Identifier("B73206C4F70E0735E9288128BAC3400233738122"),
             Identifier("FCDF4C1D67ACFA8B42F6A77C408A9CB7367171C2"),
             Identifier("B69A678AA242FA4F0BBF12205C0608799B0E3C51"),
-    )
+        )
 
-    /**
-     * A few minutes after the network has been generated.
-     */
+    /** A few minutes after the network has been generated. */
     val t0 = parseReferenceTime("2022-01-28 15:18:00 UTC")
 
     override val tempFilePrefix: String

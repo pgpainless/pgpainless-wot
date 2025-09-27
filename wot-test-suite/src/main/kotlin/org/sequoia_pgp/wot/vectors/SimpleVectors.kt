@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,8 +8,8 @@ package org.sequoia_pgp.wot.vectors
 import org.pgpainless.wot.network.Identifier
 
 /**
- * A straightforward certification chain.  Note: when A is the root, she
- * can authenticate D, but not E due to depth constraints.
+ * A straightforward certification chain. Note: when A is the root, she can authenticate D, but not
+ * E due to depth constraints.
  *
  * ```text
  *            o A
@@ -26,10 +27,10 @@ import org.pgpainless.wot.network.Identifier
  *            o E
  * ```
  */
-class SimpleVectors: ArtifactVectors {
+class SimpleVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("85DAB65713B2D0ABFC5A4F28BC10C9CE4A699D8D")
-    val aliceUid = "<alice@example.org>";
+    val aliceUid = "<alice@example.org>"
 
     val bobFpr = Identifier("39A479816C934B9E0464F1F4BC1DCFDEADA4EE90")
     val bobUid = "<bob@example.org>"

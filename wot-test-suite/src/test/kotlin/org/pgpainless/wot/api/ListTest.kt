@@ -4,6 +4,7 @@
 
 package org.pgpainless.wot.api
 
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
 import org.pgpainless.wot.DijkstraAlgorithmFactory
@@ -11,7 +12,6 @@ import org.pgpainless.wot.KeyRingCertificateStore
 import org.pgpainless.wot.PGPNetworkParser
 import org.pgpainless.wot.network.TrustRoot
 import org.sequoia_pgp.wot.vectors.BestViaRootVectors
-import kotlin.test.assertEquals
 
 class ListTest {
 
@@ -23,8 +23,7 @@ class ListTest {
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t0)
 
         val roots = setOf(TrustRoot(v.aliceFpr))
-        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t0,
-                DijkstraAlgorithmFactory())
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t0, DijkstraAlgorithmFactory())
 
         assertEquals(1, api.list().bindings.size)
     }
@@ -37,8 +36,7 @@ class ListTest {
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t1)
 
         val roots = setOf(TrustRoot(v.aliceFpr))
-        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1,
-                DijkstraAlgorithmFactory())
+        val api = WebOfTrustAPI(network, roots, false, false, 120, v.t1, DijkstraAlgorithmFactory())
 
         assertEquals(6, api.list().bindings.size)
     }

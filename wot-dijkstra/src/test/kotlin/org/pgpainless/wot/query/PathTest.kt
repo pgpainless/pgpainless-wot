@@ -4,12 +4,12 @@
 
 package org.pgpainless.wot.query
 
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.pgpainless.wot.dsl.NetworkDSL
 import org.pgpainless.wot.network.TrustDepth
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class PathTest : NetworkDSL {
 
@@ -78,7 +78,9 @@ class PathTest : NetworkDSL {
         assertEquals(listOf(root, alice, bob), path.certificates)
         assertEquals(bob, path.target)
         assertEquals(3, path.length)
-        assertEquals(120, path.amount) // second certification has less amount, so amount is capped to its value
+        assertEquals(
+            120,
+            path.amount) // second certification has less amount, so amount is capped to its value
     }
 
     @Test
@@ -119,12 +121,9 @@ class PathTest : NetworkDSL {
         assertEquals(2, path.length)
     }
 
-
     @Test
     fun `verify that a Path cannot point to its own root via a delegation`() {
         val path = Path(root)
-        assertThrows<IllegalArgumentException> {
-            path.append(root_root)
-        }
+        assertThrows<IllegalArgumentException> { path.append(root_root) }
     }
 }

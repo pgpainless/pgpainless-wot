@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub <vanitasvitae@fsfe.org>
+// SPDX-FileCopyrightText: 2023 Neal H. Walfield <neal@pep.foundation>, Paul Schaub
+// <vanitasvitae@fsfe.org>
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -22,7 +23,7 @@ import org.pgpainless.wot.network.Identifier
  * dave
  * ```
  */
-class CertificationNetworkVectors: ArtifactVectors {
+class CertificationNetworkVectors : ArtifactVectors {
 
     val aliceFpr = Identifier("B2B371214EF71AFD16E42C62D81360B4C0489225")
     val aliceUid = "<alice@example.org>"
@@ -36,9 +37,7 @@ class CertificationNetworkVectors: ArtifactVectors {
     val daveFpr = Identifier("9A1AE937B5CB8BC46048AB63023CC01973ED9DF3")
     val daveUid = "<dave@example.org>"
 
-    /**
-     * A few minutes after the Network has been generated.
-     */
+    /** A few minutes after the Network has been generated. */
     val t0 = parseReferenceTime("2023-01-19 12:00:00 UTC")
 
     override val tempFilePrefix: String
@@ -47,5 +46,4 @@ class CertificationNetworkVectors: ArtifactVectors {
     override fun getResourceName(): String {
         return "org/sequoia_pgp/wot/vectors/certification-network.pgp"
     }
-
 }

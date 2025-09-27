@@ -4,11 +4,11 @@
 
 package org.pgpainless.wot.network
 
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.pgpainless.wot.dsl.NetworkDSL
-import kotlin.test.assertEquals
 
-class NodeTest: NetworkDSL {
+class NodeTest : NetworkDSL {
 
     @Test
     fun `Fingerprint 'A' toString`() {
