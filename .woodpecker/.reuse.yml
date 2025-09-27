@@ -3,5 +3,7 @@
 steps:
   reuse:
     image: fsfe/reuse:latest
+    when:
+      branch: main
     commands:
       - reuse lint
