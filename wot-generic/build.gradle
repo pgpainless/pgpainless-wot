@@ -33,7 +33,7 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
     // @Nullable, @Nonnull annotations
-    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation "com.google.code.findbugs:jsr305:$jsr305Version"
 }
 
 test {

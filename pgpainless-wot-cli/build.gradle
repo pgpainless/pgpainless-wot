@@ -30,8 +30,8 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit5:$kotlinVersion"
 
     // CLI
-    implementation "info.picocli:picocli:4.6.3"
-    annotationProcessor "info.picocli:picocli-codegen:4.6.3"
+    implementation "info.picocli:picocli:$picocliVersion"
+    annotationProcessor "info.picocli:picocli-codegen:$picocliVersion"
 
     // Logging
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
