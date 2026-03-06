@@ -58,11 +58,11 @@ interface ArtifactVectors {
 
     fun getNetworkAt(
         referenceTime: Date = Date(),
-        policy: Policy = PGPainless.getPolicy()
+        policy: Policy = PGPainless.getInstance().algorithmPolicy
     ): Network {
         val inputStream = keyRingInputStream()
-        val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(inputStream)
-        val store = KeyRingCertificateStore(keyRing)
+        val keyRing = PGPainless.getInstance().readKey().parseKeysOrCertificates(inputStream)
+        val store = KeyRingCertificateStore(listOf(keyRing))
         return PGPNetworkParser(store).buildNetwork(policy, referenceTime)
     }
 

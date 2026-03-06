@@ -5,12 +5,13 @@
 package org.pgpainless.wot
 
 import java.util.*
-import org.bouncycastle.openpgp.PGPPublicKeyRing
+import org.bouncycastle.bcpg.KeyIdentifier
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
 import org.pgpainless.PGPainless
 import org.pgpainless.authentication.CertificateAuthenticity
-import org.pgpainless.authentication.CertificateAuthenticity.CertificationChain
-import org.pgpainless.authentication.CertificateAuthenticity.ChainLink
 import org.pgpainless.authentication.CertificateAuthority
+import org.pgpainless.authentication.CertificationChain
+import org.pgpainless.authentication.ChainLink
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.api.Binding
 import org.pgpainless.wot.api.WebOfTrustAPI
@@ -61,8 +62,8 @@ class CertificateAuthorityImpl(
     }
 
     override fun authenticateBinding(
-        fingerprint: OpenPgpFingerprint,
-        userId: String,
+        certIdentifier: KeyIdentifier,
+        userId: CharSequence,
         email: Boolean,
         referenceTime: Date,
         targetAmount: Int
@@ -76,13 +77,25 @@ class CertificateAuthorityImpl(
                 targetAmount,
                 referenceTime,
                 shortestPathAlgorithmFactory)
-        val result = api.authenticate(Identifier(fingerprint.toString()), userId, email)
+        val result =
+            api.authenticate(Identifier(certIdentifier.toString()), userId.toString(), email)
 
         return mapToAuthenticity(result.binding, targetAmount)
     }
 
-    override fun lookupByUserId(
+    override fun authenticateBinding(
+        fingerprint: OpenPgpFingerprint,
         userId: String,
+        email: Boolean,
+        referenceTime: Date,
+        targetAmount: Int
+    ): CertificateAuthenticity {
+        return authenticateBinding(
+            fingerprint.keyIdentifier, userId, email, referenceTime, targetAmount)
+    }
+
+    override fun lookupByUserId(
+        userId: CharSequence,
         email: Boolean,
         referenceTime: Date,
         targetAmount: Int
@@ -96,12 +109,12 @@ class CertificateAuthorityImpl(
                 targetAmount,
                 referenceTime,
                 shortestPathAlgorithmFactory)
-        val result = api.lookup(userId, email)
+        val result = api.lookup(userId.toString(), email)
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
     override fun identifyByFingerprint(
-        fingerprint: OpenPgpFingerprint,
+        certIdentifier: KeyIdentifier,
         referenceTime: Date,
         targetAmount: Int
     ): List<CertificateAuthenticity> {
@@ -114,20 +127,28 @@ class CertificateAuthorityImpl(
                 targetAmount,
                 referenceTime,
                 shortestPathAlgorithmFactory)
-        val result = api.identify(Identifier(fingerprint.toString()))
+        val result = api.identify(Identifier(certIdentifier.toString()))
         return result.bindings.map { mapToAuthenticity(it, targetAmount) }
     }
 
+    override fun identifyByFingerprint(
+        fingerprint: OpenPgpFingerprint,
+        referenceTime: Date,
+        targetAmount: Int
+    ): List<CertificateAuthenticity> {
+        return identifyByFingerprint(fingerprint.keyIdentifier, referenceTime, targetAmount)
+    }
+
     private fun mapToAuthenticity(binding: Binding, targetAmount: Int): CertificateAuthenticity {
-        val publicKeyRing = readPublicKeyRing(binding.fingerprint)
+        val publicKeyRing = readCertificate(binding.fingerprint)
 
         val certificationChains = mutableMapOf<CertificationChain, Int>()
         for ((path, amount) in binding.paths.items) {
             val links = mutableListOf<ChainLink>()
-            links.add(ChainLink(readPublicKeyRing(path.root.fingerprint)))
+            links.add(ChainLink(readCertificate(path.root.fingerprint)))
 
             for (edge in path.certifications) {
-                val target = readPublicKeyRing(edge.target.fingerprint)
+                val target = readCertificate(edge.target.fingerprint)
                 links.add(ChainLink(target))
             }
 
@@ -135,11 +156,11 @@ class CertificateAuthorityImpl(
         }
 
         return CertificateAuthenticity(
-            publicKeyRing, binding.userId, certificationChains, targetAmount)
+            binding.userId, publicKeyRing, certificationChains, targetAmount)
     }
 
-    private fun readPublicKeyRing(fingerprint: Identifier): PGPPublicKeyRing {
+    private fun readCertificate(fingerprint: Identifier): OpenPGPCertificate {
         val certificate = certificateStore.getCertificate(fingerprint.toString())
-        return PGPainless.readKeyRing().publicKeyRing(certificate.inputStream)!!
+        return PGPainless.getInstance().readKey().parseCertificate(certificate.inputStream)!!
     }
 }

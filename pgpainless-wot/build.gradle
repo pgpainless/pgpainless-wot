@@ -20,6 +20,7 @@ group 'org.pgpainless'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -45,6 +46,7 @@ dependencies {
     }
 
     api("org.pgpainless:pgpainless-core:$pgpainlessVersion")
+    api("org.bouncycastle:bcpg-jdk18on:1.84-SNAPSHOT")
     api(project(":wot-generic"))
 }
 

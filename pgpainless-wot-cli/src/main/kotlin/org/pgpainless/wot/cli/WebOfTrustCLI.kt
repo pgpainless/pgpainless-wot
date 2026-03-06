@@ -156,7 +156,7 @@ class WebOfTrustCLI : Callable<Int> {
                 if (optKeyring != null) {
                     return KeyRingCertificateStore(
                         optKeyring!!.map {
-                            PGPainless.readKeyRing().publicKeyRingCollection(it.inputStream())
+                            PGPainless.getInstance().readKey().parseCertificates(it.inputStream())
                         })
                 }
 

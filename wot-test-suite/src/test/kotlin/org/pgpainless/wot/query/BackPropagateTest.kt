@@ -166,7 +166,7 @@ class BackPropagateTest {
     @Test
     fun cliques() {
         val t1 = CliquesVectors()
-        val n1 = t1.getNetworkAt()
+        val n1 = t1.getNetworkAt(t1.t0)
 
         println(
             "Network contains " +
@@ -201,7 +201,7 @@ class BackPropagateTest {
                 t1.targetFpr))
 
         val t2 = CliquesLocalOptimaVectors()
-        val n2 = t2.getNetworkAt()
+        val n2 = t2.getNetworkAt(t2.t0)
 
         println(
             "Network contains " +
@@ -234,7 +234,7 @@ class BackPropagateTest {
                 t2.targetFpr))
 
         val t3 = CliquesLocalOptima2Vectors()
-        val n3 = t3.getNetworkAt()
+        val n3 = t3.getNetworkAt(t3.t0)
 
         println(
             "Network contains " +
@@ -663,7 +663,7 @@ class BackPropagateTest {
     @Test
     fun multipleCertifications1() {
         val t = MultipleCertifications1Vectors()
-        val n1 = t.getNetworkAt()
+        val n1 = t.getNetworkAt(t.t0)
 
         println(
             "Network contains " +

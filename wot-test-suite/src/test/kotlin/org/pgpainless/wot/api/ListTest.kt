@@ -18,8 +18,8 @@ class ListTest {
     @Test
     fun `best-via-root - verify that we can list only the trust-root at t0`() {
         val v = BestViaRootVectors()
-        val keyRing = PGPainless.readKeyRing().publicKeyRingCollection(v.keyRingInputStream())
-        val store = KeyRingCertificateStore(keyRing)
+        val keyRing = PGPainless.getInstance().readKey().parseCertificates(v.keyRingInputStream())
+        val store = KeyRingCertificateStore(listOf(keyRing))
         val network = PGPNetworkParser(store).buildNetwork(referenceTime = v.t0)
 
         val roots = setOf(TrustRoot(v.aliceFpr))

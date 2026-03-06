@@ -5,7 +5,7 @@
 package org.pgpainless.wot
 
 import kotlin.test.*
-import org.bouncycastle.openpgp.PGPPublicKeyRing
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.wot.network.Edge
 import org.pgpainless.wot.network.Identifier
@@ -21,7 +21,7 @@ class PGPNetworkParserTest {
     private val barBankCa = fingerprintOf(WotTestVectors.freshBarBankCaCert)
     private val barBankEmployee = fingerprintOf(WotTestVectors.freshBarBankEmployeeCert)
 
-    private fun fingerprintOf(cert: PGPPublicKeyRing): Identifier {
+    private fun fingerprintOf(cert: OpenPGPCertificate): Identifier {
         return Identifier(OpenPgpFingerprint.of(cert).toString())
     }
 

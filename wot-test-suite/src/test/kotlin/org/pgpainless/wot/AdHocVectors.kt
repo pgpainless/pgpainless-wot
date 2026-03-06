@@ -4,10 +4,8 @@
 
 package org.pgpainless.wot
 
-import org.bouncycastle.openpgp.PGPKeyRing
-import org.bouncycastle.openpgp.PGPPublicKeyRing
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
-import org.bouncycastle.openpgp.PGPSecretKeyRing
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
+import org.bouncycastle.openpgp.api.OpenPGPKey
 import org.pgpainless.PGPainless
 import org.pgpainless.key.OpenPgpFingerprint
 import org.pgpainless.key.generation.type.rsa.RsaLength
@@ -28,100 +26,95 @@ interface AdHocVectors {
      * -> B -> C -> Target, not A -> Y -> Z -> Target.
      */
     class BestViaRoot : AdHocVectors {
+        val api = PGPainless.getInstance()
         val aliceUID: String = "Alice <alice@pgpainless.org>"
-        val aliceKey: PGPSecretKeyRing = PGPainless.generateKeyRing().modernKeyRing(aliceUID)
-        val aliceCert = PGPPublicKeyRing(aliceKey)
+        val aliceKey: OpenPGPKey = api.generateKey().modernKeyRing(aliceUID)
+        val aliceCert = aliceKey.toCertificate()
         val aliceFingerprint = Fingerprint(aliceKey)
 
         val bobUID = "Bob <bob@pgpainless.org>"
-        val bobKey: PGPSecretKeyRing =
-            PGPainless.generateKeyRing().simpleRsaKeyRing(bobUID, RsaLength._3072)
-        val bobCert = PGPPublicKeyRing(bobKey)
+        val bobKey: OpenPGPKey = api.generateKey().simpleRsaKeyRing(bobUID, RsaLength._3072)
+        val bobCert = bobKey.toCertificate()
         val bobFingerprint = Fingerprint(bobKey)
 
         val carolUID = "Carol <carol@example.com>"
-        val carolKey: PGPSecretKeyRing = PGPainless.generateKeyRing().simpleEcKeyRing(carolUID)
-        val carolCert = PGPPublicKeyRing(carolKey)
+        val carolKey: OpenPGPKey = api.generateKey().simpleEcKeyRing(carolUID)
+        val carolCert = carolKey.toCertificate()
         val carolFingerprint = Fingerprint(carolKey)
 
         val targetUID = "Tanja <tanja@target.tld>"
-        val targetKey: PGPSecretKeyRing = PGPainless.generateKeyRing().modernKeyRing(targetUID)
-        val targetCert = PGPPublicKeyRing(targetKey)
+        val targetKey: OpenPGPKey = api.generateKey().modernKeyRing(targetUID)
+        val targetCert = targetKey.toCertificate()
         val targetFingerprint = Fingerprint(targetKey)
 
         val yellowUID = "Yellow <yellow@alternate.path>"
-        val yellowKey: PGPSecretKeyRing = PGPainless.generateKeyRing().modernKeyRing(yellowUID)
-        val yellowCert = PGPPublicKeyRing(yellowKey)
+        val yellowKey: OpenPGPKey = api.generateKey().modernKeyRing(yellowUID)
+        val yellowCert = yellowKey.toCertificate()
         val yellowFingerprint = Fingerprint(yellowKey)
 
         val zebraUID = "Zebra <zebra@alternate.path>"
-        val zebraKey: PGPSecretKeyRing = PGPainless.generateKeyRing().modernKeyRing(zebraUID)
-        val zebraCert = PGPPublicKeyRing(zebraKey)
+        val zebraKey: OpenPGPKey = api.generateKey().modernKeyRing(zebraUID)
+        val zebraCert = zebraKey.toCertificate()
         val zebraFingerprint = Fingerprint(zebraKey)
 
-        override val publicKeyRingCollection: PGPPublicKeyRingCollection
+        override val publicKeyRingCollection: List<OpenPGPCertificate>
 
         init {
             publicKeyRingCollection =
                 listOf(
-                        targetCert
-                            .let {
-                                // C ---120/10--> Target
-                                certify(issuer = carolKey, target = it, amount = 120, depth = 10)
-                            }
-                            .let {
-                                // Z ---50/10---> Target
-                                certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
-                            },
-                        carolCert.let {
-                            // B ---120/10--> C
-                            certify(issuer = bobKey, target = it, amount = 120, depth = 10)
+                    targetCert
+                        .let {
+                            // C ---120/10--> Target
+                            certify(issuer = carolKey, target = it, amount = 120, depth = 10)
+                        }
+                        .let {
+                            // Z ---50/10---> Target
+                            certify(issuer = zebraKey, target = it, amount = 50, depth = 10)
                         },
-                        bobCert.let {
-                            // A ---120/10--> B
-                            certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
-                        },
-                        aliceCert,
-                        zebraCert.let {
-                            // Y ---50/10--> Z
-                            certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
-                        },
-                        yellowCert.let {
-                            // A ---50/10--> Y
-                            certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
-                        })
-                    .let { PGPPublicKeyRingCollection(it) }
+                    carolCert.let {
+                        // B ---120/10--> C
+                        certify(issuer = bobKey, target = it, amount = 120, depth = 10)
+                    },
+                    bobCert.let {
+                        // A ---120/10--> B
+                        certify(issuer = aliceKey, target = it, amount = 120, depth = 10)
+                    },
+                    aliceCert,
+                    zebraCert.let {
+                        // Y ---50/10--> Z
+                        certify(issuer = yellowKey, target = it, amount = 50, depth = 10)
+                    },
+                    yellowCert.let {
+                        // A ---50/10--> Y
+                        certify(issuer = aliceKey, target = it, amount = 50, depth = 10)
+                    })
         }
     }
 
-    val publicKeyRingCollection: PGPPublicKeyRingCollection
+    val publicKeyRingCollection: List<OpenPGPCertificate>
 
     val pgpCertificateStore: PGPCertificateStore
-        get() = KeyRingCertificateStore(publicKeyRingCollection)
+        get() = KeyRingCertificateStore(listOf(publicKeyRingCollection))
 
     fun certify(
-        issuer: PGPSecretKeyRing,
-        target: PGPPublicKeyRing,
-        userId: String = target.publicKey.userIDs.next()!!,
+        issuer: OpenPGPKey,
+        target: OpenPGPCertificate,
+        userId: String = target.allUserIds[0]!!.userId,
         amount: Int,
         depth: Int
-    ): PGPPublicKeyRing =
-        PGPainless.certify()
-            .userIdOnCertificate(userId, target)
+    ): OpenPGPCertificate =
+        PGPainless.getInstance()
+            .generateCertification()
+            .certifyUserId(userId, target)
             .withKey(issuer, SecretKeyRingProtector.unprotectedKeys())
             .buildWithSubpackets(
                 object : Callback {
-                    override fun modifyHashedSubpackets(
-                        hashedSubpackets: CertificationSubpackets?
-                    ) {
-                        hashedSubpackets!!.setTrust(depth, amount)
+                    override fun modifyHashedSubpackets(hashedSubpackets: CertificationSubpackets) {
+                        hashedSubpackets.setTrust(depth, amount)
                     }
                 })
             .certifiedCertificate
 
-    fun PGPPublicKeyRing(secretKey: PGPSecretKeyRing): PGPPublicKeyRing =
-        PGPainless.extractCertificate(secretKey)
-
-    fun Fingerprint(keyRing: PGPKeyRing): Identifier =
-        Identifier(OpenPgpFingerprint.of(keyRing).toString())
+    fun Fingerprint(cert: OpenPGPCertificate): Identifier =
+        Identifier(OpenPgpFingerprint.of(cert).toString())
 }

@@ -220,7 +220,7 @@ class AuthenticateTest {
     @Test
     fun cliques() {
         val t1 = CliquesVectors()
-        val n1 = t1.getNetworkAt()
+        val n1 = t1.getNetworkAt(t1.t0)
         printNetwork(n1)
 
         val q1 = Query(n1, t1.rootFpr)
@@ -271,7 +271,7 @@ class AuthenticateTest {
             null)
 
         val t2 = CliquesLocalOptimaVectors()
-        val n2 = t2.getNetworkAt()
+        val n2 = t2.getNetworkAt(t2.t0)
         printNetwork(n2)
 
         val q3 = Query(n2, t2.rootFpr)
@@ -349,7 +349,7 @@ class AuthenticateTest {
             null)
 
         val t3 = CliquesLocalOptima2Vectors()
-        val n3 = t3.getNetworkAt()
+        val n3 = t3.getNetworkAt(t3.t0)
         printNetwork(n3)
 
         val q5 = Query(n3, t3.rootFpr)
@@ -685,7 +685,7 @@ class AuthenticateTest {
     @Test
     fun localOptima() {
         val t = LocalOptimaVectors()
-        val n = t.getNetworkAt()
+        val n = t.getNetworkAt(t.t0)
         printNetwork(n)
 
         val q1 = Query(n, t.aliceFpr)

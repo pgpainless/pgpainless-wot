@@ -6,6 +6,7 @@ package org.pgpainless.wot
 
 import java.io.InputStream
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
 import org.pgpainless.PGPainless
 import org.pgpainless.certificate_store.CertificateFactory
 import org.pgpainless.key.OpenPgpFingerprint
@@ -15,35 +16,37 @@ import pgp.certificate_store.certificate.KeyMaterialMerger
 import pgp.certificate_store.exception.BadNameException
 
 /**
- * Implementation of [PGPCertificateStore] which is based on one or more
- * [PGPPublicKeyRingCollection]. During initialization, all items in the
- * [PGPPublicKeyRingCollection]s are converted into [Certificates][Certificate] and stored in a map
- * keyed by their fingerprints.
+ * Implementation of [PGPCertificateStore] which is based on one or more lists of
+ * [OpenPGPCertificate]s. During initialization, all items in the lists are converted into
+ * [Certificates][Certificate] and stored in a map keyed by their fingerprints.
  *
  * In case of fingerprint collisions across certificates from different collections, [Certificate]
- * objects from a [PGPPublicKeyRingCollection] instance with a higher list index take precedence.
+ * objects from a list of OpenPGPCertificates with a higher list index take precedence.
  *
  * [Certificates][Certificate] being inserted using [insertCertificate] or
- * [insertCertificateBySpecialName] are also stored in that map, but are not being written into the
- * [PGPPublicKeyRingCollection].
+ * [insertCertificateBySpecialName] are also stored in that map, but are not being written into base
+ * list.
  */
-class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) :
+class KeyRingCertificateStore(baseCertificates: List<List<OpenPGPCertificate>>) :
     PGPCertificateStore {
 
     // Keep certificates inserted only in memory
     private val certificates = mutableMapOf<String, Certificate>()
+    private val api = PGPainless.getInstance()
 
     init {
-        baseKeyRings.forEach { store ->
+        baseCertificates.forEach { store ->
             store.forEach {
                 val fingerprint = OpenPgpFingerprint.of(it).toString()
-                val certificate = CertificateFactory.certificateFromPublicKeyRing(it, null)
+                val certificate = CertificateFactory.certificateFromOpenPGPCertificate(it, null)
                 certificates[fingerprint] = certificate
             }
         }
     }
 
-    constructor(baseKeyRing: PGPPublicKeyRingCollection) : this(listOf(baseKeyRing))
+    constructor(
+        baseKeyRing: PGPPublicKeyRingCollection
+    ) : this(listOf(baseKeyRing.map { PGPainless.getInstance().toCertificate(it) }.toList()))
 
     override fun getCertificate(identifier: String?): Certificate {
         if (identifier == null) {
@@ -67,9 +70,9 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) :
     }
 
     override fun insertCertificate(data: InputStream?, merge: KeyMaterialMerger?): Certificate {
-        val publicKeys = PGPainless.readKeyRing().publicKeyRing(data!!)
-        val certificate = CertificateFactory.certificateFromPublicKeyRing(publicKeys!!, null)
-        var insert: Certificate? =
+        val publicKeys = api.readKey().parseCertificate(data!!)
+        val certificate = CertificateFactory.certificateFromOpenPGPCertificate(publicKeys!!, null)
+        val insert: Certificate? =
             if (merge != null) {
                 val existing =
                     try {
@@ -95,10 +98,10 @@ class KeyRingCertificateStore(baseKeyRings: List<PGPPublicKeyRingCollection>) :
         data: InputStream?,
         merge: KeyMaterialMerger?
     ): Certificate {
-        val publicKeys = PGPainless.readKeyRing().publicKeyRing(data!!)
-        val certificate = CertificateFactory.certificateFromPublicKeyRing(publicKeys!!, null)
+        val publicKeys = api.readKey().parseCertificate(data!!)
+        val certificate = CertificateFactory.certificateFromOpenPGPCertificate(publicKeys!!, null)
 
-        var insert: Certificate? =
+        val insert: Certificate? =
             if (merge != null) {
                 val existing =
                     try {
