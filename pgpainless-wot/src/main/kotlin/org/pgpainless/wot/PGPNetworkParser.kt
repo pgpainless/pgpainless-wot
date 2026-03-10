@@ -173,24 +173,24 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
         private fun indexIncomingEdges(validatedTarget: OpenPGPCertificate) {
             // Direct-Key Signatures (delegations) by X on Y
             val delegators =
-                validatedTarget.allDelegations
-                    .plus(validatedTarget.allDelegationRevocations)
+                validatedTarget.allThirdPartySignatures
                     .map { it.keyIdentifier }
                     .flatMap { byKeyId[it]?.toList() ?: emptyList() }
                     .toSet()
             for (delegator in delegators) {
                 validatedTarget
-                    .getThirdPartyKeySignatureChainsBy(delegator, referenceTime)
-                    .filter {
-                        it.isValid &&
-                            it.leafLink.signature.issuer.isBoundAt(it.signature.creationTime)
-                    }
+                    .getDelegationsBy(delegator)
+                    .getChainsAt(referenceTime)
+                    .plus(validatedTarget.getRevocationsBy(delegator).getChainsAt(referenceTime))
                     .forEach {
-                        networkBuilder.addEdge(
-                            fromDelegation(
-                                getNode(delegator)!!,
-                                getNode(validatedTarget)!!,
-                                it.signature.signature))
+                        if (it.isValid &&
+                            it.signature.issuer.isBoundAt(it.signature.creationTime)) {
+                            networkBuilder.addEdge(
+                                fromDelegation(
+                                    getNode(delegator)!!,
+                                    getNode(validatedTarget)!!,
+                                    it.signature.signature))
+                        }
                     }
             }
 
@@ -211,18 +211,19 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
                     .toSet()
             for (issuer in certifiers) {
                 userId
-                    .getThirdPartySignatureChainsBy(issuer, referenceTime)
-                    .filter {
-                        it.isValid &&
-                            it.leafLink.signature.issuer.isBoundAt(it.signature.creationTime)
-                    }
+                    .getCertificationsBy(issuer)
+                    .getChainsAt(referenceTime)
+                    .plus(userId.getRevocationsBy(issuer).getChainsAt(referenceTime))
                     .forEach {
-                        networkBuilder.addEdge(
-                            fromCertification(
-                                getNode(issuer)!!,
-                                getNode(userId.certificate)!!,
-                                userId.userId,
-                                it.signature.signature))
+                        if (it.isValid &&
+                            it.signature.issuer.isBoundAt(it.signature.creationTime)) {
+                            networkBuilder.addEdge(
+                                fromCertification(
+                                    getNode(issuer)!!,
+                                    getNode(userId.certificate)!!,
+                                    userId.userId,
+                                    it.signature.signature))
+                        }
                     }
             }
         }
