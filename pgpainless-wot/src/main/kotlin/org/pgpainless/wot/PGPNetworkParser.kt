@@ -173,7 +173,7 @@ class PGPNetworkParser(private val certificateStore: PGPCertificateStore) {
         private fun indexIncomingEdges(validatedTarget: OpenPGPCertificate) {
             // Direct-Key Signatures (delegations) by X on Y
             val delegators =
-                validatedTarget.allThirdPartySignatures
+                validatedTarget.allThirdPartyKeySignatures
                     .map { it.keyIdentifier }
                     .flatMap { byKeyId[it]?.toList() ?: emptyList() }
                     .toSet()
