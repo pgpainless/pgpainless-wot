@@ -14,7 +14,7 @@ allprojects {
         certDJavaVersion = '0.2.3'
         picocliVersion = '4.6.3'
         pgpainlessCertDVersion = '0.2.3'
-        pgpainlessVersion = '2.0.3-SNAPSHOT'
+        pgpainlessVersion = '2.0.3'
         mockitoVersion = '4.5.1'
         slf4jVersion = '1.7.36'
     }
