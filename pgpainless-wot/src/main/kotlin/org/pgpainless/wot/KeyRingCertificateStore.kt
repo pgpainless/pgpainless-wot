@@ -14,6 +14,7 @@ import pgp.certificate_store.PGPCertificateStore
 import pgp.certificate_store.certificate.Certificate
 import pgp.certificate_store.certificate.KeyMaterialMerger
 import pgp.certificate_store.exception.BadNameException
+import java.io.File
 
 /**
  * Implementation of [PGPCertificateStore] which is based on one or more lists of
@@ -128,5 +129,15 @@ class KeyRingCertificateStore(baseCertificates: List<List<OpenPGPCertificate>>) 
 
     override fun getFingerprints(): MutableIterator<String> {
         return certificates.values.map { it.fingerprint }.toMutableList().listIterator()
+    }
+
+    companion object {
+        @JvmStatic
+        fun fromFiles(files: Array<File>): KeyRingCertificateStore {
+            return KeyRingCertificateStore(
+                files.map {
+                    PGPainless.getInstance().readKey().parseCertificates(it.inputStream())
+                })
+        }
     }
 }
