@@ -105,7 +105,7 @@ class Dijkstra(
     }
 
     // FIXME: This should not be public, but is currently needed for the `BackPropagationTest`
-    // suite.
+    //  suite.
     fun backwardPropagate(
         targetFpr: Identifier,
         targetUserid: String

@@ -32,7 +32,7 @@ import picocli.CommandLine
 import picocli.CommandLine.*
 
 /**
- * Command Line Interface for pgpainless-wot, modelled after the reference implementation "sq-wot".
+ * Command Line Interface for pgpainless-wot, modeled after the reference implementation "sq-wot".
  *
  * @see <a href="https://gitlab.com/sequoia-pgp/sequoia-wot/">Sequoia Web of Trust Reference
  *   Implementation</a>
@@ -153,11 +153,9 @@ class WebOfTrustCLI : Callable<Int> {
                 if (optGpg) {
                     return gpgHelper.readGpgKeyRing()
                 }
+
                 if (optKeyring != null) {
-                    return KeyRingCertificateStore(
-                        optKeyring!!.map {
-                            PGPainless.readKeyRing().publicKeyRingCollection(it.inputStream())
-                        })
+                    return KeyRingCertificateStore.fromFiles(optKeyring!!)
                 }
 
                 if (optPgpCertD == "") {
@@ -213,7 +211,7 @@ class WebOfTrustCLI : Callable<Int> {
         require(optTrustRoot.isNotEmpty()) { "Expected at least one trust-root." }
 
         for (notation in optKnownNotations) {
-            PGPainless.getPolicy().notationRegistry.addKnownNotation(notation)
+            PGPainless.getInstance().algorithmPolicy.notationRegistry.addKnownNotation(notation)
         }
 
         return 0

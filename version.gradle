@@ -8,11 +8,13 @@ allprojects {
         isSnapshot = true
         javaSourceCompatibility = 11
         junitVersion = '5.8.2'
+        jsr305Version = '3.0.2'
         kotlinVersion = '1.9.21'
         logbackVersion = '1.5.13'
-        certDJavaVersion = '0.2.2'
-        pgpainlessCertDVersion = '0.2.2'
-        pgpainlessVersion = '1.6.1'
+        certDJavaVersion = '0.2.3'
+        picocliVersion = '4.6.3'
+        pgpainlessCertDVersion = '0.2.3'
+        pgpainlessVersion = '2.0.3'
         mockitoVersion = '4.5.1'
         slf4jVersion = '1.7.36'
     }

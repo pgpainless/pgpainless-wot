@@ -10,7 +10,7 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.bouncycastle.openpgp.PGPPublicKeyRing
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
 import org.bouncycastle.util.io.Streams
 import org.junit.jupiter.api.Test
 import org.pgpainless.PGPainless
@@ -25,7 +25,7 @@ import org.pgpainless.wot.network.TrustRoot
 class CertificateAuthorityImplTest {
 
     val v = AdHocVectors.BestViaRoot()
-    val store = KeyRingCertificateStore(v.publicKeyRingCollection)
+    val store = KeyRingCertificateStore(listOf(v.publicKeyRingCollection))
     val trustRoots = setOf(TrustRoot(v.aliceFingerprint))
     val certAuthority =
         CertificateAuthorityImpl.webOfTrustFromCertificateStore(
@@ -40,7 +40,7 @@ class CertificateAuthorityImplTest {
                 false,
                 Date(),
                 120)
-        assertTrue { authenticity.isAuthenticated }
+        assertTrue { authenticity.authenticated }
         assertEquals(v.targetFingerprint, Fingerprint(authenticity.certificate))
         assertEquals(
             listOf(v.aliceFingerprint, v.bobFingerprint, v.carolFingerprint, v.targetFingerprint),
@@ -58,7 +58,7 @@ class CertificateAuthorityImplTest {
                 false,
                 Date(),
                 120)
-        assertFalse { authenticity.isAuthenticated }
+        assertFalse { authenticity.authenticated }
     }
 
     @Test
@@ -95,7 +95,7 @@ class CertificateAuthorityImplTest {
         assertEquals(msg, plaintext.toString())
     }
 
-    fun Fingerprint(publicKeyRing: PGPPublicKeyRing): Identifier {
+    fun Fingerprint(publicKeyRing: OpenPGPCertificate): Identifier {
         return Identifier(OpenPgpFingerprint.of(publicKeyRing).toString())
     }
 }

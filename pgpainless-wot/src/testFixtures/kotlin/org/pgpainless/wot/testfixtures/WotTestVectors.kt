@@ -7,8 +7,8 @@ package org.pgpainless.wot.testfixtures
 import java.io.IOException
 import java.io.InputStream
 import org.bouncycastle.openpgp.PGPException
-import org.bouncycastle.openpgp.PGPPublicKeyRing
-import org.bouncycastle.openpgp.PGPSecretKeyRing
+import org.bouncycastle.openpgp.api.OpenPGPCertificate
+import org.bouncycastle.openpgp.api.OpenPGPKey
 import org.pgpainless.PGPainless
 import org.pgpainless.algorithm.Trustworthiness
 import org.pgpainless.key.protection.SecretKeyRingProtector
@@ -26,14 +26,16 @@ class WotTestVectors {
         }
 
         @JvmStatic
-        val freshFooBankCaKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(getTestResource("test_vectors/freshly_generated/foobankCaKey.asc"))!!
+        val freshFooBankCaKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(getTestResource("test_vectors/freshly_generated/foobankCaKey.asc"))!!
 
         @JvmStatic
-        val freshFooBankCaCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshFooBankCaCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/foobankCaCert.asc"))!!
 
         @JvmStatic val fooBankCaPassphrase = "superS3cureP4ssphrase"
@@ -43,15 +45,17 @@ class WotTestVectors {
             SecretKeyRingProtector.unlockAnyKeyWith(Passphrase.fromPassword(fooBankCaPassphrase))
 
         @JvmStatic
-        val freshFooBankEmployeeKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(
+        val freshFooBankEmployeeKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(
                     getTestResource("test_vectors/freshly_generated/foobankEmployeeKey.asc"))!!
 
         @JvmStatic
-        val freshFooBankEmployeeCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshFooBankEmployeeCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/foobankEmployeeCert.asc"))!!
 
         @JvmStatic val fooBankEmployeePassphrase = "iLoveWorking@FooBank"
@@ -62,15 +66,16 @@ class WotTestVectors {
                 Passphrase.fromPassword(fooBankEmployeePassphrase))
 
         @JvmStatic
-        val freshFooBankAdminKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(
-                    getTestResource("test_vectors/freshly_generated/foobankAdminKey.asc"))!!
+        val freshFooBankAdminKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(getTestResource("test_vectors/freshly_generated/foobankAdminKey.asc"))!!
 
         @JvmStatic
-        val freshFooBankAdminCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshFooBankAdminCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/foobankAdminCert.asc"))!!
 
         @JvmStatic val fooBankAdminPassphrase = "keepFooBankSecure"
@@ -80,15 +85,17 @@ class WotTestVectors {
             SecretKeyRingProtector.unlockAnyKeyWith(Passphrase.fromPassword(fooBankAdminPassphrase))
 
         @JvmStatic
-        val freshFooBankCustomerKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(
+        val freshFooBankCustomerKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(
                     getTestResource("test_vectors/freshly_generated/foobankCustomerKey.asc"))!!
 
         @JvmStatic
-        val freshFooBankCustomerCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshFooBankCustomerCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/foobankCustomerCert.asc"))!!
 
         @JvmStatic
@@ -96,71 +103,82 @@ class WotTestVectors {
             SecretKeyRingProtector.unprotectedKeys()
 
         @JvmStatic
-        val freshBarBankCaKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(getTestResource("test_vectors/freshly_generated/barbankCaKey.asc"))!!
+        val freshBarBankCaKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(getTestResource("test_vectors/freshly_generated/barbankCaKey.asc"))!!
 
         @JvmStatic
-        val freshBarBankCaCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshBarBankCaCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/barbankCaCert.asc"))!!
 
         @JvmStatic
         val barBankCaProtector: SecretKeyRingProtector = SecretKeyRingProtector.unprotectedKeys()
 
         @JvmStatic
-        val freshBarBankEmployeeKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(
+        val freshBarBankEmployeeKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(
                     getTestResource("test_vectors/freshly_generated/barbankEmployeeKey.asc"))!!
 
         @JvmStatic
-        val freshBarBankEmployeeCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshBarBankEmployeeCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/barbankEmployeeCert.asc"))!!
 
         @JvmStatic
-        val freshFakeFooBankEmployeeKey: PGPSecretKeyRing =
-            PGPainless.readKeyRing()
-                .secretKeyRing(
+        val freshFakeFooBankEmployeeKey: OpenPGPKey =
+            PGPainless.getInstance()
+                .readKey()
+                .parseKey(
                     getTestResource("test_vectors/freshly_generated/fakeFoobankEmployeeKey.asc"))!!
 
         @JvmStatic
-        val freshFakeFooBankEmployeeCert: PGPPublicKeyRing =
-            PGPainless.readKeyRing()
-                .publicKeyRing(
+        val freshFakeFooBankEmployeeCert: OpenPGPCertificate =
+            PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(
                     getTestResource("test_vectors/freshly_generated/fakeFoobankEmployeeCert.asc"))!!
 
         @Throws(IOException::class)
-        fun getCrossSignedBarBankCaCert(): PGPPublicKeyRing? {
-            return PGPainless.readKeyRing()
-                .publicKeyRing(getTestResource("cross_signed/barbankCaCert.asc"))
+        fun getCrossSignedBarBankCaCert(): OpenPGPCertificate {
+            return PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(getTestResource("cross_signed/barbankCaCert.asc"))
         }
 
         @Throws(IOException::class)
-        fun getCrossSignedBarBankEmployeeCert(): PGPPublicKeyRing? {
-            return PGPainless.readKeyRing()
-                .publicKeyRing(getTestResource("cross_signed/barbankEmployeeCert.asc"))
+        fun getCrossSignedBarBankEmployeeCert(): OpenPGPCertificate {
+            return PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(getTestResource("cross_signed/barbankEmployeeCert.asc"))
         }
 
         @Throws(IOException::class)
-        fun getCrossSignedFooBankAdminCert(): PGPPublicKeyRing? {
-            return PGPainless.readKeyRing()
-                .publicKeyRing(getTestResource("cross_signed/foobankAdminCert.asc"))
+        fun getCrossSignedFooBankAdminCert(): OpenPGPCertificate {
+            return PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(getTestResource("cross_signed/foobankAdminCert.asc"))
         }
 
         @Throws(IOException::class)
-        fun getCrossSignedFooBankCaCert(): PGPPublicKeyRing? {
-            return PGPainless.readKeyRing()
-                .publicKeyRing(getTestResource("cross_signed/foobankCaCert.asc"))
+        fun getCrossSignedFooBankCaCert(): OpenPGPCertificate {
+            return PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(getTestResource("cross_signed/foobankCaCert.asc"))
         }
 
         @Throws(IOException::class)
-        fun getCrossSignedFooBankEmployeeCert(): PGPPublicKeyRing? {
-            return PGPainless.readKeyRing()
-                .publicKeyRing(getTestResource("cross_signed/foobankEmployeeCert.asc"))
+        fun getCrossSignedFooBankEmployeeCert(): OpenPGPCertificate {
+            return PGPainless.getInstance()
+                .readKey()
+                .parseCertificate(getTestResource("cross_signed/foobankEmployeeCert.asc"))
         }
 
         // Generate cross signed test vectors from freshly generated
@@ -171,8 +189,9 @@ class WotTestVectors {
 
             // Foo CA signs Foo Employee
             val caCertifiedFooBankEmployeeCert =
-                PGPainless.certify()
-                    .userIdOnCertificate(
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .certifyUserId(
                         "Foo Bank Employee <employee@foobank.com>", freshFooBankEmployeeCert)
                     .withKey(freshFooBankCaKey, fooBankCaProtector)
                     .buildWithSubpackets(
@@ -188,9 +207,9 @@ class WotTestVectors {
 
             // Foo CA signs Foo Admin
             val caCertifiedFooBankAdminCert =
-                PGPainless.certify()
-                    .userIdOnCertificate(
-                        "Foo Bank Admin <admin@foobank.com>", freshFooBankAdminCert)
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .certifyUserId("Foo Bank Admin <admin@foobank.com>", freshFooBankAdminCert)
                     .withKey(freshFooBankCaKey, fooBankCaProtector)
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -205,8 +224,9 @@ class WotTestVectors {
 
             // Foo Employee delegates trust to Foo CA
             val employeeDelegatedCaCert =
-                PGPainless.certify()
-                    .certificate(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .delegateTrust(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
                     .withKey(freshFooBankEmployeeKey, fooBankEmployeeProtector)
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -220,8 +240,9 @@ class WotTestVectors {
 
             // Foo Admin delegates trust to Foo CA
             val adminDelegatedCaCert =
-                PGPainless.certify()
-                    .certificate(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .delegateTrust(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
                     .withKey(freshFooBankAdminKey, fooBankAdminProtector)
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -235,8 +256,9 @@ class WotTestVectors {
 
             // Customer delegates trust to Foo CA
             val customerDelegatedCaCert =
-                PGPainless.certify()
-                    .certificate(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .delegateTrust(freshFooBankCaCert, Trustworthiness.fullyTrusted().introducer())
                     .withKey(freshFooBankCustomerKey, SecretKeyRingProtector.unprotectedKeys())
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -247,13 +269,17 @@ class WotTestVectors {
                             }
                         })
                     .certifiedCertificate
-            var mergedFooCa = PGPPublicKeyRing.join(employeeDelegatedCaCert, adminDelegatedCaCert)
-            mergedFooCa = PGPPublicKeyRing.join(mergedFooCa, customerDelegatedCaCert)
+            var mergedFooCa =
+                PGPainless.getInstance()
+                    .mergeCertificate(employeeDelegatedCaCert, adminDelegatedCaCert)
+            mergedFooCa =
+                PGPainless.getInstance().mergeCertificate(mergedFooCa, customerDelegatedCaCert)
 
             // Foo Admin delegates trust to Bar CA
             val fooAdminDelegatedBarCa =
-                PGPainless.certify()
-                    .certificate(freshBarBankCaCert, Trustworthiness.fullyTrusted().introducer())
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .delegateTrust(freshBarBankCaCert, Trustworthiness.fullyTrusted().introducer())
                     .withKey(freshFooBankAdminKey, fooBankAdminProtector)
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -267,8 +293,9 @@ class WotTestVectors {
 
             // Bar Employee delegates Bar CA
             val barEmployeeDelegatesBarCa =
-                PGPainless.certify()
-                    .certificate(freshBarBankCaCert, Trustworthiness.fullyTrusted().introducer())
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .delegateTrust(freshBarBankCaCert, Trustworthiness.fullyTrusted().introducer())
                     .withKey(freshBarBankEmployeeKey, SecretKeyRingProtector.unprotectedKeys())
                     .buildWithSubpackets(
                         object : CertificationSubpackets.Callback {
@@ -280,12 +307,14 @@ class WotTestVectors {
                         })
                     .certifiedCertificate
             val mergedBarCa =
-                PGPPublicKeyRing.join(fooAdminDelegatedBarCa, barEmployeeDelegatesBarCa)
+                PGPainless.getInstance()
+                    .mergeCertificate(fooAdminDelegatedBarCa, barEmployeeDelegatesBarCa)
 
             // Bar CA signs Bar Employee
             val barCaCertifiedEmployeeCert =
-                PGPainless.certify()
-                    .userIdOnCertificate(
+                PGPainless.getInstance()
+                    .generateCertification()
+                    .certifyUserId(
                         "Bar Bank Employee <employee@barbank.com>", freshBarBankEmployeeCert)
                     .withKey(freshBarBankCaKey, SecretKeyRingProtector.unprotectedKeys())
                     .buildWithSubpackets(
